@@ -1,7 +1,7 @@
 ORG 0
 BITS 16
 
-jmp 0x7c00:start
+jmp 0x7c0:start
 
 start:
     cli
