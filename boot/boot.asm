@@ -1,9 +1,18 @@
 ORG 0
 BITS 16
 
-jmp 0x7c0:start
+; bios parameter block
+_start:
+    jmp short start
+    nop
 
+times 33 db 0
+
+; start of bootloader
 start:
+    jmp 0x7c0:step2
+
+step2:
     cli
     mov ax, 0x7c0       ; setup data segment
     mov ds, ax
