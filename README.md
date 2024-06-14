@@ -2,10 +2,11 @@
 A toy multi-threadded OS.
 
 ### Make
-From the room of the project, invoke the make build system
+From the root of the project, invoke the make build system
 
 ```shell
-make
+sudo chmod +x ./build.sh
+./build.sh
 ```
 
 ### Assembler
