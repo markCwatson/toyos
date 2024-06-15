@@ -1,4 +1,6 @@
 #include "kernel.h"
+#include "idt/idt.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -73,8 +75,14 @@ void print(const char* str)
     }
 }
 
+// \todo: remove this (for testing idt)
+extern void problem();
+
 void kernel_main()
 {
     terminal_initialize();
     print("Hello world!");
+
+    idt_init();
+    problem();
 }
