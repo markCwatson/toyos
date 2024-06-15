@@ -2,25 +2,18 @@
 A toy multi-threadded OS.
 
 ### Make
-From the root of the project, invoke the make build system
+From the root of the project, invoke the make build system (will need to make build script executable beforehand: `sudo chmod +x ./build.sh`)
 
 ```shell
-sudo chmod +x ./build.sh
+make clean
 ./build.sh
-```
-
-### Assembler
-`nasm` can be involked using 
-
-```shell
-nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
 ```
 
 ### Emulator
 `qemu` can be involked using
 
 ```shell
-qemu-system-x86_64 -hda ./bin/boot.bin
+qemu-system-x86_64 -hda ./bin/os.bin
 ```
 
 ### gdb
@@ -28,5 +21,5 @@ Attach gdb to the emulator
 
 ```shell
 $ gdb
-(gdb) target remote | qemu-system-x86_64 -hda ./bin/boot.bin -S -gdb stdio
+(gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio
 ```
