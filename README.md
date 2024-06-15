@@ -1,4 +1,4 @@
-## toyos
+# toyos
 A toy multi-threadded OS.
 
 ### Building
@@ -9,8 +9,12 @@ make clean
 ./build.sh
 ```
 
+<br />
+
 > [!NOTE] 
 > The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
+
+<br />
 
 ### Emulation (QEMU) and debugging (GDB)
 To run the kernel in the QEMU emulator without debugging, simply run
