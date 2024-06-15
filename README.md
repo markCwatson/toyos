@@ -1,8 +1,6 @@
 ## toyos
 A toy multi-threadded OS.
 
-<br />
-
 ### Building
 From the root of the project, invoke the make build system (will need to make build script executable beforehand: `sudo chmod +x ./build.sh`)
 
@@ -11,24 +9,43 @@ make clean
 ./build.sh
 ```
 
-<br />
-
 > [!NOTE] 
 > The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
 
-<br />
-
-### Emulator
-`qemu` can be involked using
+### Emulation (QEMU) and debugging (GDB)
+To run the kernel in the QEMU emulator without debugging, simply run
 
 ```shell
 qemu-system-x86_64 -hda ./bin/os.bin
 ```
 
-### gdb
-Attach gdb to the emulator
+To debug with GDB, first start GDB
 
 ```shell
 $ gdb
-(gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio
+```
+
+Next, manually load symbol file at the specified address for debugging (because the emulator does not load symbol information from `os.bin` automatically).
+
+
+```shell
+(gdb) add-symbol-file "./build/kernelfull.o" 0x100000
+```
+
+Connect to the QEMU instance with GDB
+
+```shell
+(gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio -S
+```
+
+Confirm `kernel_main` is being called.
+
+```shell
+(gdb) break kernel_main
+```
+
+Step through the code using 
+
+```shell
+(gdb) stepi
 ```
