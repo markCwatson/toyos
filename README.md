@@ -14,7 +14,7 @@ make clean
 <br />
 
 > [!NOTE] 
-> The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom build to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
+> The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
 
 <br />
 
