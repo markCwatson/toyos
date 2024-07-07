@@ -84,5 +84,5 @@ void kernel_main()
     print("Hello world!");
 
     idt_init();
-    problem();
+    //problem();
 }

@@ -33,6 +33,7 @@ _start:
     out 0x21, al
 
     ; call kernel main
+    sti
     call kernel_main
     jmp $
 
