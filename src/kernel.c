@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "idt/idt.h"
+#include "memory/heap/kheap.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -81,8 +82,20 @@ extern void problem();
 void kernel_main()
 {
     terminal_initialize();
-    print("Hello world!");
+    print("Terminal initialized!\n");
 
+    kheap_init();
     idt_init();
-    //problem();
+
+    // testing heap
+    void* ptr = kmalloc(500);
+    void* ptr2 = kmalloc(6000);
+    if (ptr == 0 || ptr2 == 0) {
+        problem();
+    }
+
+    kfree(ptr);
+    kfree(ptr2);
+
+    print("\nGood bye!");
 }

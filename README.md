@@ -36,10 +36,16 @@ Next, manually load symbol file at the specified address for debugging (because 
 (gdb) add-symbol-file "./build/kernelfull.o" 0x100000
 ```
 
-Connect to the QEMU instance with GDB
+Connect to the 64-bit QEMU instance with GDB
 
 ```shell
 (gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio -S
+```
+
+or thr 32-bit VM using
+
+```shell
+target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
 ```
 
 Confirm `kernel_main` is being called.
