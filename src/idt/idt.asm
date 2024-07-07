@@ -6,6 +6,16 @@ extern no_int_handler
 global idt_load
 global int21h
 global no_int
+global enable_int
+global disable_int
+
+enable_int:
+    sti
+    ret
+
+disable_int:
+    cli
+    ret
 
 idt_load:
     push ebp

@@ -86,6 +86,7 @@ void kernel_main()
 
     kheap_init();
     idt_init();
+    enable_int();
 
     // testing heap
     void* ptr = kmalloc(500);

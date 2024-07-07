@@ -41,5 +41,8 @@ struct interrupt_frame
 } __attribute__((packed));
 
 void idt_init();
+void enable_int();
+void disable_int();
+
 
 #endif
