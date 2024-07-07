@@ -14,7 +14,7 @@ static int heap_validate_table(void* ptr, void* end, struct heap_table* table)
         return -EINVARG;
     }
 
-    return 0;
+    return ALL_GOOD;
 }
 
 static bool heap_validate_alignment(void* ptr)
@@ -42,7 +42,7 @@ int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* tabl
     size_t table_size = sizeof(heap_block_table_entry) * table->total;
     memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
 
-    return 0;
+    return ALL_GOOD;
 }
 
 static uint32_t heap_align_value_to_upper(uint32_t val)

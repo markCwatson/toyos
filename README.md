@@ -42,7 +42,7 @@ Connect to the 64-bit QEMU instance with GDB
 (gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio -S
 ```
 
-or thr 32-bit VM using
+or the 32-bit VM using
 
 ```shell
 target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
