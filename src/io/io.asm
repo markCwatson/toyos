@@ -48,5 +48,3 @@ outw:
 
     pop ebp
     ret
-
-    

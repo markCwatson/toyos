@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "io.h": "c",
+        "memory.h": "c",
+        "status.h": "c"
+    }
+}

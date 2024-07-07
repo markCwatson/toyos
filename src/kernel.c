@@ -2,6 +2,7 @@
 #include "idt/idt.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "disk/disk.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -77,9 +78,6 @@ void print(const char* str)
     }
 }
 
-// \todo: remove this (for testing idt)
-extern void problem();
-
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
 void kernel_main()
@@ -88,38 +86,14 @@ void kernel_main()
     print("Terminal initialized!\n");
 
     kheap_init();
+    disk_search_and_init();
     idt_init();
 
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(kernel_chunk);
-
-    // test paging:
-    // 1. get block of heap
-    char *ptr = kzalloc(4096);
-    // 2. set 0x1000 to point to physical memory ptr (0x1000 -> ptr1)
-    paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void *)0x1000, ((uint32_t)ptr | PAGING_ACCESS_FROM_ALL | PAGING_IS_PRESENT | PAGING_IS_WRITEABLE));
-
     enable_paging();
 
-    // 3. ptr2 points to virtual memory 0x1000 which is mapped to physical address ptr
-    char *ptr2 = (char *)0x1000;
-    // 4. this should also affect ptr since 0x1000 is mapped to ptr
-    ptr2[0] = 'A';
-    ptr2[1] = 'B';
-    print(ptr2);
-    print(ptr);
-
     enable_int();
-
-    // testing heap
-    void* ptr3 = kmalloc(500);
-    void* ptr4 = kmalloc(6000);
-    if (ptr3 == 0 || ptr4 == 0) {
-        problem();
-    }
-
-    kfree(ptr3);
-    kfree(ptr4);
 
     print("\nGood bye!");
 }

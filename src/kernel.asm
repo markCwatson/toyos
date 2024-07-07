@@ -3,9 +3,6 @@
 extern kernel_main
 global _start
 
-; \todo: remove this (for testing idt)
-global problem
-
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
 
@@ -35,10 +32,5 @@ _start:
     ; call kernel main
     call kernel_main
     jmp $
-
-; \todo: remove this (for testing idt)
-problem:
-    mov eax, 0
-    div eax
 
 times 512-($ - $$) db 0
