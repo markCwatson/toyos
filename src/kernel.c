@@ -3,6 +3,7 @@
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "string/string.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -53,19 +54,6 @@ void terminal_initialize()
             terminal_putchar(x, y, ' ', 0);
         }
     }   
-}
-
-int strlen(const char* ptr)
-{
-    int i = 0;
-    
-    while(*ptr != 0)
-    {
-        i++;
-        ptr += 1;
-    }
-
-    return i;
 }
 
 void print(const char* str)
