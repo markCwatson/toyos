@@ -14,7 +14,7 @@ static int path_parser_path_valid_format(const char* filename)
 
 static int path_parser_get_drive_by_path(const char** path)
 {
-    if(!path_parser_path_valid_format(*path))
+    if (!path_parser_path_valid_format(*path))
     {
         return -EBADPATH;
     }
@@ -46,7 +46,7 @@ static const char* path_parser_get_path_part(const char** path)
         return NULL;
     }
 
-    while(**path != '/' && **path != 0x00)
+    while (**path != '/' && **path != 0x00)
     {
         result_path_part[i] = **path;
         *path += 1;
@@ -59,7 +59,7 @@ static const char* path_parser_get_path_part(const char** path)
         *path += 1;
     }
 
-    if(i == 0)
+    if (i == 0)
     {
         kfree(result_path_part);
         result_path_part = 0;
@@ -68,6 +68,9 @@ static const char* path_parser_get_path_part(const char** path)
     return result_path_part;
 }
 
+/*
+ * @attention this function modifies the path pointer
+*/
 struct path_part* path_parser_parse_path_part(struct path_part* last_part, const char** path)
 {
     const char* path_part_str = path_parser_get_path_part(path);
@@ -97,7 +100,7 @@ void path_parser_free(struct path_root* root)
 {
     struct path_part* part = root->first;
 
-    while(part)
+    while (part)
     {
         struct path_part* next_part = part->next;
         kfree((void*) part->part);
@@ -140,7 +143,7 @@ struct path_root* path_parser_parse(const char* path, const char* current_direct
 
     path_root->first = first_part;
     struct path_part* part = path_parser_parse_path_part(first_part, &tmp_path);
-    while(part)
+    while (part)
     {
         part = path_parser_parse_path_part(part, &tmp_path);
     }
