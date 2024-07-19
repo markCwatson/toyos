@@ -17,7 +17,7 @@ void kheap_init()
     int res = heap_create(&kernel_heap, (void*)(TOYOS_HEAP_ADDRESS), end, &kernel_heap_table);
     if (res < 0)
     {
-        print("Failed to create heap\n");
+        printk("Failed to create heap\n");
     }
 }
 

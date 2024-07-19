@@ -19,7 +19,7 @@ void no_int_handler()
 
 void int21h_handler()
 {
-    print("\nKeyboard pressed\n");
+    printk("\nKeyboard pressed\n");
 
     // ack interrupt
     outb(0x20, 0x20);
@@ -27,7 +27,7 @@ void int21h_handler()
 
 void idt_zero()
 {
-    print("\nDivide by zero error!\n");
+    printk("\nDivide by zero error!\n");
 }
 
 void idt_set(int interrupt_no, void* address)
