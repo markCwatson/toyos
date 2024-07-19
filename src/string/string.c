@@ -4,7 +4,7 @@ int strlen(const char* ptr)
 {
     int i = 0;
     
-    while(*ptr != 0)
+    while (*ptr != 0)
     {
         i++;
         ptr += 1;
@@ -18,7 +18,8 @@ int strnlen(const char* ptr, int max)
     int i = 0;
     for (i = 0; i < max; i++)
     {
-        if (ptr[i] == 0) {
+        if (ptr[i] == 0)
+        {
             break;
         }
     }
