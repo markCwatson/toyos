@@ -19,27 +19,32 @@ static int path_parser_get_drive_by_path(const char** path)
         return -EBADPATH;
     }
 
-    int drive_no = c_to_i(*path[0]);
-
-    // Add 3 bytes to skip drive number 0:/ 1:/ 2:/
-    *path += 3;
-    return drive_no;
+    return c_to_i(*path[0]);
 }
 
 static struct path_root* path_parser_create_root(int drive_number)
 {
     struct path_root* path_r = kzalloc(sizeof(struct path_root));
+    if (!path_r)
+    {
+        return NULL;
+    }
 
     path_r->drive_no = drive_number;
-    path_r->first = 0;
+    path_r->first = NULL;
 
     return path_r;
 }
 
 static const char* path_parser_get_path_part(const char** path)
 {
-    char* result_path_part = kzalloc(TOYOS_MAX_PATH);
     int i = 0;
+
+    char* result_path_part = kzalloc(TOYOS_MAX_PATH);
+    if (!result_path_part)
+    {
+        return NULL;
+    }
 
     while(**path != '/' && **path != 0x00)
     {
@@ -68,12 +73,17 @@ struct path_part* path_parser_parse_path_part(struct path_part* last_part, const
     const char* path_part_str = path_parser_get_path_part(path);
     if (!path_part_str)
     {
-        return 0;
+        return NULL;
     }
 
     struct path_part* part = kzalloc(sizeof(struct path_part));
+    if (!part)
+    {
+        return NULL;
+    }
+
     part->part = path_part_str;
-    part->next = 0x00;
+    part->next = NULL;
 
     if (last_part)
     {
@@ -100,27 +110,28 @@ void path_parser_free(struct path_root* root)
 
 struct path_root* path_parser_parse(const char* path, const char* current_directory_path)
 {
-    int res = 0;
     const char* tmp_path = path;
-    struct path_root* path_root = 0;
+    struct path_root* path_root = NULL;
 
     if (strlen(path) > TOYOS_MAX_PATH)
     {
         goto out;
     }
 
-    res = path_parser_get_drive_by_path(&tmp_path);
-    if (res < 0)
+    int drive_no = path_parser_get_drive_by_path(&tmp_path);
+    if (drive_no < 0)
     {
         goto out;
     }
 
-    path_root = path_parser_create_root(res);
+    path_root = path_parser_create_root(drive_no);
     if (!path_root)
     {
         goto out;
     }
 
+    // Add 3 bytes to skip drive number 0:/ 1:/ 2:/
+    tmp_path += 3;
     struct path_part* first_part = path_parser_parse_path_part(NULL, &tmp_path);
     if (!first_part)
     {

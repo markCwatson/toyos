@@ -121,7 +121,7 @@ void heap_mark_blocks_taken(struct heap* heap, int start_block, int total_blocks
 
 void* heap_malloc_blocks(struct heap* heap, uint32_t total_blocks)
 {
-    void* address = 0;
+    void* address = NULL;
 
     int start_block = heap_get_start_block(heap, total_blocks);
     if (start_block < 0)
@@ -130,6 +130,10 @@ void* heap_malloc_blocks(struct heap* heap, uint32_t total_blocks)
     }
 
     address = heap_block_to_address(heap, start_block);
+    if (!address)
+    {
+        goto out;
+    }
 
     // Mark the blocks as taken
     heap_mark_blocks_taken(heap, start_block, total_blocks);

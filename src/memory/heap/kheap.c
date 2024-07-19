@@ -30,7 +30,7 @@ void* kzalloc(size_t size)
 {
     void* ptr = kmalloc(size);
     if (!ptr) {
-        return 0;
+        return NULL;
     }
 
     memset(ptr, 0x00, size);
