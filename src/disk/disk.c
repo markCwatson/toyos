@@ -4,9 +4,9 @@
 #include "status.h"
 #include "memory/memory.h"
 
-struct disk disk;
+static struct disk disk;
 
-int disk_read_sector(int lba, int total, void* buf)
+static int disk_read_sector(int lba, int total, void* buf)
 {
     outb(0x1f6, (lba >> 24) | 0xe0);
     outb(0x1f2, total);
@@ -38,7 +38,7 @@ int disk_read_sector(int lba, int total, void* buf)
     return ALL_GOOD;
 }
 
-void disk_search_and_init()
+void disk_search_and_init(void)
 {
     memset(&disk, 0, sizeof(disk));
     disk.type = DISK_TYPE_REAL;
@@ -49,7 +49,7 @@ struct disk* disk_get(int index)
 {
     if (index != 0)
     {
-        return 0;
+        return NULL;
     }
     
     return &disk;
