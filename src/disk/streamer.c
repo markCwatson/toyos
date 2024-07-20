@@ -12,6 +12,10 @@ struct disk_stream* streamer_new(int disk_id)
     }
 
     struct disk_stream* streamer = kzalloc(sizeof(struct disk_stream));
+    if (!streamer) {
+        return NULL;
+    }
+    
     streamer->pos = 0;
     streamer->disk = disk;
 
