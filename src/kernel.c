@@ -5,6 +5,7 @@
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
 #include "string/string.h"
+#include "disk/streamer.h"
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
@@ -32,6 +33,13 @@ void kernel_main()
     enable_paging();
 
     enable_int();
+
+    struct disk_stream *stream = streamer_new(0);
+    streamer_seek(stream, 0x201);
+    unsigned char c = 0;
+    streamer_read(stream, &c, 1);
+
+    while (1);
 
     printk("\nGood bye!");
 }
