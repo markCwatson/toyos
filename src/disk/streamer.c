@@ -1,6 +1,7 @@
 #include "streamer.h"
 #include "memory/heap/kheap.h"
 #include "config.h"
+#include "status.h"
 #include <stdbool.h>
 
 struct disk_stream* streamer_new(int disk_id)
@@ -12,10 +13,11 @@ struct disk_stream* streamer_new(int disk_id)
     }
 
     struct disk_stream* streamer = kzalloc(sizeof(struct disk_stream));
-    if (!streamer) {
+    if (!streamer)
+    {
         return NULL;
     }
-    
+
     streamer->pos = 0;
     streamer->disk = disk;
 
@@ -24,12 +26,23 @@ struct disk_stream* streamer_new(int disk_id)
 
 int streamer_seek(struct disk_stream* stream, int pos)
 {
+    if (!stream || pos < 0)
+    {
+        return -EINVARG;
+    }
+
     stream->pos = pos;
+    
     return 0;
 }
 
 int streamer_read(struct disk_stream* stream, void* out, int total)
 {
+    if (!stream || !out || total < 0)
+    {
+        return -EINVARG;
+    }
+
     int sector = stream->pos / TOYOS_SECTOR_SIZE;
     int offset = stream->pos % TOYOS_SECTOR_SIZE;
     int total_to_read = total;
