@@ -6,7 +6,17 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
-	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
+	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
+
+	# create then copy file (test.txt) from linux (in /mnt/d) to toyos fat16 file system
+	sudo mkdir /mnt/d
+	sudo mount -t vfat ./bin/os.bin /mnt/d
+	touch test.txt
+	echo "i am in toyos file system!" > test.txt
+	sudo cp test.txt /mnt/d
+	sudo umount /mnt/d
+	sudo rm -rf /mnt/d
+	rm -f test.txt
 
 ./bin/kernel.bin: $(FILES)
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
