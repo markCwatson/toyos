@@ -6,6 +6,7 @@
         "string.h": "c",
         "kernel.h": "c",
         "kheap.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "streamer.h": "c"
     }
 }

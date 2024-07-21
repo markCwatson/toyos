@@ -16,6 +16,9 @@ struct disk
     
     // filesystem binded to disk
     struct filesystem* fs;
+
+    // private data of filesystem
+    void* fs_private;
 };
 
 int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf);
