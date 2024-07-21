@@ -17,5 +17,6 @@
 
 #define TOYOS_MAX_FILESYSTEMS       12
 #define TOYOS_MAX_FILE_DESCRIPTORS  512
+#define TOYOS_MAX_PATH              108
 
 #endif

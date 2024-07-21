@@ -35,5 +35,15 @@ void kernel_main() {
 
     enable_int();
 
+    int fd = fopen("0:/test.txt", "r");
+    if (fd) {
+        printk("File opened!\n");
+    }
+
+    int fd2 = fopen("0:/test2.txt", "r");
+    if (fd2 == 0) {
+        printk("File not found!\n");
+    }
+
     while (1);
 }

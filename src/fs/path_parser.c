@@ -1,5 +1,6 @@
 #include "path_parser.h"
 #include "kernel.h"
+#include "config.h"
 #include "string/string.h"
 #include "memory/heap/kheap.h"
 #include "memory/memory.h"

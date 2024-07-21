@@ -7,6 +7,7 @@
         "kernel.h": "c",
         "kheap.h": "c",
         "stddef.h": "c",
-        "streamer.h": "c"
+        "streamer.h": "c",
+        "config.h": "c"
     }
 }
