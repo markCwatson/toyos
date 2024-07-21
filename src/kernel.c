@@ -38,12 +38,13 @@ void kernel_main() {
     int fd = fopen("0:/test.txt", "r");
     if (fd) {
         printk("File opened!\n");
+        char buf[27];
+        fread(buf, 26, 1, fd);
+        buf[27] = '\0';
+        printk(buf);
     }
 
-    int fd2 = fopen("0:/test2.txt", "r");
-    if (fd2 == 0) {
-        printk("File not found!\n");
-    }
+    printk("\nKernel initialized!\n");
 
     while (1);
 }
