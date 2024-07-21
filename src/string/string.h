@@ -7,5 +7,6 @@ int strlen(const char* ptr);
 int c_to_i(char c);
 bool is_digit(char c);
 int strnlen(const char* ptr, int max);
+char* strcpy(char* dest, const char* src);
 
 #endif

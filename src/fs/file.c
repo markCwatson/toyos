@@ -1,10 +1,10 @@
 #include "file.h"
+#include "fat/fat16.h"
 #include "config.h"
 #include "kernel.h"
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "status.h"
-#include <stddef.h>
 
 struct filesystem* filesystems[TOYOS_MAX_FILESYSTEMS] = { NULL };
 struct file_descriptor* file_descriptors[TOYOS_MAX_FILE_DESCRIPTORS] = { NULL };
@@ -38,7 +38,7 @@ void fs_insert_filesystem(struct filesystem* filesystem)
 
 static void fs_static_load(void)
 {
-    // fs_insert_filesystem(fat16_init());
+    fs_insert_filesystem(fat16_init());
 }
 
 void fs_load(void)
@@ -93,7 +93,7 @@ struct filesystem* fs_resolve(struct disk* disk)
 {
     for (int i = 0; i < TOYOS_MAX_FILESYSTEMS; i++)
     {
-        if (filesystems[i] != NULL && filesystems[i]->resolve(disk) == 0)
+        if (filesystems[i] != NULL && filesystems[i]->resolve(disk) == ALL_GOOD)
         {
             return filesystems[i];
         }

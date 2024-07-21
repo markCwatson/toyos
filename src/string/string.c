@@ -1,5 +1,22 @@
 #include "string.h"
 
+char* strcpy(char* dest, const char* src)
+{
+    char* res = dest;
+
+    while (*src != 0)
+    {
+        *dest = *src;
+        src += 1;
+        dest += 1;
+    }
+
+    // null terminator
+    *dest = 0x00;
+
+    return res;
+}
+
 int strlen(const char* ptr)
 {
     int i = 0;
