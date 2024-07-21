@@ -3,7 +3,11 @@
 
 #define TOYOS_MAX_PATH 108
 
-void kernel_main();
+#define ERROR(value)    ((void*)(value))
+#define ISERROR(value)  (((int)(value)) < 0)
+#define ERROR_I(value)  ((int)(value))
+
+void kernel_main(void);
 void printk(const char* str);
 
 #endif
