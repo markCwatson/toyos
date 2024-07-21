@@ -127,12 +127,14 @@ int fat16_resolve(struct disk* disk);
 void* fat16_open(struct disk* disk, struct path_part* path, file_mode mode);
 int fat16_read(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* out);
 int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode);
+int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat);
 
 struct filesystem fat16_fs = {
     .resolve = fat16_resolve,
     .open = fat16_open,
     .read = fat16_read,
-    .seek = fat16_seek
+    .seek = fat16_seek,
+    .stat = fat16_stat,
 };
 
 struct filesystem* fat16_init(void) {
@@ -667,6 +669,32 @@ int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode) {
             break;
         default:
             return -EINVARG;
+    }
+
+    return ALL_GOOD;
+}
+
+int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat) {
+    if (!stat || !private_data || !disk) {
+        return -EINVARG;
+    }
+
+    struct fat_file_descriptor* descriptor = private_data;
+    struct fat_item* item = descriptor->item;
+    if (!item) {
+        return -EINVARG;
+    }
+
+    if (item->type == FAT_ITEM_TYPE_DIRECTORY) {
+        return -EINVARG;
+    }
+
+    struct fat_directory_item* dir_item = item->item;
+    stat->filesize = dir_item->filesize;
+    stat->flags = 0;
+
+    if (dir_item->attribute & FAT_FILE_READ_ONLY) {
+        stat->flags |= FILE_STAT_READ_ONLY;
     }
 
     return ALL_GOOD;

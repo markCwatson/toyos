@@ -172,3 +172,16 @@ int fseek(int fd, int offset, file_seek_mode whence) {
 
     return desc->fs->seek(desc->private_data, offset, whence);
 }
+
+int fstat(int fd, struct file_stat* stat) {
+    if (fd < 0) {
+        return -EINVARG;
+    }
+
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if (!desc) {
+        return -EINVARG;
+    }
+
+    return desc->fs->stat(desc->disk, desc->private_data, stat);
+}

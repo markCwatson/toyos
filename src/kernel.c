@@ -18,7 +18,7 @@ void printk(const char* str) {
     }
 }
 
-void kernel_main() {
+void kernel_main(void) {
     terminal_init();
     printk("Terminal initialized!\n");
 
@@ -37,6 +37,8 @@ void kernel_main() {
 
     int fd = fopen("0:/test.txt", "r");
     if (fd) {
+        struct file_stat stat;
+        fstat(fd, &stat);
         printk("File opened!\n");
         char buf[27];
         fseek(fd, 2, SEEK_SET);
