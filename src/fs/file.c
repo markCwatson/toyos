@@ -185,3 +185,24 @@ int fstat(int fd, struct file_stat* stat) {
 
     return desc->fs->stat(desc->disk, desc->private_data, stat);
 }
+
+int fclose(int fd) {
+    if (fd < 0) {
+        return -EINVARG;
+    }
+
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if (!desc) {
+        return -EINVARG;
+    }
+
+    int res = desc->fs->close(desc->private_data);
+    if (res < 0) {
+        return res;
+    }
+
+    kfree(desc);
+    file_descriptors[fd - 1] = NULL;
+
+    return ALL_GOOD;
+}

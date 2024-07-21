@@ -45,6 +45,7 @@ void kernel_main(void) {
         fread(buf, 24, 1, fd);
         buf[27] = '\0';
         printk(buf);
+        fclose(fd);
     }
 
     printk("\nKernel initialized!\n");
