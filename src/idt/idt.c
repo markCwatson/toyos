@@ -11,27 +11,23 @@ extern void int21h(void);
 extern void no_int(void);
 extern void idt_load(struct idtr_desc* ptr);
 
-void no_int_handler()
-{
+void no_int_handler() {
     // ack interrupt
     outb(0x20, 0x20);
 }
 
-void int21h_handler()
-{
+void int21h_handler() {
     printk("\nKeyboard pressed\n");
 
     // ack interrupt
     outb(0x20, 0x20);
 }
 
-void idt_zero()
-{
+void idt_zero() {
     printk("\nDivide by zero error!\n");
 }
 
-void idt_set(int interrupt_no, void* address)
-{
+void idt_set(int interrupt_no, void* address) {
     struct idt_desc* desc = &idt_descriptors[interrupt_no];
     desc->offset_1 = (uint32_t)address & 0x0000ffff;
     desc->selector = KERNEL_CODE_SELECTOR;
@@ -40,14 +36,12 @@ void idt_set(int interrupt_no, void* address)
     desc->offset_2 = (uint32_t)address >> 16;
 }
 
-void idt_init()
-{
+void idt_init() {
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
     idtr_descriptor.base = (uint32_t)idt_descriptors;
 
-    for (int i = 0; i < TOYOS_TOTAL_INTERRUPTS; i++)
-    {
+    for (int i = 0; i < TOYOS_TOTAL_INTERRUPTS; i++) {
         idt_set(i, no_int);
     }
 

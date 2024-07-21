@@ -4,17 +4,14 @@
 #include "status.h"
 #include <stdbool.h>
 
-struct disk_stream* streamer_new(int disk_id)
-{
+struct disk_stream* streamer_new(int disk_id) {
     struct disk* disk = disk_get(disk_id);
-    if (!disk)
-    {
+    if (!disk) {
         return NULL;
     }
 
     struct disk_stream* streamer = kzalloc(sizeof(struct disk_stream));
-    if (!streamer)
-    {
+    if (!streamer) {
         return NULL;
     }
 
@@ -24,10 +21,8 @@ struct disk_stream* streamer_new(int disk_id)
     return streamer;
 }
 
-int streamer_seek(struct disk_stream* stream, int pos)
-{
-    if (!stream || pos < 0)
-    {
+int streamer_seek(struct disk_stream* stream, int pos) {
+    if (!stream || pos < 0) {
         return -EINVARG;
     }
 
@@ -36,10 +31,8 @@ int streamer_seek(struct disk_stream* stream, int pos)
     return 0;
 }
 
-int streamer_read(struct disk_stream* stream, void* out, int total)
-{
-    if (!stream || !out || total < 0)
-    {
+int streamer_read(struct disk_stream* stream, void* out, int total) {
+    if (!stream || !out || total < 0) {
         return -EINVARG;
     }
 
@@ -49,27 +42,23 @@ int streamer_read(struct disk_stream* stream, void* out, int total)
     bool overflow = (offset+total_to_read) >= TOYOS_SECTOR_SIZE;
     char buf[TOYOS_SECTOR_SIZE];
 
-    if (overflow)
-    {
+    if (overflow) {
         total_to_read -= (offset+total_to_read) - TOYOS_SECTOR_SIZE;
     }
 
     int res = disk_read_block(stream->disk, sector, 1, buf);
-    if (res < 0)
-    {
+    if (res < 0) {
         goto out;
     }
 
    
-    for (int i = 0; i < total_to_read; i++)
-    {
+    for (int i = 0; i < total_to_read; i++) {
         *(char*)out++ = buf[offset+i];
     }
 
     // Adjust the stream
     stream->pos += total_to_read;
-    if (overflow)
-    {
+    if (overflow) {
         res = streamer_read(stream, out, total - total_to_read);
     }
 
@@ -77,7 +66,6 @@ out:
     return res;
 }
 
-void streamer_close(struct disk_stream* stream)
-{
+void streamer_close(struct disk_stream* stream) {
     kfree(stream);
 }

@@ -10,18 +10,15 @@
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
-void printk(const char* str)
-{
+void printk(const char* str) {
     size_t len = strlen(str);
 
-    for (int i = 0; i < len; i++)
-    {
+    for (int i = 0; i < len; i++) {
         terminal_writechar(str[i], 15);
     }
 }
 
-void kernel_main()
-{
+void kernel_main() {
     terminal_init();
     printk("Terminal initialized!\n");
 

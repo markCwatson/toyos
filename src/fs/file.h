@@ -6,8 +6,7 @@
 
 typedef unsigned int file_seek_mode;
 
-enum
-{
+enum {
     SEEK_SET,
     SEEK_CUR,
     SEEK_END
@@ -15,8 +14,7 @@ enum
 
 typedef unsigned int file_mode;
 
-enum
-{ 
+enum { 
     FILE_MODE_READ,
     FILE_MODE_WRITE,
     FILE_MODE_APPEND,
@@ -25,16 +23,14 @@ enum
 
 typedef unsigned int file_stat_flags;
 
-enum
-{
+enum {
     FILE_STAT_READ_ONLY = 0b00000001
 };
 
 // forward declare struct disk
 struct disk;
 
-struct file_stat
-{
+struct file_stat {
     file_stat_flags flags;
     uint32_t filesize;
 };
@@ -47,8 +43,7 @@ typedef int (*fs_seek_fp)(void* private_data, uint32_t offset, file_seek_mode se
 typedef int (*fs_stat_fp)(struct disk* disk, void* private_data, struct file_stat* stat);
 
 // interface for a file system
-struct filesystem
-{
+struct filesystem {
     char name[20];
     // Filesystem should return zero from resolve if the provided disk is using its filesystem
     fs_resolve_fp resolve;
@@ -59,8 +54,7 @@ struct filesystem
     fs_close_fp close;
 };
 
-struct file_descriptor
-{
+struct file_descriptor {
     // The descriptor index
     int index;
     struct filesystem* fs;

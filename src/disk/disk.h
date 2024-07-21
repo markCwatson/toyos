@@ -8,8 +8,7 @@
 
 typedef unsigned int disk_type;
 
-struct disk
-{
+struct disk {
     disk_type type;
     int sector_size;
     int id;

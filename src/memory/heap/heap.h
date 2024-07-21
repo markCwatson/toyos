@@ -11,17 +11,14 @@
 #define HEAP_BLOCK_HAS_NEXT 0b10000000
 #define HEAP_BLOCK_IS_FIRST  0b01000000
 
-
 typedef unsigned char heap_block_table_entry;
 
-struct heap_table
-{
+struct heap_table {
     heap_block_table_entry* entries;
     size_t total;
 };
 
-struct heap
-{
+struct heap {
     struct heap_table* table;
 
     // Start address of the heap data pool

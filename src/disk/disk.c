@@ -6,10 +6,8 @@
 
 struct disk disk;
 
-static int disk_read_sector(int lba, int total, void* buf)
-{
-    if (!buf)
-    {
+static int disk_read_sector(int lba, int total, void* buf) {
+    if (!buf) {
         return -EINVARG;
     }
 
@@ -22,18 +20,15 @@ static int disk_read_sector(int lba, int total, void* buf)
 
     unsigned short* ptr = (unsigned short*)buf;
 
-    for (int i = 0; i < total; i++)
-    {
+    for (int i = 0; i < total; i++) {
         // Wait for the buffer to be ready
         char c = insb(0x1f7);
-        while(!(c & 0x08))
-        {
+        while(!(c & 0x08)) {
             c = insb(0x1f7);
         }
 
         // Copy from hard disk to memory
-        for (int j = 0; j < 256; j++)
-        {
+        for (int j = 0; j < 256; j++) {
             *ptr = insw(0x1f0);
             ptr++;
         }
@@ -43,8 +38,7 @@ static int disk_read_sector(int lba, int total, void* buf)
     return ALL_GOOD;
 }
 
-void disk_search_and_init(void)
-{
+void disk_search_and_init(void) {
     memset(&disk, 0, sizeof(disk));
     disk.id = 0;
     disk.type = DISK_TYPE_REAL;
@@ -52,20 +46,16 @@ void disk_search_and_init(void)
     disk.fs = fs_resolve(&disk);
 }
 
-struct disk* disk_get(int index)
-{
-    if (index != 0)
-    {
+struct disk* disk_get(int index) {
+    if (index != 0) {
         return NULL;
     }
     
     return &disk;
 }
 
-int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf)
-{
-    if (idisk != &disk)
-    {
+int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf) {
+    if (idisk != &disk) {
         return -EIO;
     }
 
