@@ -146,3 +146,16 @@ out:
 
     return res;
 }
+
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
+    if (size == 0 || nmemb == 0 || fd < 0) {
+        return -EINVARG;
+    }
+
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if (!desc) {
+        return -EINVARG;
+    }
+
+    return desc->fs->read(desc->disk, desc->private_data, size, nmemb, (char*)ptr);
+}
