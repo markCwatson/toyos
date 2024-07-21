@@ -39,7 +39,8 @@ void kernel_main() {
     if (fd) {
         printk("File opened!\n");
         char buf[27];
-        fread(buf, 26, 1, fd);
+        fseek(fd, 2, SEEK_SET);
+        fread(buf, 24, 1, fd);
         buf[27] = '\0';
         printk(buf);
     }
