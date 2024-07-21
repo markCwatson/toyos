@@ -5,6 +5,7 @@
         "status.h": "c",
         "string.h": "c",
         "kernel.h": "c",
-        "kheap.h": "c"
+        "kheap.h": "c",
+        "stddef.h": "c"
     }
 }

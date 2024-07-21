@@ -4,7 +4,7 @@
 #include "status.h"
 #include "memory/memory.h"
 
-static struct disk disk;
+struct disk disk;
 
 static int disk_read_sector(int lba, int total, void* buf)
 {
@@ -48,6 +48,7 @@ void disk_search_and_init(void)
     memset(&disk, 0, sizeof(disk));
     disk.type = DISK_TYPE_REAL;
     disk.sector_size = TOYOS_SECTOR_SIZE;
+    disk.fs = fs_resolve(&disk);
 }
 
 struct disk* disk_get(int index)

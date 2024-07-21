@@ -6,5 +6,6 @@
 #define ENOMEM      2
 #define EIO         3
 #define EBADPATH    4
+#define ENOFILEMEM  5
 
 #endif
