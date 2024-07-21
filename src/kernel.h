@@ -7,5 +7,6 @@
 
 void kernel_main(void);
 void printk(const char* str);
+void panick(const char* str);
 
 #endif

@@ -18,6 +18,11 @@ void printk(const char* str) {
     }
 }
 
+void panick(const char* str) {
+    printk(str);
+    while (1);
+}
+
 void kernel_main(void) {
     terminal_init();
     printk("Terminal initialized!\n");

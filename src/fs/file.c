@@ -24,9 +24,7 @@ static struct filesystem** fs_get_free_filesystem(void) {
 void fs_insert_filesystem(struct filesystem* filesystem) {
     struct filesystem** fs = fs_get_free_filesystem();
     if (!fs) {
-        // \todo: replace with panic
-        printk("Problem inserting filesystem"); 
-        while(1);
+        panick("Problem inserting filesystem"); 
     }
 
     // add to list of file systems

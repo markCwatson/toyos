@@ -8,6 +8,8 @@
         "kheap.h": "c",
         "stddef.h": "c",
         "streamer.h": "c",
-        "config.h": "c"
+        "config.h": "c",
+        "idt.h": "c",
+        "terminal.h": "c"
     }
 }
