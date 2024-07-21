@@ -40,19 +40,6 @@ void kernel_main(void) {
 
     enable_int();
 
-    int fd = fopen("0:/test.txt", "r");
-    if (fd) {
-        struct file_stat stat;
-        fstat(fd, &stat);
-        printk("File opened!\n");
-        char buf[27];
-        fseek(fd, 2, SEEK_SET);
-        fread(buf, 24, 1, fd);
-        buf[27] = '\0';
-        printk(buf);
-        fclose(fd);
-    }
-
     printk("\nKernel initialized!\n");
 
     while (1);
