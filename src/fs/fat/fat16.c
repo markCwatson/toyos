@@ -695,7 +695,8 @@ void* fat16_open(struct disk *disk, struct path_part* path, file_mode mode) {
         return ERROR(-EINVARG);
     }
 
-    if (mode != FILE_MODE_READ && mode != FILE_MODE_WRITE && mode != FILE_MODE_APPEND) {
+    if (mode != FILE_MODE_READ && mode != FILE_MODE_WRITE) {
+        // FILE_MODE_APPEND is not supported
         return ERROR(-EINVARG);
     }
 
