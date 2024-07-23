@@ -1,3 +1,6 @@
+#ifdef RUN_TESTS
+#include "../tests/tests.h"
+#endif
 #include "kernel.h"
 #include "terminal/terminal.h"
 #include "idt/idt.h"
@@ -7,9 +10,6 @@
 #include "string/string.h"
 #include "disk/streamer.h"
 #include "fs/file.h"
-#include "tests/tests.h"
-
-#define RUN_TESTS
 
 struct paging_4gb_chunk *kernel_chunk = NULL;
 
