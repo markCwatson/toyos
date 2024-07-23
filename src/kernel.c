@@ -8,6 +8,7 @@
 #include "disk/streamer.h"
 #include "fs/file.h"
 #include "tests/tests.h"
+#include "utils/printf.h"
 
 #define RUN_TESTS
 
