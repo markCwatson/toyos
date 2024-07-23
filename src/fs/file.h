@@ -38,6 +38,7 @@ struct file_stat {
 typedef void* (*fs_open_fp)(struct disk* disk, struct path_part* path, file_mode mode);
 typedef int (*fs_resolve_fp)(struct disk* disk);
 typedef int (*fs_read_fp)(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* out);
+typedef int (*fs_write_fp)(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* in);
 typedef int (*fs_close_fp)(void* private_data);
 typedef int (*fs_seek_fp)(void* private_data, uint32_t offset, file_seek_mode seek_mode);
 typedef int (*fs_stat_fp)(struct disk* disk, void* private_data, struct file_stat* stat);
@@ -49,6 +50,7 @@ struct filesystem {
     fs_resolve_fp resolve;
     fs_open_fp open;
     fs_read_fp read;
+    fs_write_fp write;
     fs_seek_fp seek;
     fs_stat_fp stat;
     fs_close_fp close;
@@ -70,6 +72,7 @@ void fs_init(void);
 int fopen(const char* filename, const char* mode_str);
 int fseek(int fd, int offset, file_seek_mode whence);
 int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
+int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 int fstat(int fd, struct file_stat* stat);
 int fclose(int fd);
 void fs_insert_filesystem(struct filesystem* filesystem);

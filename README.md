@@ -45,7 +45,7 @@ Connect to the 64-bit QEMU instance with GDB
 or the 32-bit VM using
 
 ```shell
-target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
+(gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
 ```
 
 Confirm `kernel_main` is being called.

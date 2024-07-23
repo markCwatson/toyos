@@ -7,6 +7,9 @@
 #include "string/string.h"
 #include "disk/streamer.h"
 #include "fs/file.h"
+#include "tests/tests.h"
+
+#define RUN_TESTS
 
 static struct paging_4gb_chunk *kernel_chunk = 0;
 
@@ -39,6 +42,10 @@ void kernel_main(void) {
     enable_paging();
 
     enable_int();
+
+#ifdef RUN_TESTS
+    tests_run();
+#endif
 
     printk("\nKernel initialized!\n");
 

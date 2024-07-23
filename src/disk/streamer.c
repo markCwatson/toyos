@@ -28,7 +28,7 @@ int streamer_seek(struct disk_stream* stream, int pos) {
 
     stream->pos = pos;
     
-    return 0;
+    return ALL_GOOD;
 }
 
 int streamer_read(struct disk_stream* stream, void* out, int total) {
@@ -39,11 +39,11 @@ int streamer_read(struct disk_stream* stream, void* out, int total) {
     int sector = stream->pos / TOYOS_SECTOR_SIZE;
     int offset = stream->pos % TOYOS_SECTOR_SIZE;
     int total_to_read = total;
-    bool overflow = (offset+total_to_read) >= TOYOS_SECTOR_SIZE;
+    bool overflow = (offset + total_to_read) >= TOYOS_SECTOR_SIZE;
     char buf[TOYOS_SECTOR_SIZE];
 
     if (overflow) {
-        total_to_read -= (offset+total_to_read) - TOYOS_SECTOR_SIZE;
+        total_to_read -= (offset + total_to_read) - TOYOS_SECTOR_SIZE;
     }
 
     int res = disk_read_block(stream->disk, sector, 1, buf);
@@ -53,13 +53,58 @@ int streamer_read(struct disk_stream* stream, void* out, int total) {
 
    
     for (int i = 0; i < total_to_read; i++) {
-        *(char*)out++ = buf[offset+i];
+        *(char*)out++ = buf[offset + i];
     }
 
     // Adjust the stream
     stream->pos += total_to_read;
     if (overflow) {
         res = streamer_read(stream, out, total - total_to_read);
+    }
+
+out:
+    return res;
+}
+
+int streamer_write(struct disk_stream* stream, const void* in, int total) {
+    if (!stream || !in || total < 0) {
+        return -EINVARG;
+    }
+
+    int sector = stream->pos / TOYOS_SECTOR_SIZE;
+    int offset = stream->pos % TOYOS_SECTOR_SIZE;
+    int total_to_write = total;
+    bool overflow = (offset + total_to_write) >= TOYOS_SECTOR_SIZE;
+    char buf[TOYOS_SECTOR_SIZE];
+
+    // If the write spans multiple sectors, we need to handle the overflow
+    if (overflow) {
+        total_to_write -= (offset + total_to_write) - TOYOS_SECTOR_SIZE;
+    }
+
+    // Read the sector into the buffer if we are not writing an entire sector
+    if (offset != 0 || total_to_write != TOYOS_SECTOR_SIZE) {
+        int res = disk_read_block(stream->disk, sector, 1, buf);
+        if (res < 0) {
+            goto out;
+        }
+    }
+
+    // Copy data into the buffer
+    for (int i = 0; i < total_to_write; i++) {
+        buf[offset + i] = *(const char*)in++;
+    }
+
+    // Write the buffer back to the disk
+    int res = disk_write_block(stream->disk, sector, 1, buf);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Adjust the stream position
+    stream->pos += total_to_write;
+    if (overflow) {
+        res = streamer_write(stream, in, total - total_to_write);
     }
 
 out:

@@ -126,6 +126,7 @@ struct fat_private
 int fat16_resolve(struct disk* disk);
 void* fat16_open(struct disk* disk, struct path_part* path, file_mode mode);
 int fat16_read(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* out);
+int fat16_write(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* in);
 int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode);
 int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat);
 int fat16_close(void* private_data);
@@ -134,6 +135,7 @@ struct filesystem fat16_fs = {
     .resolve = fat16_resolve,
     .open = fat16_open,
     .read = fat16_read,
+    .write = fat16_write,
     .seek = fat16_seek,
     .stat = fat16_stat,
     .close = fat16_close
@@ -597,9 +599,104 @@ struct fat_item* fat16_get_directory_entry(struct disk* disk, struct path_part* 
     return current_item;
 }
 
+static int fat16_set_fat_entry(struct disk* disk, int cluster, int value) {
+    if (!disk) {
+        return -EINVARG;
+    }
+
+    struct fat_private* private = disk->fs_private;
+    struct disk_stream* stream = private->fat_read_stream;
+    if (!stream) {
+        return -EIO;
+    }
+
+    uint32_t fat_table_position = fat16_get_first_fat_sector(private) * disk->sector_size;
+    if (streamer_seek(stream, fat_table_position + (cluster * TOYOS_FAT16_FAT_ENTRY_SIZE)) != ALL_GOOD) {
+        return -EIO;
+    }
+
+    uint16_t entry = value;
+    if (streamer_write(stream, &entry, sizeof(entry)) != ALL_GOOD) {
+        return -EIO;
+    }
+
+    return ALL_GOOD;
+}
+
+static int fat16_allocate_cluster(struct disk* disk, int current_cluster) {
+    if (!disk) {
+        return -EINVARG;
+    }
+
+    struct fat_private* fs_private = disk->fs_private;
+
+    // Find a free cluster
+    for (int i = 2; i < fs_private->header.primary_header.number_of_sectors; i++) {
+        int entry = fat16_get_fat_entry(disk, i);
+        if (entry == TOYOS_FAT16_UNUSED) {
+            // Mark the new cluster as used and link it to the current cluster
+            if (fat16_set_fat_entry(disk, current_cluster, i) != ALL_GOOD) {
+                return -EIO;
+            }
+
+            if (fat16_set_fat_entry(disk, i, 0xfff) != ALL_GOOD) {
+                return -EIO;
+            }
+
+            return i;
+        }
+    }
+
+    return -ENOMEM;
+}
+
+static int fat16_get_directory_sector(struct fat_private* private, struct fat_directory_item* item) {
+    if (!item || !private) {
+        return -EINVARG;
+    }
+
+    if (item->attribute & FAT_FILE_SUBDIRECTORY) {
+        // For subdirectories, calculate the sector based on the cluster
+        int cluster = fat16_get_first_cluster(item);
+        return fat16_cluster_to_sector(private, cluster);
+    }
+
+    // For the root directory, return the starting sector of the root directory
+    struct fat_header* primary_header = &private->header.primary_header;
+    int root_dir_sector = primary_header->reserved_sectors + (primary_header->fat_copies * primary_header->sectors_per_fat);
+    return root_dir_sector;
+}
+
+static int fat16_get_directory_offset(struct fat_private* private, struct fat_directory_item* item) {
+    if (!item || !private) {
+        return -EINVARG;
+    }
+
+    // For subdirectories, the offset is within the cluster
+    if (item->attribute & FAT_FILE_SUBDIRECTORY) {
+        // Subdirectories start at the beginning of their cluster
+        return 0;
+    }
+
+    // For the root directory, calculate the offset based on the item's position
+    struct fat_directory* root_directory = &private->root_directory;
+    for (int i = 0; i < root_directory->total; i++) {
+        if (&root_directory->item[i] == item) {
+            return i * sizeof(struct fat_directory_item);
+        }
+    }
+
+    // Item not found in the root directory
+    return -EIO;
+}
+
 void* fat16_open(struct disk *disk, struct path_part* path, file_mode mode) {
-    if (mode != FILE_MODE_READ) {
-        return ERROR(-ERDONLY);
+    if (!disk || !path) {
+        return ERROR(-EINVARG);
+    }
+
+    if (mode != FILE_MODE_READ && mode != FILE_MODE_WRITE && mode != FILE_MODE_APPEND) {
+        return ERROR(-EINVARG);
     }
 
     struct fat_file_descriptor* descriptor = NULL;
@@ -607,8 +704,7 @@ void* fat16_open(struct disk *disk, struct path_part* path, file_mode mode) {
 
     descriptor = kzalloc(sizeof(struct fat_file_descriptor));
     if (!descriptor) {
-        err_code = -ENOMEM;
-        goto err_out;
+        return ERROR(-ENOMEM);
     }
 
     descriptor->item = fat16_get_directory_entry(disk, path);
@@ -617,18 +713,19 @@ void* fat16_open(struct disk *disk, struct path_part* path, file_mode mode) {
         goto err_out;
     }
 
-    descriptor->pos = 0;
+    descriptor->pos = mode == FILE_MODE_APPEND ? descriptor->item->item->filesize : 0;
     return descriptor;
 
 err_out:
-    if(descriptor) {
-        kfree(descriptor);
-    }
-
+    kfree(descriptor);
     return ERROR(err_code);
 }
 
 int fat16_read(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* out) {
+    if (!disk || !private_data || !out) {
+        return -EINVARG;
+    }
+
     struct fat_file_descriptor* descriptor = private_data;
     struct fat_directory_item* item = descriptor->item->item;
     int offset = descriptor->pos;
@@ -647,6 +744,10 @@ int fat16_read(struct disk* disk, void* private_data, uint32_t size, uint32_t nm
 } 
 
 int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode) {
+    if (!private_data) {
+        return -EINVARG;
+    }
+
     struct fat_file_descriptor* descriptor = private_data;
     struct fat_item* item = descriptor->item;
 
@@ -700,6 +801,94 @@ int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat) {
     }
 
     return ALL_GOOD;
+}
+
+int fat16_write(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* in) {
+    if (!private_data || !disk || !in) {
+        return -EINVARG;
+    }
+
+    struct fat_file_descriptor* descriptor = private_data;
+    struct fat_directory_item* item = descriptor->item->item;
+    struct fat_private* fs_private = disk->fs_private;
+    
+    if (item->attribute & FAT_FILE_READ_ONLY) {
+        return -ERDONLY;
+    }
+
+    uint32_t total_bytes = size * nmemb;
+    uint32_t bytes_written = 0;
+    int cluster = fat16_get_first_cluster(item);
+    int offset = descriptor->pos;
+
+    while (total_bytes > 0) {
+        int current_cluster = fat16_get_cluster_for_offset(disk, cluster, offset);
+        if (current_cluster < 0) {
+            return -EIO;
+        }
+
+        // Calculate the sector to write to
+        int starting_sector = fat16_cluster_to_sector(fs_private, current_cluster);
+        int offset_from_cluster = offset % (fs_private->header.primary_header.sectors_per_cluster * disk->sector_size);
+        int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
+        int bytes_to_write = total_bytes > (disk->sector_size - offset_from_cluster) ? 
+                             (disk->sector_size - offset_from_cluster) : total_bytes;
+
+        // Write to the disk
+        struct disk_stream* stream = fs_private->cluster_read_stream;
+        if (streamer_seek(stream, starting_pos) != ALL_GOOD) {
+            return -EIO;
+        }
+
+        if (streamer_write(stream, in + bytes_written, bytes_to_write) != ALL_GOOD) {
+            return -EIO;
+        }
+
+        total_bytes -= bytes_to_write;
+        bytes_written += bytes_to_write;
+        offset += bytes_to_write;
+
+        // If we reach the end of the current cluster, get the next cluster
+        if (offset_from_cluster + bytes_to_write >= disk->sector_size * fs_private->header.primary_header.sectors_per_cluster) {
+            int next_cluster = fat16_get_fat_entry(disk, current_cluster);
+
+            if (next_cluster == 0xfff || next_cluster == 0xff8) {
+                // Allocate a new cluster if necessary
+                next_cluster = fat16_allocate_cluster(disk, current_cluster);
+                if (next_cluster < 0) {
+                    return -EIO;
+                }
+            }
+
+            cluster = next_cluster;
+        }
+    }
+
+    if (descriptor->pos + bytes_written > item->filesize) {
+        item->filesize = descriptor->pos + bytes_written;
+    }
+
+    // Update the directory entry on the disk
+    int dir_sector = fat16_get_directory_sector(fs_private, item);
+    if (dir_sector < 0) {
+        return -EIO;
+    }
+
+    int dir_offset = fat16_get_directory_offset(fs_private, item);
+    if (dir_offset < 0) {
+        return -EIO;
+    }
+
+    if (streamer_seek(fs_private->directory_stream, dir_sector * disk->sector_size + dir_offset) != ALL_GOOD) {
+        return -EIO;
+    }
+
+    if (streamer_write(fs_private->directory_stream, item, sizeof(*item)) != ALL_GOOD) {
+        return -EIO;
+    }
+
+    descriptor->pos += bytes_written;
+    return bytes_written;
 }
 
 int fat16_close(void* private_data) {

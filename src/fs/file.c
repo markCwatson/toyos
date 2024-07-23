@@ -158,6 +158,19 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
     return desc->fs->read(desc->disk, desc->private_data, size, nmemb, (char*)ptr);
 }
 
+int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
+    if (size == 0 || nmemb == 0 || fd < 0) {
+        return -EINVARG;
+    }
+
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if (!desc) {
+        return -EINVARG;
+    }
+
+    return desc->fs->write(desc->disk, desc->private_data, size, nmemb, (char*)ptr);
+}
+
 int fseek(int fd, int offset, file_seek_mode whence) {
     if (fd < 0) {
         return -EINVARG;

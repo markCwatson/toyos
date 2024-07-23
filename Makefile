@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/disk/disk.o ./build/disk/streamer.o ./build/terminal/terminal.o ./build/fs/file.o ./build/fs/path_parser.o ./build/fs/fat/fat16.o ./build/string/string.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/tests/tests.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/disk/disk.o ./build/disk/streamer.o ./build/terminal/terminal.o ./build/fs/file.o ./build/fs/path_parser.o ./build/fs/fat/fat16.o ./build/string/string.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -12,7 +12,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	touch test.txt
-	echo "i am in toyos file system!" > test.txt
+	echo "01234" > test.txt
 	sudo cp test.txt /mnt/d
 	sudo umount /mnt/d
 	sudo rm -rf /mnt/d
@@ -75,6 +75,9 @@ all: ./bin/boot.bin ./bin/kernel.bin
 
 ./build/terminal/terminal.o: ./src/terminal/terminal.c
 	i686-elf-gcc ${INCLUDES} -I./src/terminal ${FLAGS} -std=gnu99 -c ./src/terminal/terminal.c -o ./build/terminal/terminal.o
+
+./build/tests/tests.o: ./src/tests/tests.c
+	i686-elf-gcc ${INCLUDES} -I./src/tests ${FLAGS} -std=gnu99 -c ./src/tests/tests.c -o ./build/tests/tests.o
 
 clean:
 	rm -rf ./bin/*.bin
