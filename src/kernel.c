@@ -11,7 +11,7 @@
 
 #define RUN_TESTS
 
-static struct paging_4gb_chunk *kernel_chunk = 0;
+struct paging_4gb_chunk *kernel_chunk = NULL;
 
 void printk(const char* str) {
     size_t len = strlen(str);
