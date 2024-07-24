@@ -1,7 +1,19 @@
 # toyos
-A toy multi-threadded OS.
+
+A toy multi-threadded OS. This is a WIP hobby project. Existing features include:
+
+- paging
+- FAT16 filesystem including reading and writing (appending is WIP)
+- terminal (WIP)
+
+Future features will include
+
+- multi-threading
+- interactive shell
+- user level programs
 
 ### Building
+
 From the root of the project, invoke the make build system (will need to make build script executable beforehand: `sudo chmod +x ./build.sh`)
 
 ```shell
@@ -16,11 +28,21 @@ make clean
 
 <br />
 
-### Emulation (QEMU) and debugging (GDB)
-To run the kernel in the QEMU emulator without debugging, simply run
+### Tests
+
+To run the tests (see [tests](https://github.com/markCwatson/toyos/tree/main/tests) folder at root of project), use the `--tests` flag
 
 ```shell
-qemu-system-x86_64 -hda ./bin/os.bin
+make clean
+./build.sh --tests
+```
+
+### Emulation (QEMU) and debugging (GDB)
+
+To run the kernel in the QEMU emulator without debugging, simply run the 32-bit x86 emulator
+
+```shell
+qemu-system-i386 -hda ./bin/os.bin
 ```
 
 To debug with GDB, first start GDB
@@ -36,26 +58,8 @@ Next, manually load symbol file at the specified address for debugging (because 
 (gdb) add-symbol-file "./build/kernelfull.o" 0x100000
 ```
 
-Connect to the 64-bit QEMU instance with GDB
-
-```shell
-(gdb) target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio -S
-```
-
-or the 32-bit VM using
+Connect to the 32-bit QEMU instance with GDB
 
 ```shell
 (gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
-```
-
-Confirm `kernel_main` is being called.
-
-```shell
-(gdb) break kernel_main
-```
-
-Step through the code using 
-
-```shell
-(gdb) stepi
 ```
