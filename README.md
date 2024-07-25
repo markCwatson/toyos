@@ -1,19 +1,20 @@
-# toyos
+# ToyOS
 
-A toy multi-threadded OS. This is a WIP hobby project. Existing features include:
+ToyOS is a work-in-progress (WIP) hobby operating system designed for educational and experimental purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. Current features include:
 
-- 16-bit bootloader
-- 32-bit kernel targeting x86 platforms
-- virtual memory using paging
-- virtual filesystem
-- FAT16 filesystem including reading and writing (appending is WIP)
-- simple terminal (WIP)
+- **16-bit Bootloader:** A basic bootloader that initializes the system and loads the 32-bit kernel.
+- **32-bit Kernel:** The core of ToyOS, built for x86 platforms, handling essential system tasks.
+- **Virtual Memory with Paging:** Implements paging to manage memory, providing virtual memory support.
+- **Virtual Filesystem (VFS):** An abstraction layer for file system operations, allowing different filesystem types to be used seamlessly.
+- **FAT16 Filesystem:** Supports reading and writing files using the FAT16 format. Writing in append mode is under development.
+- **Simple Terminal:** A basic terminal interface for user interaction, currently under development.
+- **Simple Test Framework:** A basic test framework for functional testing, currently under development.
 
-Future features will include
+Future planned features:
 
-- multi-threading
-- interactive shell
-- user level programs
+- **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
+- **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
+- **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
 
 ### Building
 
