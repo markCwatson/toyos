@@ -4,9 +4,9 @@
 #include <stdint.h>
 
 struct interrupt_frame;
+
 typedef void* (*isr80h_cmd)(struct interrupt_frame* frame);
 typedef void (*interrupt_cb_fn)();
-
 
 struct idt_desc {
     uint16_t offset_1;      // Offset bits 0 - 15

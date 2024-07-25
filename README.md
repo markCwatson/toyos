@@ -2,9 +2,12 @@
 
 A toy multi-threadded OS. This is a WIP hobby project. Existing features include:
 
-- paging
+- 16-bit bootloader
+- 32-bit kernel targeting x86 platforms
+- virtual memory using paging
+- virtual filesystem
 - FAT16 filesystem including reading and writing (appending is WIP)
-- terminal (WIP)
+- simple terminal (WIP)
 
 Future features will include
 

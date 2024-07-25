@@ -11,10 +11,11 @@ extern struct paging_4gb_chunk* kernel_chunk;
 
 #define MAX_TESTS 100
 
+// Structure to hold the result of each test
 typedef struct {
-    int test_num;
-    const char* description;
-    bool passed;
+    int test_num;            /**< The test number. */
+    const char* description; /**< A brief description of the test. */
+    bool passed;             /**< Whether the test passed or failed. */
 } test_result_t;
 
 static test_result_t test_results[MAX_TESTS];
@@ -22,6 +23,16 @@ static int test_count = 0;
 static int pass_count = 0;
 static int fail_count = 0;
 
+/**
+ * @brief Registers the result of a test.
+ *
+ * This function stores the result of a test, including its number, description,
+ * and whether it passed or failed. It also updates the count of passed and failed tests.
+ *
+ * @param test_num The number of the test.
+ * @param description A description of the test.
+ * @param condition Whether the test passed (true) or failed (false).
+ */
 static inline void register_test(int test_num, const char* description, bool condition) {
     if (test_count < MAX_TESTS) {
         test_results[test_count].test_num = test_num;
@@ -38,6 +49,12 @@ static inline void register_test(int test_num, const char* description, bool con
     }
 }
 
+/**
+ * @brief Prints a summary of the test results.
+ *
+ * This function outputs the total number of tests run, the number of tests passed,
+ * and the number of tests failed. It also lists the details of any failed tests.
+ */
 static void print_test_summary(void) {
     printf("\n\nTest Summary:\n");
     printf("Total tests run: %d\n", test_count);
@@ -53,6 +70,11 @@ static void print_test_summary(void) {
     }
 }
 
+/**
+ * @brief Tests the disk streamer functionality.
+ *
+ * This function tests creating a disk stream, reading from it, and closing it.
+ */
 static void test_streamer(void) {
     int test_num = 1;
     struct disk_stream* stream = streamer_new(0);
@@ -70,6 +92,11 @@ static void test_streamer(void) {
     }
 }
 
+/**
+ * @brief Tests reading the initial content of a file.
+ *
+ * This function tests opening a file, reading its content, and verifying the read data.
+ */
 static void test_read_initial_content(void) {
     int test_num = 1;
     struct file_stat stat;
@@ -86,6 +113,11 @@ static void test_read_initial_content(void) {
     }
 }
 
+/**
+ * @brief Tests writing new content to a file.
+ *
+ * This function tests opening a file for writing, writing new content, and then verifying the content.
+ */
 static void test_write_new_content(void) {
     int test_num = 1;
     int fd = fopen("0:/test.txt", "w");
@@ -111,6 +143,11 @@ static void test_write_new_content(void) {
     }
 }
 
+/**
+ * @brief Tests appending content to a file.
+ *
+ * This function tests opening a file for appending, writing additional data, and then verifying the appended content.
+ */
 static void test_append_content(void) {
     int test_num = 1;
     int fd = fopen("0:/test.txt", "a");
@@ -136,12 +173,23 @@ static void test_append_content(void) {
     }
 }
 
+/**
+ * @brief Runs a series of file operation tests.
+ *
+ * This function includes tests for reading initial content, writing new content,
+ * and appending content to files.
+ */
 static void test_file_operations(void) {
     test_read_initial_content();
     test_write_new_content();
     // test_append_content(); FILE_MODE_APPEND is not implemented yet
 }
 
+/**
+ * @brief Tests the kernel heap functionality.
+ *
+ * This function tests memory allocation and deallocation using the kernel heap.
+ */
 static void test_heap(void) {
     int test_num = 1;
     void* ptr = kmalloc(100);
@@ -151,6 +199,12 @@ static void test_heap(void) {
     register_test(test_num++, "Heap free", true);
 }
 
+/**
+ * @brief Tests the paging system functionality.
+ *
+ * This function includes tests for allocating a heap block, setting paging,
+ * and verifying read/write operations to a mapped virtual address.
+ */
 static void test_paging(void) {
     int test_num = 1;
 
@@ -172,6 +226,12 @@ static void test_paging(void) {
     register_test(test_num++, "Free memory", true);
 }
 
+/**
+ * @brief Main function to run all tests.
+ *
+ * This function orchestrates the running of all test cases, including heap,
+ * paging, file operations, and disk streamer functionality. It also prints a summary of the results.
+ */
 void tests_run(void) {
     test_heap();
     test_paging();

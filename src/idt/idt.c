@@ -11,19 +11,19 @@ extern void int21h(void);
 extern void no_int(void);
 extern void idt_load(struct idtr_desc* ptr);
 
-void no_int_handler() {
+void no_int_handler(void) {
     // ack interrupt
     outb(0x20, 0x20);
 }
 
-void int21h_handler() {
+void int21h_handler(void) {
     printk("\nKeyboard pressed\n");
 
     // ack interrupt
     outb(0x20, 0x20);
 }
 
-void idt_zero() {
+void idt_zero(void) {
     printk("\nDivide by zero error!\n");
 }
 
@@ -36,7 +36,7 @@ void idt_set(int interrupt_no, void* address) {
     desc->offset_2 = (uint32_t)address >> 16;
 }
 
-void idt_init() {
+void idt_init(void) {
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
     idtr_descriptor.base = (uint32_t)idt_descriptors;
