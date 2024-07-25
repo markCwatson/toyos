@@ -182,7 +182,7 @@ static void test_append_content(void) {
 static void test_file_operations(void) {
     test_read_initial_content();
     test_write_new_content();
-    // test_append_content(); FILE_MODE_APPEND is not implemented yet
+    test_append_content(); // failing because FILE_MODE_APPEND is not implemented yet
 }
 
 /**
