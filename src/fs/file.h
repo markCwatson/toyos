@@ -1,5 +1,5 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef _FILE_H_
+#define _FILE_H_
 
 #include "path_parser.h"
 #include <stdint.h>

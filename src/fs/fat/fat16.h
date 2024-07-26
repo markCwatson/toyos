@@ -1,5 +1,5 @@
-#ifndef FAT16_H
-#define FAT16_H
+#ifndef _FAT16_H_
+#define _FAT16_H_
 
 #include "file.h"
 

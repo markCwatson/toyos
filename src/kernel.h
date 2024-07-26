@@ -1,5 +1,5 @@
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef _KERNEL_H_
+#define _KERNEL_H_
 
 /**
  * @brief Macro to represent an error value as a void pointer.
@@ -35,14 +35,16 @@
 #define ERROR_I(value)  ((int)(value))
 
 /**
- * @brief Prints a string to the kernel console.
+ * @brief Prints a string to the terminal.
  *
- * This function is used for displaying messages on the kernel's console,
- * typically for debugging or logging purposes.
+ * This function writes each character of the given string to the terminal, using a fixed
+ * color attribute. It is typically used for kernel-level logging and debugging.
  *
  * @param str The null-terminated string to print.
+ * @param fg The foreground color of the text.
+ * @param bg The background color of the text.
  */
-void printk(const char* str);
+void printk(const char* str, unsigned char fg, unsigned char bg);
 
 /**
  * @brief Halts the system and displays a panic message.
@@ -53,5 +55,14 @@ void printk(const char* str);
  * @param str The null-terminated string describing the panic reason.
  */
 void panick(const char* str);
+
+/**
+ * @brief Prints an alert message to the terminal.
+ * 
+ * This function prints an alert message to the terminal using a fixed color attribute.
+ * 
+ * @param str The null-terminated string to print.
+ */
+void alertk(const char* str);
 
 #endif

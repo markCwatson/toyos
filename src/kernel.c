@@ -21,12 +21,14 @@ struct paging_4gb_chunk *kernel_chunk = NULL;
  * color attribute. It is typically used for kernel-level logging and debugging.
  *
  * @param str The null-terminated string to print.
+ * @param fg The foreground color of the text.
+ * @param bg The background color of the text.
  */
-void printk(const char* str) {
+void printk(const char* str, unsigned char fg, unsigned char bg) {
     size_t len = strlen(str);
 
     for (int i = 0; i < len; i++) {
-        terminal_writechar(str[i], 15);  // Color 15 is typically white text on a black background
+        terminal_writechar(str[i], fg, bg);
     }
 }
 
@@ -40,8 +42,19 @@ void printk(const char* str) {
  * @param str The null-terminated string describing the panic reason.
  */
 void panick(const char* str) {
-    printk(str);
+    printk(str, VGA_COLOR_WHITE, VGA_COLOR_RED);
     while (1);  // Infinite loop to halt the system
+}
+
+/**
+ * @brief Prints an alert message to the terminal.
+ * 
+ * This function prints an alert message to the terminal using a fixed color attribute.
+ * 
+ * @param str The null-terminated string to print.
+ */
+void alertk(const char* str) {
+    printk(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLACK);
 }
 
 /**
@@ -51,9 +64,9 @@ void panick(const char* str) {
  * heap, file system, disk, and interrupt descriptor table (IDT). It sets up paging,
  * enables interrupts, and optionally runs tests if compiled in test mode.
  */
-void kernel_main(void) {
+void maink(void) {
     terminal_init();
-    printk("Terminal initialized!\n");
+    printk("Terminal initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     kheap_init();
     fs_init();
@@ -73,7 +86,7 @@ void kernel_main(void) {
     tests_run();
 #endif
 
-    printk("\nKernel initialized!\n");
+    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     while (1);
 }

@@ -29,7 +29,7 @@ void kheap_init() {
     // Create the heap structure within the specified memory range
     int res = heap_create(&kernel_heap, (void*)(TOYOS_HEAP_ADDRESS), end, &kernel_heap_table);
     if (res < 0) {
-        printk("Failed to create heap\n");  // Print an error message if heap creation fails
+        panick("Failed to create heap\n");
     }
 }
 

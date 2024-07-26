@@ -1,7 +1,7 @@
 #include "tests.h"
 #include "fs/file.h"
 #include "string/string.h"
-#include "utils/printf.h"
+#include "stdlib/printf.h"
 #include "disk/streamer.h"
 #include "memory/paging/paging.h"
 #include "memory/heap/kheap.h"
@@ -58,13 +58,13 @@ static inline void register_test(int test_num, const char* description, bool con
 static void print_test_summary(void) {
     printf("\n\nTest Summary:\n");
     printf("Total tests run: %d\n", test_count);
-    printf("Tests passed: %d\n", pass_count);
-    printf("Tests failed: %d\n", fail_count);
+    printf_colored("Tests passed: %d\n", COLOR_GREEN, COLOR_BLACK, pass_count);
+    printf_colored("Tests failed: %d\n", COLOR_RED, COLOR_BLACK, fail_count);
     if (fail_count > 0) {
-        printf("\nFailed Tests:\n");
+        printf_colored("\nFailed Tests:\n", COLOR_RED, COLOR_BLACK);
         for (int i = 0; i < test_count; i++) {
             if (!test_results[i].passed) {
-                printf("Test %d: %s\n", test_results[i].test_num, test_results[i].description);
+                printf_colored("Test %d: %s\n", COLOR_RED, COLOR_BLACK, test_results[i].test_num, test_results[i].description);
             }
         }
     }

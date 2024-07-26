@@ -1,5 +1,5 @@
-#ifndef PATH_PARSER_H
-#define PATH_PARSER_H
+#ifndef _PATH_PARSER_H_
+#define _PATH_PARSER_H_
 
 /**
  * @brief Structure representing the root of a parsed path.

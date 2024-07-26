@@ -1,5 +1,5 @@
-#ifndef STATUS_H
-#define STATUS_H
+#ifndef _STATUS_H_
+#define _STATUS_H_
 
 /**
  * @brief Status code indicating that an operation completed successfully.

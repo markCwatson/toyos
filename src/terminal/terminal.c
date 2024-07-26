@@ -35,7 +35,7 @@ static uint16_t terminal_make_char(char c, char color) {
  * @param c The character to display.
  * @param color The color attribute for the character.
  */
-static void terminal_putchar(int x, int y, char c, char color) {
+static void terminal_putchar(int x, int y, char c, unsigned char color) {
     video_mem[(y * VGA_WIDTH) + x] = terminal_make_char(c, color);
 }
 
@@ -47,16 +47,17 @@ static void terminal_putchar(int x, int y, char c, char color) {
  * the cursor to the beginning of the next line.
  *
  * @param c The character to write.
- * @param color The color attribute for the character.
+ * @param fg The foreground color of the character.
+ * @param bg The background color of the character.
  */
-void terminal_writechar(char c, char color) {
+void terminal_writechar(char c, unsigned char fg, unsigned char bg) {
     if (c == '\n') {
         terminal_row += 1;
         terminal_col = 0;
         return;
     }
 
-    terminal_putchar(terminal_col, terminal_row, c, color);
+    terminal_putchar(terminal_col, terminal_row, c, ((bg & 0x0f) << 4) | (fg & 0x0f));
     terminal_col += 1;
 
     // If the cursor reaches the end of the line, move to the next line

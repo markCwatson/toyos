@@ -1,6 +1,6 @@
 [BITS 32]                ; Assembler directive to generate 32-bit code.
 
-extern kernel_main       ; Declare external function `kernel_main` defined elsewhere.
+extern maink       ; Declare external function `maink` defined elsewhere.
 global _start            ; Define the global entry point `_start` for the linker.
 
 CODE_SEG equ 0x08        ; Code segment selector for protected mode (points to code segment in GDT).
@@ -30,7 +30,7 @@ _start:
     out 0x21, al         ; Send the command to the master PIC data port (0x21).
 
     ; Call the main function of the kernel, which is the entry point of the kernel's C code.
-    call kernel_main     ; Transfer control to the C kernel code.
+    call maink     ; Transfer control to the C kernel code.
 
     jmp $                ; Infinite loop to prevent returning from the kernel main function.
 

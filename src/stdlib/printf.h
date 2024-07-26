@@ -6,6 +6,24 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+// Defines for terminal colors
+#define COLOR_BLACK         0
+#define COLOR_BLUE          1
+#define COLOR_GREEN         2
+#define COLOR_CYAN          3
+#define COLOR_RED           4
+#define COLOR_MAGENTA       5
+#define COLOR_BROWN         6
+#define COLOR_LIGHT_GREY    7
+#define COLOR_DARK_GREY     8
+#define COLOR_LIGHT_BLUE    9
+#define COLOR_LIGHT_GREEN   10
+#define COLOR_LIGHT_CYAN    11
+#define COLOR_LIGHT_RED     12
+#define COLOR_LIGHT_MAGENTA 13
+#define COLOR_LIGHT_BROWN   14
+#define COLOR_WHITE         15
+
 /**
  * @brief Tiny printf implementation.
  * 
@@ -16,8 +34,19 @@
  * @param format A string that specifies the format of the output.
  * @return The number of characters that are written into the array, not counting the terminating null character.
  */
-#define printf printf_
-int printf_(const char* format, ...);
+int printf(const char* format, ...);
+
+/**
+ * @brief ToyOS printf implementation with color support.
+ * 
+ * This function is similar to `printf` but accepts additional arguments for foreground and background colors.
+ * 
+ * @param format A string that specifies the format of the output.
+ * @param fg The foreground color of the text.
+ * @param bg The background color of the text.
+ * @return The number of characters that are written into the array, not counting the terminating null character.
+ */
+int printf_colored(const char* format, unsigned char fg, unsigned char bg, ...);
 
 /**
  * @brief Tiny sprintf implementation.
@@ -28,8 +57,7 @@ int printf_(const char* format, ...);
  * @param format A string that specifies the format of the output.
  * @return The number of characters that are WRITTEN into the buffer, not counting the terminating null character.
  */
-#define sprintf sprintf_
-int sprintf_(char* buffer, const char* format, ...);
+int sprintf(char* buffer, const char* format, ...);
 
 /**
  * @brief Tiny snprintf/vsnprintf implementation.
@@ -45,10 +73,8 @@ int sprintf_(char* buffer, const char* format, ...);
  *         null character. A value equal to or larger than `count` indicates truncation. Only when the returned value
  *         is non-negative and less than `count`, the string has been completely written.
  */
-#define snprintf  snprintf_
-#define vsnprintf vsnprintf_
-int  snprintf_(char* buffer, size_t count, const char* format, ...);
-int vsnprintf_(char* buffer, size_t count, const char* format, va_list va);
+int snprintf(char* buffer, size_t count, const char* format, ...);
+int vsnprintf(char* buffer, size_t count, const char* format, va_list va);
 
 /**
  * @brief Tiny vprintf implementation.
@@ -59,8 +85,7 @@ int vsnprintf_(char* buffer, size_t count, const char* format, va_list va);
  * @param va A value identifying a variable arguments list.
  * @return The number of characters that are WRITTEN into the buffer, not counting the terminating null character.
  */
-#define vprintf vprintf_
-int vprintf_(const char* format, va_list va);
+int vprintf(const char* format, va_list va);
 
 /**
  * @brief printf with output function.

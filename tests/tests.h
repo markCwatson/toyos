@@ -1,5 +1,5 @@
-#ifndef TESTS_H
-#define TESTS_H
+#ifndef _TESTS_H_
+#define _TESTS_H_
 
 /**
  * @brief Runs a suite of tests for the system.

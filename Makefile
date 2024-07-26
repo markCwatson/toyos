@@ -5,7 +5,7 @@ RUN_TESTS_FLAG =
 FILES = ./build/kernel.asm.o \
 		./build/kernel.o \
 		./build/idt/idt.asm.o \
-		./build/utils/printf.o \
+		./build/stdlib/printf.o \
 		./build/tests/tests.o \
 		./build/idt/idt.o \
 		./build/memory/memory.o \
@@ -167,8 +167,8 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/tests/tests.o: ./tests/tests.c
 	i686-elf-gcc ${INCLUDES} -I./tests ${FLAGS} -std=gnu99 -c ./tests/tests.c -o ./build/tests/tests.o
 
-./build/utils/printf.o: ./src/utils/printf.c
-	i686-elf-gcc ${INCLUDES} -I./src/utils ${FLAGS} -std=gnu99 -c ./src/utils/printf.c -o ./build/utils/printf.o
+./build/stdlib/printf.o: ./src/stdlib/printf.c
+	i686-elf-gcc ${INCLUDES} -I./src/stdlib ${FLAGS} -std=gnu99 -c ./src/stdlib/printf.c -o ./build/stdlib/printf.o
 
 # The 'clean' target removes all the compiled files and binaries.
 clean:

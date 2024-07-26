@@ -1,5 +1,5 @@
-#ifndef DISK_H
-#define DISK_H
+#ifndef _DISK_H_
+#define _DISK_H_
 
 #include "fs/file.h"
 
