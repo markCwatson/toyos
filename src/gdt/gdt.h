@@ -28,7 +28,7 @@ struct gdt {
  * It abstracts the raw format into base address, limit, and type fields.
  */
 struct gdt_structured {
-    uint32_t base;   /**< Base address of the segment */
+    uintptr_t base;  /**< Base address of the segment */
     uint32_t limit;  /**< Limit of the segment */
     uint8_t type;    /**< Segment type and access flags */
 };

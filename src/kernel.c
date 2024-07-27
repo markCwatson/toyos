@@ -29,7 +29,7 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
     {.base = 0, .limit = 0xffffffff, .type = 0x92},                 // Kernel data segment
     {.base = 0, .limit = 0xffffffff, .type = 0xf8},                 // User code segment
     {.base = 0, .limit = 0xffffffff, .type = 0xf2},                 // User data segment
-    {.base = (uint32_t)&tss, .limit = sizeof(tss), .type = 0xe9}    // Task state segment
+    {.base = (uintptr_t)&tss, .limit = sizeof(tss), .type = 0xe9}   // Task state segment
 };
 
 /**
