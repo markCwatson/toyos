@@ -7,8 +7,8 @@
  * These values are used in the GDT (Global Descriptor Table) to switch between
  * code and data segments in protected mode.
  */
-#define KERNEL_CODE_SELECTOR        0x08  /**< Kernel code segment selector. */
-#define KERNEL_DATA_SELECTOR        0x10  /**< Kernel data segment selector. */
+#define TOYOS_CODE_SELECTOR         0x08  /**< Kernel code segment selector. */
+#define TOYOS_DATA_SELECTOR         0x10  /**< Kernel data segment selector. */
 
 /**
  * @brief Total number of interrupts supported.
@@ -62,6 +62,6 @@
  * Defines the total number of GDT segments used by the system. The GDT is a data structure
  * used by the x86 architecture to define memory segments and access rights.
  */
-#define TOYOS_TOTAL_GDT_SEGMENTS    5     /**< Total number of GDT segments. */
+#define TOYOS_TOTAL_GDT_SEGMENTS    6     /**< Total number of GDT segments. */
 
 #endif

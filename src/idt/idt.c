@@ -30,7 +30,7 @@ void idt_zero(void) {
 void idt_set(int interrupt_no, void* address) {
     struct idt_desc* desc = &idt_descriptors[interrupt_no];
     desc->offset_1 = (uint32_t)address & 0x0000ffff;
-    desc->selector = KERNEL_CODE_SELECTOR;
+    desc->selector = TOYOS_CODE_SELECTOR;
     desc->zero = 0x00;
     desc->type_attr = 0xee;
     desc->offset_2 = (uint32_t)address >> 16;

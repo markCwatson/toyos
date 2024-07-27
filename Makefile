@@ -22,7 +22,8 @@ FILES = ./build/kernel.asm.o \
 		./build/fs/fat/fat16.o \
 		./build/string/string.o \
 		./build/gdt/gdt.asm.o \
-		./build/gdt/gdt.o
+		./build/gdt/gdt.o \
+		./build/task/tss.asm.o
 
 # Include paths for the compiler to find header files.
 INCLUDES = -I./src
@@ -177,6 +178,9 @@ all: ./bin/boot.bin ./bin/kernel.bin
 
 ./build/gdt/gdt.o: ./src/gdt/gdt.c
 	i686-elf-gcc ${INCLUDES} -I./src/gdt ${FLAGS} -std=gnu99 -c ./src/gdt/gdt.c -o ./build/gdt/gdt.o
+
+./build/task/tss.asm.o: ./src/task/tss.asm
+	nasm -f elf -g ./src/task/tss.asm -o ./build/task/tss.asm.o
 
 # The 'clean' target removes all the compiled files and binaries.
 clean:
