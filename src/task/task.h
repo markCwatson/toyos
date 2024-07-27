@@ -59,6 +59,36 @@ struct task* task_new(struct process* process);
 struct task* task_get_next(void);
 
 /**
+ * @brief Retrieves the current running task.
+ * 
+ * @return Pointer to the current task.
+ */
+struct task* task_current(void);
+
+/**
+ * @brief Switches to a new task
+ * 
+ * @param task The task to switch to
+ * @return int Returns 0 on success, negative value on failure
+ */
+int task_switch(struct task *task);
+
+/**
+ * @brief Switches to the next task in the linked list
+ * 
+ * @details This function is called by the timer interrupt handler to switch to 
+ * the next task in the linked list of tasks.
+ * 
+ * @return int Returns 0 on success, negative value on failure
+ */
+int task_page(void);
+
+/**
+ * @brief Runs the first ever task
+ */
+void task_run_first_ever_task(void);
+
+/**
  * @brief Frees the resources associated with a task.
  * 
  * @param task The task to free.

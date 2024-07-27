@@ -14,6 +14,8 @@
 #include "gdt/gdt.h"
 #include "config.h"
 #include "task/tss.h"
+#include "task/task.h"
+#include "task/process.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
@@ -66,9 +68,9 @@ void panick(const char* str) {
 
 /**
  * @brief Prints an alert message to the terminal.
- * 
+ *
  * This function prints an alert message to the terminal using a fixed color attribute.
- * 
+ *
  * @param str The null-terminated string to print.
  */
 void alertk(const char* str) {
@@ -100,7 +102,7 @@ void maink(void) {
     memset(&tss, 0, sizeof(tss));
     tss.esp0 = 0x60000;             // Set the stack pointer for ring 0
     tss.ss0 = TOYOS_DATA_SELECTOR;  // Set the stack segment for ring 0
-    
+
     // Load the TSS
     tss_load(0x28);
 
@@ -109,15 +111,20 @@ void maink(void) {
     paging_switch(kernel_chunk);
     enable_paging();
 
-    // Enable interrupts
-    enable_int();
+    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+
+    // Load the first process
+    struct process* process = NULL;
+    int res = process_load("0:/blank.bin", &process);
+    if (ISERROR(res)) {
+        panick("Failed to load the first process!\n");
+    }
+
+    task_run_first_ever_task();
 
 #ifdef RUN_TESTS
     // Run tests if the kernel is compiled in test mode
+    enable_int();
     tests_run();
 #endif
-
-    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-
-    while (1);
 }

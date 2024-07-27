@@ -26,6 +26,15 @@ struct task* task_head = NULL;
 static int task_init(struct task* task, struct process *process);
 
 /**
+ * @brief Retrieves the current running task
+ * 
+ * @return struct task* Pointer to the current task
+ */
+struct task* task_current(void) {
+    return current_task;
+}
+
+/**
  * @brief Creates a new task for a given process
  * 
  * @param process The process to associate with the new task
@@ -154,6 +163,44 @@ void task_save_state(struct task* task, struct interrupt_frame* frame) {
 }
 
 /**
+ * @brief Switches to a new task
+ * 
+ * @param task The task to switch to
+ * @return int Returns 0 on success, negative value on failure
+ */
+int task_switch(struct task *task) {
+    current_task = task;
+    paging_switch(task->page_directory);
+    return ALL_GOOD;
+}
+
+/**
+ * @brief Switches to the next task in the linked list
+ * 
+ * @details This function is called by the timer interrupt handler to switch to 
+ * the next task in the linked list of tasks.
+ * 
+ * @return int Returns 0 on success, negative value on failure
+ */
+int task_page(void) {
+    user_registers();
+    task_switch(current_task);
+    return ALL_GOOD;
+}
+
+/**
+ * @brief Runs the first ever task
+ */
+void task_run_first_ever_task(void) {
+    if (!current_task) {
+        panick("[task_run_first_ever_task] No current task exists!\n");
+    }
+
+    task_switch(task_head);
+    task_return(&task_head->registers);
+}
+
+/**
  * @brief Initializes a task structure with a given process
  * 
  * @param task The task structure to initialize
@@ -173,6 +220,8 @@ static int task_init(struct task* task, struct process* process) {
         return -EIO;
     }
 
+    // Map the kernel memory
+    task->registers.ip = TOYOS_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = TOYOS_USER_DATA_SEGMENT;
     task->registers.cs = TOYOS_USER_CODE_SEGMENT;
     task->registers.esp = TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;

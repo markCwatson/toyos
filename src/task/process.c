@@ -57,6 +57,8 @@ out:
 /**
  * Maps the binary data to memory.
  * 
+ * @details This function maps the binary data to the virtual address space of the process.
+ * 
  * @param process The process to map.
  * @return 0 on success, error code on failure.
  */

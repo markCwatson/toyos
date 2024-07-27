@@ -93,21 +93,29 @@ all_tests: all
 #      to create space for additional file system data or to meet the minimum disk size.
 #    - bs=1048576 sets the block size to 1 MiB, and count=16 specifies that 16 blocks should be added, resulting in
 #      16 MiB of zero-padding.
-all: ./bin/boot.bin ./bin/kernel.bin
+# 5. Builds the user programs and copies them to the mounted OS image.
+# 6. Crates a test file on the mounted OS image.
+all: ./bin/boot.bin ./bin/kernel.bin user_programs
+
+	# Combines the bootloader and kernel into a single OS image.
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 
-	# Mounts the generated OS image, adds a test file, and then unmounts.
+	# Mounts the generated OS image, adds a user program and test file, and then unmounts.
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
+	sudo cp ./programs/blank/blank.bin /mnt/d
+
+	# Create a test file on the mounted OS image.
 	touch test.txt
 	echo "01234" > test.txt
 	sudo cp test.txt /mnt/d
+	rm -f test.txt
+
 	sudo umount /mnt/d
 	sudo rm -rf /mnt/d
-	rm -f test.txt
 
 # The 'kernel.bin' target links all object files into a final binary.
 ./bin/kernel.bin: $(FILES)
@@ -194,8 +202,14 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/task/process.o: ./src/task/process.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/task/process.c -o ./build/task/process.o
 
+user_programs:
+	cd ./programs/blank && make all
+
+user_programs_clean:
+	cd ./programs/blank && make clean
+
 # The 'clean' target removes all the compiled files and binaries.
-clean:
+clean: user_programs_clean
 	rm -rf ./bin/*.bin
 	rm -rf ./build/*.o
 	rm -rf ./build/*.asm.o
