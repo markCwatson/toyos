@@ -13,8 +13,8 @@ ToyOS is a work-in-progress (WIP) hobby operating system designed for educationa
 Future planned features:
 
 - **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
-- **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
+- **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
 
 ### Building
 

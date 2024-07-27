@@ -59,4 +59,11 @@
  */
 #define ERDONLY     7   /**< Read-only error. */
 
+/**
+ * @brief Status code indicating that a process slot is already taken.
+ * 
+ * This error occurs when a process is created with an ID that is already in use by another process.
+ */
+#define EISTKN      8   /** < Process slot is taken */
+
 #endif

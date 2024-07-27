@@ -151,6 +151,16 @@ int paging_map_to(struct paging_4gb_chunk *directory, void *virt, void *phys, vo
 void* paging_get_physical_address(uint32_t* directory, void* virt);
 
 /**
+ * @brief Frees a 4GB paging chunk.
+ * 
+ * Releases the memory allocated for a 4GB paging chunk, including all its page tables
+ * and the page directory.
+ * 
+ * @param chunk Pointer to the paging chunk to free.
+ */
+void paging_free_4gb(struct paging_4gb_chunk *chunk);
+
+/**
  * @brief Retrieves the value of a page directory entry for a given virtual address.
  * 
  * @param directory The paging directory to search.

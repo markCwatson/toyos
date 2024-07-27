@@ -12,6 +12,7 @@
         "idt.h": "c",
         "terminal.h": "c",
         "file.h": "c",
-        "tests.h": "c"
+        "tests.h": "c",
+        "task.h": "c"
     }
 }

@@ -1,5 +1,5 @@
-#ifndef _TASKSWITCHSEGMENT_H
-#define _TASKSWITCHSEGMENT_H
+#ifndef _TASKSWITCHSEGMENT_H_
+#define _TASKSWITCHSEGMENT_H_
 
 #include <stdint.h>
 

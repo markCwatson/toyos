@@ -60,6 +60,20 @@ int strnlen(const char* ptr, int max);
 char* strcpy(char* dest, const char* src);
 
 /**
+ * @brief Copies a string up to a specified length.
+ *
+ * This function copies up to n characters from the null-terminated string src to the buffer
+ * pointed to by dest. If the length of src is less than n, the remaining bytes in dest are
+ * filled with null bytes.
+ *
+ * @param dest Pointer to the destination buffer.
+ * @param src Pointer to the source string.
+ * @param n The maximum number of characters to copy.
+ * @return A pointer to the destination buffer.
+ */
+char *strncpy(char *dest, const char *src, int n);
+
+/**
  * @brief Compares two strings up to a specified length.
  *
  * This function compares up to n characters of the null-terminated strings str1 and str2.

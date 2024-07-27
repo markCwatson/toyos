@@ -64,4 +64,21 @@
  */
 #define TOYOS_TOTAL_GDT_SEGMENTS    6     /**< Total number of GDT segments. */
 
+/**
+ * @brief Configuration for the TSS (Task State Segment).
+ */
+#define TOYOS_PROGRAM_VIRTUAL_ADDRESS               0x400000        /**< Virtual address for program entry point. */
+#define TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START   0x3ff000        /**< Virtual address for program stack start. */
+#define TOYOS_USER_PROGRAM_STACK_SIZE               (1024 * 16)     /**< Size of the user program stack. */
+/**< Virtual address for program stack end. */
+#define TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END     (TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START - TOYOS_USER_PROGRAM_STACK_SIZE)
+#define TOYOS_USER_DATA_SEGMENT                     0x23            /**< User data segment selector. */
+#define TOYOS_USER_CODE_SEGMENT                     0x1b            /**< User code segment selector. */
+
+/**
+ * @brief Configuration for process and program management.
+ */
+#define TOYOS_MAX_PROGRAM_ALLOCATIONS   1024  /**< Maximum number of memory allocations per program. */
+#define TOYOS_MAX_PROCESSES             12    /**< Max number of processes > */
+
 #endif
