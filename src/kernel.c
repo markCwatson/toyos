@@ -4,15 +4,26 @@
 #include "kernel.h"
 #include "terminal/terminal.h"
 #include "idt/idt.h"
+#include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
 #include "string/string.h"
 #include "disk/streamer.h"
 #include "fs/file.h"
+#include "gdt/gdt.h"
+#include "config.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
+
+// Global descriptor table (GDT) entries
+struct gdt gdt_real[TOYOS_TOTAL_GDT_SEGMENTS];
+struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
+    {.base = 0, .limit = 0, .type = 0},             // Null segment
+    {.base = 0, .limit = 0xffffffff, .type = 0x9a}, // Kernel code segment
+    {.base = 0, .limit = 0xffffffff, .type = 0x92}, // Kernel data segment
+};
 
 /**
  * @brief Prints a string to the terminal.
@@ -67,6 +78,11 @@ void alertk(const char* str) {
 void maink(void) {
     terminal_init();
     printk("Terminal initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+
+    // Initialize the GDT
+    memset(gdt_real, 0, sizeof(gdt_real));
+    gdt_structured_to_gdt(gdt_real, gdt_structured, TOYOS_TOTAL_GDT_SEGMENTS);
+    gdt_load(gdt_real,sizeof(gdt_real));
 
     kheap_init();
     fs_init();

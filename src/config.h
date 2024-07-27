@@ -56,4 +56,12 @@
 #define TOYOS_MAX_FILE_DESCRIPTORS  512   /**< Maximum number of file descriptors supported. */
 #define TOYOS_MAX_PATH              108   /**< Maximum path length for files. */
 
+/**
+ * @brief Configuration for the GDT (Global Descriptor Table).
+ * 
+ * Defines the total number of GDT segments used by the system. The GDT is a data structure
+ * used by the x86 architecture to define memory segments and access rights.
+ */
+#define TOYOS_TOTAL_GDT_SEGMENTS    5     /**< Total number of GDT segments. */
+
 #endif
