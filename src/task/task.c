@@ -45,7 +45,7 @@ struct task* task_new(struct process *process) {
         return ERROR(-EINVARG);
     }
 
-    int res = ALL_GOOD;
+    int res = OK;
 
     struct task* task = kzalloc(sizeof(struct task));
     if (!task) {
@@ -54,7 +54,7 @@ struct task* task_new(struct process *process) {
     }
 
     res = task_init(task, process);
-    if (res != ALL_GOOD) {
+    if (res != OK) {
         goto out;
     }
 
@@ -187,7 +187,7 @@ int task_free(struct task* task) {
 
     // Finally free the task data
     kfree(task);
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -234,13 +234,16 @@ void task_current_save_state(struct interrupt_frame* frame) {
 /**
  * @brief Switches to a new task
  * 
+ * @details This function switches to a new task by setting the current task to the given task and
+ * switching to the task's page directory.
+ * 
  * @param task The task to switch to
  * @return int Returns 0 on success, negative value on failure
  */
 int task_switch(struct task *task) {
     current_task = task;
     paging_switch(task->page_directory);
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -254,11 +257,13 @@ int task_switch(struct task *task) {
 int task_page(void) {
     user_registers();
     task_switch(current_task);
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
  * @brief Runs the first ever task
+ * 
+ * @details This function is called to run the first task in the linked list of tasks.
  */
 void task_run_first_ever_task(void) {
     if (!current_task) {
@@ -267,6 +272,56 @@ void task_run_first_ever_task(void) {
 
     task_switch(task_head);
     task_return(&task_head->registers);
+}
+
+/**
+ * @brief Switches to page directory for a given task
+ * 
+ * @param task The task to switch to
+ * @return int Returns 0 on success, negative value on failure
+ */
+static int task_page_task(struct task* task) {
+    user_registers();
+    paging_switch(task->page_directory);
+    return OK;
+}
+
+/**
+ * @brief Retrieves the value of a stack item for a given task
+ * 
+ * @details This function retrieves the value of a stack item for a given task. It switches to the
+ * task's page directory, retrieves the value of the stack item, and then switches back to the kernel
+ * page directory.
+ * 
+ * @param task The task to retrieve the stack item from
+ * @param index The index of the stack item to retrieve
+ * @return void* The value of the stack item
+ */
+void* task_get_stack_item(struct task* task, int index) {
+    if (index < 0) {
+        alertk("[task_get_stack_item] Invalid index provided!\n");
+        return NULL;
+    }
+    
+    if (!task) {
+        alertk("[task_get_stack_item] No task provided!\n");
+        return NULL;
+    }
+
+    void* result = 0;
+
+    // Get the stack pointer from the task
+    uint32_t* sp_ptr = (uint32_t*) task->registers.esp;
+
+    // Switch to the given tasks page
+    task_page_task(task);
+
+    result = (void*)sp_ptr[index];
+
+    // Switch back to the kernel page
+    kernel_page();
+
+    return result;
 }
 
 /**
@@ -297,5 +352,5 @@ static int task_init(struct task* task, struct process* process) {
 
     task->process = process;
 
-    return ALL_GOOD;
+    return OK;
 }

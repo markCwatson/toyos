@@ -64,7 +64,7 @@ Next, manually load symbol file at the specified address for debugging (because 
 Connect to the 32-bit QEMU instance with GDB
 
 ```shell
-(gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
+(gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio
 ```
 
 To debug user programs, use address `0x400000` for user space.

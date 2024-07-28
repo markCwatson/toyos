@@ -22,7 +22,7 @@ static struct process* processes[TOYOS_MAX_PROCESSES] = {};
  * @return 0 on success, error code on failure.
  */
 static int process_load_binary(const char* filename, struct process* process) {
-   int res = ALL_GOOD;
+   int res = OK;
    int fd = fopen(filename, "r");
     if (fd < 0) {
          return -EIO;
@@ -63,7 +63,7 @@ out:
  * @return 0 on success, error code on failure.
  */
 static int process_map_binary(struct process* process) {
-    int res = ALL_GOOD;
+    int res = OK;
     res = paging_map_to(process->task->page_directory,
                         (void*)TOYOS_PROGRAM_VIRTUAL_ADDRESS,
                         process->ptr,
@@ -93,13 +93,30 @@ static void process_init(struct process* process) {
 }
 
 /**
- * Maps the memory for a process.
+ * @brief Maps the memory for a process.
+ * 
+ * @details This function maps the memory for a process, including the binary data and the stack.
  * 
  * @param process The process to map memory for.
  * @return 0 on success, error code on failure.
  */
 static int process_map_memory(struct process* process) {
-    return process_map_binary(process);
+    int res = 0;
+    res = process_map_binary(process);
+    if (res < 0) {
+        return res;
+    }
+
+    res = paging_map_to(process->task->page_directory,
+                        (void*)TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END,
+                        process->stack,
+                        paging_align_address(process->stack + TOYOS_USER_PROGRAM_STACK_SIZE), 
+                        PAGING_IS_PRESENT | PAGING_IS_WRITEABLE | PAGING_ACCESS_FROM_ALL);
+    if (res < 0) {
+        return res;
+    }
+
+    return OK;
 }
 
 /**
@@ -124,7 +141,7 @@ static int process_get_free_slot(void) {
  * @return 0 on success, error code on failure.
  */
 int process_load(const char* filename, struct process** process) {
-    int res = ALL_GOOD;
+    int res = OK;
 
     int process_slot = process_get_free_slot();
     if (process_slot < 0) {
@@ -160,19 +177,22 @@ struct process* process_get(int process_id) {
 }
 
 /**
- * Loads a process into a specific slot.
+ * @brief Loads a process into a specific slot.
+ * 
+ * @details This function loads a process into a specific slot in the process array.
+ * 
  * @param filename The name of the file to load.
  * @param process A pointer to the process structure to store the loaded process.
  * @param process_slot The slot to load the process into.
  * @return 0 on success, error code on failure.
  */
 int process_load_for_slot(const char* filename, struct process** process, int process_slot) {
-    int res = ALL_GOOD;
+    int res = OK;
     struct task* task = NULL;
     struct process* _process = NULL;
     void* program_stack_ptr = NULL;
 
-    if (process_get(process_slot) != ALL_GOOD) {
+    if (process_get(process_slot) != OK) {
         res = -EISTKN;
         goto out;
     }

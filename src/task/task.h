@@ -105,6 +105,19 @@ void task_run_first_ever_task(void);
 int task_free(struct task* task);
 
 /**
+ * @brief Retrieves the value of a stack item for a given task
+ * 
+ * @details This function retrieves the value of a stack item for a given task. It switches to the
+ * task's page directory, retrieves the value of the stack item, and then switches back to the kernel
+ * page directory.
+ * 
+ * @param task The task to retrieve the stack item from
+ * @param index The index of the stack item to retrieve
+ * @return void* The value of the stack item
+ */
+void* task_get_stack_item(struct task* task, int index);
+
+/**
  * @brief Copies a string from a task's memory to the kernel space
  * 
  * @details This function copies a string from a task's memory to the kernel space. It allocates

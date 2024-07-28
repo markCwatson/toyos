@@ -4,7 +4,7 @@
 /**
  * @brief Status code indicating that an operation completed successfully.
  */
-#define ALL_GOOD    0   /**< No error, operation was successful. */
+#define OK          0   /**< No error, operation was successful. */
 
 /**
  * @brief Status code indicating an invalid argument error.

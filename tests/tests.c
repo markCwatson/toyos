@@ -70,6 +70,11 @@ static void print_test_summary(void) {
     }
 }
 
+// \todo: complete
+static void test_user_program(void) {
+
+}
+
 /**
  * @brief Tests the disk streamer functionality.
  *

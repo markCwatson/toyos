@@ -42,7 +42,7 @@ int disk_write_sector(int lba, int total, void* buf) {
         }
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -82,7 +82,7 @@ static int disk_read_sector(int lba, int total, void* buf) {
 
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**

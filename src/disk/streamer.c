@@ -44,7 +44,7 @@ int streamer_seek(struct disk_stream* stream, int pos) {
     }
 
     stream->pos = pos;
-    return ALL_GOOD;
+    return OK;
 }
 
 /**

@@ -108,7 +108,7 @@ static file_mode file_get_mode_by_string(const char* str) {
  * It initializes the descriptor and returns a pointer to it.
  *
  * @param file_desc A pointer to the location where the new file descriptor will be stored.
- * @return ALL_GOOD if successful, or an error code if allocation fails.
+ * @return OK if successful, or an error code if allocation fails.
  */
 static int file_new_descriptor(struct file_descriptor** file_desc) {
     for (int i = 0; i < TOYOS_MAX_FILE_DESCRIPTORS; i++) {
@@ -124,7 +124,7 @@ static int file_new_descriptor(struct file_descriptor** file_desc) {
 
             *file_desc = new_file_desc;
 
-            return ALL_GOOD;
+            return OK;
         }
     }
 
@@ -160,7 +160,7 @@ static struct file_descriptor* file_get_descriptor(int file_desc_id) {
  */
 struct filesystem* fs_resolve(struct disk* disk) {
     for (int i = 0; i < TOYOS_MAX_FILESYSTEMS; i++) {
-        if (filesystems[i] != NULL && filesystems[i]->resolve(disk) == ALL_GOOD) {
+        if (filesystems[i] != NULL && filesystems[i]->resolve(disk) == OK) {
             return filesystems[i];
         }
     }
@@ -345,5 +345,5 @@ int fclose(int fd) {
     kfree(desc);
     file_descriptors[fd - 1] = NULL;
 
-    return ALL_GOOD;
+    return OK;
 }

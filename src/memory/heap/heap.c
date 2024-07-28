@@ -23,7 +23,7 @@ static int heap_validate_table(void* ptr, void* end, struct heap_table* table) {
         return -EINVARG;
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -68,7 +68,7 @@ int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* tabl
     size_t table_size = sizeof(heap_block_table_entry) * table->total;
     memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**

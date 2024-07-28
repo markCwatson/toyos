@@ -40,7 +40,7 @@ struct paging_4gb_chunk* paging_new_4gb(uint8_t flags) {
 /**
  * @brief Switches the current page directory.
  *
- * This function switches the currently active page directory to the one provided.
+ * @details This function switches the currently active page directory to the one provided.
  * It updates the CR3 register with the new directory base address, effectively changing
  * the virtual-to-physical address mapping.
  *
@@ -116,7 +116,7 @@ int paging_get_indexes(void* virtual_addr, uint32_t* directory_index, uint32_t* 
     *directory_index = ((uint32_t)virtual_addr / (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE));
     *table_index = ((uint32_t)virtual_addr % (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE) / PAGING_PAGE_SIZE);
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -195,7 +195,7 @@ int paging_map_range(struct paging_4gb_chunk* directory, void* virt, void* phys,
         phys += PAGING_PAGE_SIZE;
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -262,7 +262,7 @@ int paging_set(uint32_t* directory, void* virt, uint32_t val) {
     uint32_t* table = (uint32_t* )(entry & 0xfffff000);
     table[table_index] = val;
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**

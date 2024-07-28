@@ -144,11 +144,16 @@ void maink(void) {
 #endif
 
     // Load the first process
+    // \todo: move this to the tests and replace with a proper first process
     struct process* process = NULL;
-    int res = process_load("0:/blank.bin", &process);
+    int res = process_load("0:/test.bin", &process);
     if (ISERROR(res)) {
         panick("Failed to load the first process!\n");
     }
 
+    printk("Running the first task!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     task_run_first_ever_task();
+
+    // Halt the system if the first task returns
+    panick("First task returned!\n");
 }

@@ -215,12 +215,12 @@ int fat16_get_total_items_for_directory(struct disk* disk, uint32_t directory_st
 
     int directory_start_pos = directory_start_sector * disk->sector_size;
 
-    if (streamer_seek(stream, directory_start_pos) != ALL_GOOD) {
+    if (streamer_seek(stream, directory_start_pos) != OK) {
         return -EIO;
     }
 
     while (1) {
-        if (streamer_read(stream, &item, sizeof(item)) != ALL_GOOD) {
+        if (streamer_read(stream, &item, sizeof(item)) != OK) {
             return -EIO;
         }
 
@@ -256,7 +256,7 @@ int fat16_sector_to_absolute(struct disk *disk, int sector) {
  * @return Status code indicating success or failure.
  */
 int fat16_get_root_directory(struct disk *disk, struct fat_private *fat_private, struct fat_directory *directory) {
-    int res = ALL_GOOD;
+    int res = OK;
     struct fat_directory_item* dir = NULL;
     struct fat_header* primary_header = &fat_private->header.primary_header;
 
@@ -282,12 +282,12 @@ int fat16_get_root_directory(struct disk *disk, struct fat_private *fat_private,
         goto err_out;
     }
 
-    if (streamer_seek(stream, fat16_sector_to_absolute(disk, root_dir_sector_pos)) != ALL_GOOD) {
+    if (streamer_seek(stream, fat16_sector_to_absolute(disk, root_dir_sector_pos)) != OK) {
         res = -EIO;
         goto err_out;
     }
 
-    if (streamer_read(stream, dir, root_dir_size) != ALL_GOOD) {
+    if (streamer_read(stream, dir, root_dir_size) != OK) {
         res = -EIO;
         goto err_out;
     }
@@ -314,7 +314,7 @@ err_out:
  * @return Status code indicating success or failure.
  */
 int fat16_resolve(struct disk* disk) {
-    int res = ALL_GOOD;
+    int res = OK;
     struct fat_private *fat_private = kzalloc(sizeof(struct fat_private));
     if (!fat_private) {
         return -ENOMEM;
@@ -331,7 +331,7 @@ int fat16_resolve(struct disk* disk) {
         goto out;
     }
 
-    if (streamer_read(stream, &fat_private->header, sizeof(fat_private->header)) != ALL_GOOD) {
+    if (streamer_read(stream, &fat_private->header, sizeof(fat_private->header)) != OK) {
         res = -EIO;
         goto out;
     }
@@ -341,7 +341,7 @@ int fat16_resolve(struct disk* disk) {
         goto out;
     }
 
-    if (fat16_get_root_directory(disk, fat_private, &fat_private->root_directory) != ALL_GOOD) {
+    if (fat16_get_root_directory(disk, fat_private, &fat_private->root_directory) != OK) {
         res = -EIO;
         goto out;
     }
@@ -515,12 +515,12 @@ static int fat16_read_internal_from_stream(struct disk *disk, struct disk_stream
     int total_to_read = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
 
     res = streamer_seek(stream, starting_pos);
-    if (res != ALL_GOOD) {
+    if (res != OK) {
         goto out;
     }
 
     res = streamer_read(stream, out, total_to_read);
-    if (res != ALL_GOOD) {
+    if (res != OK) {
         goto out;
     }
 
@@ -616,12 +616,12 @@ struct fat_directory* fat16_load_fat_directory(struct disk* disk, struct fat_dir
 
     // read the directory into memory
     res = fat16_read_internal(disk, cluster, 0x00, directory_size, directory->item);
-    if (res != ALL_GOOD) {
+    if (res != OK) {
         goto out;
     }
 
 out:
-    if (res != ALL_GOOD) {
+    if (res != OK) {
         fat16_free_directory(directory);
     }
 
@@ -777,16 +777,16 @@ static int fat16_set_fat_entry(struct disk* disk, int cluster, int value) {
     }
 
     uint32_t fat_table_position = fat16_get_first_fat_sector(private) * disk->sector_size;
-    if (streamer_seek(stream, fat_table_position + (cluster * TOYOS_FAT16_FAT_ENTRY_SIZE)) != ALL_GOOD) {
+    if (streamer_seek(stream, fat_table_position + (cluster * TOYOS_FAT16_FAT_ENTRY_SIZE)) != OK) {
         return -EIO;
     }
 
     uint16_t entry = value;
-    if (streamer_write(stream, &entry, sizeof(entry)) != ALL_GOOD) {
+    if (streamer_write(stream, &entry, sizeof(entry)) != OK) {
         return -EIO;
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -807,11 +807,11 @@ static int fat16_allocate_cluster(struct disk* disk, int current_cluster) {
         int entry = fat16_get_fat_entry(disk, i);
         if (entry == TOYOS_FAT16_UNUSED) {
             // Mark the new cluster as used and link it to the current cluster
-            if (fat16_set_fat_entry(disk, current_cluster, i) != ALL_GOOD) {
+            if (fat16_set_fat_entry(disk, current_cluster, i) != OK) {
                 return -EIO;
             }
 
-            if (fat16_set_fat_entry(disk, i, 0xfff) != ALL_GOOD) {
+            if (fat16_set_fat_entry(disk, i, 0xfff) != OK) {
                 return -EIO;
             }
 
@@ -982,7 +982,7 @@ int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode) {
             return -EINVARG;
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -1015,7 +1015,7 @@ int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat) {
         stat->flags |= FILE_STAT_READ_ONLY;
     }
 
-    return ALL_GOOD;
+    return OK;
 }
 
 /**
@@ -1060,11 +1060,11 @@ int fat16_write(struct disk* disk, void* private_data, uint32_t size, uint32_t n
 
         // Write to the disk
         struct disk_stream* stream = fs_private->cluster_read_stream;
-        if (streamer_seek(stream, starting_pos) != ALL_GOOD) {
+        if (streamer_seek(stream, starting_pos) != OK) {
             return -EIO;
         }
 
-        if (streamer_write(stream, in + bytes_written, bytes_to_write) != ALL_GOOD) {
+        if (streamer_write(stream, in + bytes_written, bytes_to_write) != OK) {
             return -EIO;
         }
 
@@ -1103,11 +1103,11 @@ int fat16_write(struct disk* disk, void* private_data, uint32_t size, uint32_t n
         return -EIO;
     }
 
-    if (streamer_seek(fs_private->directory_stream, dir_sector * disk->sector_size + dir_offset) != ALL_GOOD) {
+    if (streamer_seek(fs_private->directory_stream, dir_sector * disk->sector_size + dir_offset) != OK) {
         return -EIO;
     }
 
-    if (streamer_write(fs_private->directory_stream, item, sizeof(*item)) != ALL_GOOD) {
+    if (streamer_write(fs_private->directory_stream, item, sizeof(*item)) != OK) {
         return -EIO;
     }
 
@@ -1129,5 +1129,5 @@ int fat16_close(void* private_data) {
     fat16_fat_item_free(descriptor->item);
     kfree(descriptor);
 
-    return ALL_GOOD;
+    return OK;
 }

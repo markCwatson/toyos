@@ -94,7 +94,7 @@ all_tests: all
 #      to create space for additional file system data or to meet the minimum disk size.
 #    - bs=1048576 sets the block size to 1 MiB, and count=16 specifies that 16 blocks should be added, resulting in
 #      16 MiB of zero-padding.
-# 5. Builds the user programs and copies them to the mounted OS image.
+# 5. Builds the test user program and copies it to the mounted OS image.
 # 6. Crates a test file on the mounted OS image.
 all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
@@ -104,10 +104,10 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 
-	# Mounts the generated OS image, adds a user program and test file, and then unmounts.
+	# Mounts the generated OS image, adds a test user program and test file, and then unmounts.
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
-	sudo cp ./programs/blank/blank.bin /mnt/d
+	sudo cp ./programs/test/test.bin /mnt/d
 
 	# Create a test file on the mounted OS image.
 	touch test.txt
@@ -207,10 +207,10 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/sys/sys.c -o ./build/sys/sys.o
 
 user_programs:
-	cd ./programs/blank && make all
+	cd ./programs/test && make all
 
 user_programs_clean:
-	cd ./programs/blank && make clean
+	cd ./programs/test && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean
