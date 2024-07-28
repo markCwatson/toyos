@@ -26,7 +26,8 @@ FILES = ./build/kernel.asm.o \
 		./build/task/tss.asm.o \
 		./build/task/task.asm.o \
 		./build/task/process.o \
-		./build/task/task.o
+		./build/task/task.o \
+		./build/int80h/int80h.o
 
 # Include paths for the compiler to find header files.
 INCLUDES = -I./src
@@ -201,6 +202,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 ./build/task/process.o: ./src/task/process.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/task/process.c -o ./build/task/process.o
+
+./build/int80h/int80h.o: ./src/int80h/int80h.c
+	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/int80h/int80h.c -o ./build/int80h/int80h.o
 
 user_programs:
 	cd ./programs/blank && make all

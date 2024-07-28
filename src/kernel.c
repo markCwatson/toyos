@@ -16,6 +16,8 @@
 #include "task/tss.h"
 #include "task/task.h"
 #include "task/process.h"
+#include "stdlib/printf.h"
+#include "int80h/int80h.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
@@ -60,9 +62,12 @@ void printk(const char* str, unsigned char fg, unsigned char bg) {
  * cannot safely continue execution.
  *
  * @param str The null-terminated string describing the panic reason.
+ * @param ... The optional arguments to format the string.
  */
-void panick(const char* str) {
-    printk(str, VGA_COLOR_WHITE, VGA_COLOR_RED);
+void panick(const char* str, ...) {
+    va_list args;
+    va_start(args, str);
+    printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLACK, args);
     while (1);  // Infinite loop to halt the system
 }
 
@@ -72,9 +77,24 @@ void panick(const char* str) {
  * This function prints an alert message to the terminal using a fixed color attribute.
  *
  * @param str The null-terminated string to print.
+ * @param ... The optional arguments to format the string.
  */
-void alertk(const char* str) {
-    printk(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLACK);
+void alertk(const char* str, ...) {
+    va_list args;
+    va_start(args, str);
+    printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLACK, args);
+}
+
+/**
+ * @brief Switches to the kernel page.
+ * 
+ * This function switches to the kernel page by setting up the kernel registers and
+ * switching to the kernel chunk. This is used to switch to the kernel page when
+ * the kernel is running, for example, when handling interrupts.
+ */
+void kernel_page(void) {
+    kernel_registers();
+    paging_switch(kernel_chunk);
 }
 
 /**
@@ -110,6 +130,9 @@ void maink(void) {
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(kernel_chunk);
     enable_paging();
+
+    // Initialize the int80h system call handlers for system calls
+    int80h_register_commands();
 
     printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 

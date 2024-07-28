@@ -67,6 +67,12 @@ Connect to the 32-bit QEMU instance with GDB
 (gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio -S
 ```
 
+To debug user programs, use address `0x400000` for user space.
+
+```shell
+(gdb) break *0x400000
+```
+
 ### References
 
 1. [Developing a Multithreaded Kernel From Scratch! by Daniel McCarthy](https://www.udemy.com/course/developing-a-multithreaded-kernel-from-scratch)

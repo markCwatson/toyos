@@ -53,16 +53,32 @@ void printk(const char* str, unsigned char fg, unsigned char bg);
  * it cannot recover. It displays the provided message and then halts the system.
  *
  * @param str The null-terminated string describing the panic reason.
+ * @param ... The optional arguments to format the string.
  */
-void panick(const char* str);
+void panick(const char* str, ...);
 
 /**
  * @brief Prints an alert message to the terminal.
- * 
+ *
  * This function prints an alert message to the terminal using a fixed color attribute.
- * 
+ *
  * @param str The null-terminated string to print.
+ * @param ... The optional arguments to format the string.
  */
-void alertk(const char* str);
+void alertk(const char* str, ...);
+
+/**
+ * @brief Switches to the kernel page.
+ * 
+ * This function switches to the kernel page by setting up the kernel registers and
+ * switching to the kernel chunk. This is used to switch to the kernel page when
+ * the kernel is running, for example, when handling interrupts.
+ */
+void kernel_page(void);
+
+/**
+ * @brief Function to set up data segment registers in protected mode.
+ */
+void kernel_registers(void);
 
 #endif

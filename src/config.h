@@ -81,4 +81,9 @@
 #define TOYOS_MAX_PROGRAM_ALLOCATIONS   1024  /**< Maximum number of memory allocations per program. */
 #define TOYOS_MAX_PROCESSES             12    /**< Max number of processes > */
 
+/**
+ * @brief Configuration for system calls.
+ */
+#define TOYOS_MAX_SYSCALLS  1024    /**< Maximum number of system calls. */
+
 #endif

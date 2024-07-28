@@ -148,6 +148,7 @@ void task_save_state(struct task* task, struct interrupt_frame* frame) {
         return;
     }
 
+    // Save the CPU state from the interrupt frame to the task
     task->registers.ip = frame->ip;
     task->registers.cs = frame->cs;
     task->registers.flags = frame->flags;
@@ -160,6 +161,21 @@ void task_save_state(struct task* task, struct interrupt_frame* frame) {
     task->registers.edi = frame->edi;
     task->registers.edx = frame->edx;
     task->registers.esi = frame->esi;
+}
+
+/**
+ * @brief Saves the state of the current task
+ * 
+ * @param frame The interrupt frame containing the CPU state
+ * @return void
+ */
+void task_current_save_state(struct interrupt_frame* frame) {
+    if (!task_current()) {
+        panick("[task_current_save_state] No current task exists!\n");
+    }
+
+    struct task* task = task_current();
+    task_save_state(task, frame);
 }
 
 /**

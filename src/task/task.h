@@ -74,6 +74,14 @@ struct task* task_current(void);
 int task_switch(struct task *task);
 
 /**
+ * @brief Saves the state of the current task
+ * 
+ * @param frame The interrupt frame containing the CPU state
+ * @return void
+ */
+void task_current_save_state(struct interrupt_frame* frame);
+
+/**
  * @brief Switches to the next task in the linked list
  * 
  * @details This function is called by the timer interrupt handler to switch to 
