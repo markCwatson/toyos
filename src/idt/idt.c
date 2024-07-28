@@ -13,7 +13,7 @@ extern void int21h(void);
 extern void no_interrupt(void);
 extern void idt_load(struct idtr_desc* ptr);
 
-static isr80h_cmd isr80h_commands[TOYOS_MAX_SYSCALLS];
+static sys_cmd sys_commands[TOYOS_MAX_SYSCALLS];
 
 /**
  * @brief Handles system call interrupt
@@ -25,13 +25,13 @@ static isr80h_cmd isr80h_commands[TOYOS_MAX_SYSCALLS];
  * @param frame The interrupt frame containing the system call number.
  * @return The result of the system call.
  */
-static void* isr80h_handle_command(int cmd, struct interrupt_frame* frame) {
+static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
         alertk("Invalid system call number: %d\n", cmd);
         return NULL;
     }
 
-    isr80h_cmd handler = isr80h_commands[cmd];
+    sys_cmd handler = sys_commands[cmd];
     if (!handler) {
         alertk("No handler for system call %d\n", cmd);
         return NULL;
@@ -51,16 +51,16 @@ static void* isr80h_handle_command(int cmd, struct interrupt_frame* frame) {
  * @param handler The system call handler function.
  * @return void
  */
-void register_int80h_command(int cmd, isr80h_cmd handler) {
+void register_sys_command(int cmd, sys_cmd handler) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
         panick("Invalid system call number: %d\n", cmd);
     }
 
-    if (isr80h_commands[cmd]) {
+    if (sys_commands[cmd]) {
         panick("System call %d already has a handler\n", cmd);
     }
 
-    isr80h_commands[cmd] = handler;
+    sys_commands[cmd] = handler;
 }
 
 /**
@@ -72,9 +72,9 @@ void register_int80h_command(int cmd, isr80h_cmd handler) {
  * @param cmd The system call number.
  * @param frame The interrupt frame containing the system call number.
  * @return The result of the system call.
- * @see isr80h_handle_command
+ * @see sys_handle_command
  */
-void* isr80h_handler(int cmd, struct interrupt_frame* frame) {
+void* sys_handler(int cmd, struct interrupt_frame* frame) {
     // Switch to the kernel page to access the kernel heap
     kernel_page();
 
@@ -82,13 +82,12 @@ void* isr80h_handler(int cmd, struct interrupt_frame* frame) {
     task_current_save_state(frame);
 
     // Handle the system call
-    void* res = isr80h_handle_command(cmd, frame);
+    void* res = sys_handle_command(cmd, frame);
     
     // Switch back to the task page to return to the task
     task_page();
     return res;
 }
-
 
 /**
  * @brief Handles keyboard interrupt
@@ -101,18 +100,18 @@ void int21h_handler(void) {
 }
 
 /**
+ * @brief Handles the divide by zero exception
+ */
+static void int0h(void) {
+    panick("\nDivide by zero error!\n");
+}
+
+/**
  * @brief Handles no interrupt
  */
 void no_interrupt_handler(void) {
     // ack interrupt
     outb(0x20, 0x20);
-}
-
-/**
- * @brief Handles the divide by zero exception
- */
-static void idt_zero(void) {
-    panick("\nDivide by zero error!\n");
 }
 
 /**
@@ -148,11 +147,11 @@ void idt_init(void) {
         idt_set(i, no_interrupt);
     }
 
-    // int 0 (divide by zero)
-    idt_set(0, idt_zero);
-    // key board interrupt handler
+    // int 0: divide by zero
+    idt_set(0, int0h);
+    // int 0x21: key board interrupt handler
     idt_set(0x21, int21h);
-    // system call interrupt handler
+    // int 0x80: system call interrupt handler
     idt_set(0x80, int80h);
 
     // Load the interrupt descriptor table

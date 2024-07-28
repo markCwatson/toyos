@@ -17,7 +17,7 @@
 #include "task/task.h"
 #include "task/process.h"
 #include "stdlib/printf.h"
-#include "int80h/int80h.h"
+#include "sys/sys.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
@@ -131,8 +131,8 @@ void maink(void) {
     paging_switch(kernel_chunk);
     enable_paging();
 
-    // Initialize the int80h system call handlers for system calls
-    int80h_register_commands();
+    // Initialize the sys system call handlers for system calls
+    sys_register_commands();
 
     printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 

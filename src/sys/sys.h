@@ -1,5 +1,5 @@
-#ifndef _INT80H_H_
-#define _INT80H_H_
+#ifndef _SYS_H_
+#define _SYS_H_
 
 /**
  * @brief Enumeration of system commands that can be invoked using interrupt 0x80.
@@ -20,6 +20,6 @@ enum SYSTEM_COMMANDS {
 /**
  * @brief Registers the system commands that can be invoked using interrupt 0x80.
  */
-void int80h_register_commands(void);
+void sys_register_commands(void);
 
 #endif

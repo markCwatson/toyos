@@ -2,7 +2,7 @@ section .asm                    ; This section defines assembly code that will b
 
 extern int21h_handler           ; External declaration for the handler function for interrupt 0x21 (INT 21h).
 extern no_interrupt_handler     ; External declaration for a default or placeholder interrupt handler.
-extern isr80h_handler           ; External declaration for the handler function for interrupt 0x80 (INT 80h).
+extern sys_handler           ; External declaration for the handler function for interrupt 0x80 (INT 80h).
 
 global no_interrupt             ; This is a generic handler for unexpected or unhandled interrupts.
 global int21h                   ; This is an interrupt service routine (ISR) for INT 21h.
@@ -38,7 +38,7 @@ no_interrupt:
     sti                         ; Re-enable interrupts.
     iret                        ; Return from the interrupt, restoring the state saved by the CPU on interrupt entry.
 
-int21h:
+int21h:                         
     cli                         ; Disable interrupts to prevent nesting of ISRs.
     pushad                      ; Push all general-purpose registers onto the stack.
     call int21h_handler         ; Call the external handler for interrupt 0x21.
@@ -46,12 +46,12 @@ int21h:
     sti                         ; Re-enable interrupts.
     iret                        ; Return from the interrupt, restoring the state saved by the CPU on interrupt entry.
 
-int80h:
+int80h:                         ; Handler for interrupt 0x80 (INT 80h) used for system calls.
     cli                         ; Disable interrupts to prevent nesting of ISRs.
     pushad                      ; Push all general-purpose registers onto the stack.
     push esp                    ; Push the stack pointer onto the stack to pass it as an argument to the handler.
     push eax                    ; Push the return value register onto the stack to pass it as an argument to the handler.
-    call isr80h_handler         ; Call the external handler for interrupt 0x80.
+    call sys_handler         ; Call the external handler for interrupt 0x80.
     mov dword[tmp_res], eax     ; Store the return value from the handler in a temporary variable.
     add esp, 8                  ; Adjust the stack pointer to remove the arguments pushed earlier.
     popad                       ; Pop all general-purpose registers from the stack, restoring their values.

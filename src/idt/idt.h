@@ -7,7 +7,7 @@
 struct interrupt_frame;
 
 // Function pointer type for interrupt service routines (ISRs)
-typedef void* (*isr80h_cmd)(struct interrupt_frame* frame);
+typedef void* (*sys_cmd)(struct interrupt_frame* frame);
 
 // Function pointer type for interrupt handlers
 typedef void (*interrupt_cb_fn)(void);
@@ -74,7 +74,7 @@ struct interrupt_frame {
  * @param handler The system call handler function.
  * @return void
  */
-void register_int80h_command(int cmd, isr80h_cmd handler);
+void register_sys_command(int cmd, sys_cmd handler);
 
 /**
  * @brief Initializes the interrupt descriptor table (IDT) with default handlers
