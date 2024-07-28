@@ -10,6 +10,11 @@ SECTIONS
         *(.text)               # Include all input sections named .text from the object files. ALIGN(4096) aligns the section to a 4096-byte boundary (4 KB), which is typical for memory pages.
     }
 
+    .asm : ALIGN(4096)         # Define a custom .asm section for assembly code, if any is separate from .text.
+    {
+        *(.asm)                # Include all input sections named .asm, aligning to a 4 KB boundary.
+    }
+
     .rodata : ALIGN(4096)      # Define the .rodata section for read-only data, such as string literals.
     {
         *(.rodata)             # Include all input sections named .rodata, ensuring they are aligned to a 4 KB boundary.
@@ -24,10 +29,5 @@ SECTIONS
     {
         *(COMMON)              # Include all COMMON symbols (uninitialized data), typically grouped here for simplicity.
         *(.bss)                # Include all input sections named .bss, aligned to 4 KB.
-    }
-
-    .asm : ALIGN(4096)         # Define a custom .asm section for assembly code, if any is separate from .text.
-    {
-        *(.asm)                # Include all input sections named .asm, aligning to a 4 KB boundary.
     }
 }
