@@ -105,6 +105,21 @@ void task_run_first_ever_task(void);
 int task_free(struct task* task);
 
 /**
+ * @brief Copies a string from a task's memory to the kernel space
+ * 
+ * @details This function copies a string from a task's memory to the kernel space. It allocates
+ * memory in the kernel space to store the string, copies the string from the task's memory to the
+ * kernel space, and then copies the string to the physical address provided.
+ * 
+ * @param task The task to copy the string from
+ * @param virtual The virtual address of the string in the task's memory
+ * @param phys The physical address to copy the string to
+ * @param max The maximum number of bytes to copy
+ * @return int Returns 0 on success, negative value on failure
+ */
+int copy_string_from_task(struct task* task, void* virtual, void* phys, int max);
+
+/**
  * @brief Handles the task return process, restoring registers.
  * 
  * @param regs Pointer to the registers to restore.
