@@ -132,7 +132,7 @@ static void task_list_remove(struct task* task) {
  * @return int Returns 0 on success, negative value on failure
  */
 int copy_string_from_task(struct task* task, void* virtual, void* phys, int max) {
-    if (max >= PAGING_PAGE_SIZE) {
+    if (max >= PAGING_PAGE_SIZE || !task || !virtual || !phys) {
         return -EINVARG;
     }
 
