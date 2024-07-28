@@ -8,10 +8,10 @@ struct idt_desc idt_descriptors[TOYOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
 extern void int21h(void);
-extern void no_int(void);
+extern void no_interrupt(void);
 extern void idt_load(struct idtr_desc* ptr);
 
-void no_int_handler(void) {
+void no_interrupt_handler(void) {
     // ack interrupt
     outb(0x20, 0x20);
 }
@@ -42,7 +42,7 @@ void idt_init(void) {
     idtr_descriptor.base = (uint32_t)idt_descriptors;
 
     for (int i = 0; i < TOYOS_TOTAL_INTERRUPTS; i++) {
-        idt_set(i, no_int);
+        idt_set(i, no_interrupt);
     }
 
     // int 0 (divide by zero)

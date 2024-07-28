@@ -113,6 +113,13 @@ void maink(void) {
 
     printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
+#ifdef RUN_TESTS
+    // Run tests if the kernel is compiled in test mode
+    enable_interrupt();
+    tests_run();
+    disable_interrupt();
+#endif
+
     // Load the first process
     struct process* process = NULL;
     int res = process_load("0:/blank.bin", &process);
@@ -121,10 +128,4 @@ void maink(void) {
     }
 
     task_run_first_ever_task();
-
-#ifdef RUN_TESTS
-    // Run tests if the kernel is compiled in test mode
-    enable_int();
-    tests_run();
-#endif
 }

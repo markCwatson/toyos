@@ -38,7 +38,7 @@ struct interrupt_frame {
 } __attribute__((packed));
 
 void idt_init(void);
-void enable_int(void);
-void disable_int(void);
+void enable_interrupt(void);
+void disable_interrupt(void);
 
 #endif
