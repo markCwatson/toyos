@@ -39,21 +39,36 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
 };
 
 /**
- * @brief Prints a string to the terminal.
+ * @brief Prints a string to the terminal using color attributes.
  *
- * This function writes each character of the given string to the terminal, using a fixed
+ * This function writes each character of the given string to the terminal, using caller defined
  * color attribute. It is typically used for kernel-level logging and debugging.
  *
  * @param str The null-terminated string to print.
  * @param fg The foreground color of the text.
  * @param bg The background color of the text.
  */
-void printk(const char* str, unsigned char fg, unsigned char bg) {
+static void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
     size_t len = strlen(str);
 
     for (int i = 0; i < len; i++) {
         terminal_writechar(str[i], fg, bg);
     }
+}
+
+/**
+ * @brief Prints a string to the terminal.
+ *
+ * This function writes each character of the given string to the terminal, using a fixed
+ * color attribute (white on black).
+ * 
+ * This function is a light-weight alternative to printf, and is used for kernel-level logging
+ * and debugging.
+ *
+ * @param str The null-terminated string to print.
+ */
+void printk(const char* str) {
+    printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /**
@@ -108,7 +123,7 @@ void kernel_page(void) {
  */
 void maink(void) {
     terminal_init();
-    printk("Terminal initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printk_colored("Terminal initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     // Initialize the global descriptor table (GDT)
     memset(gdt_real, 0, sizeof(gdt_real));
@@ -144,12 +159,12 @@ void maink(void) {
     // Initialize the keyboard
     keyboard_init();
 
-    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printk_colored("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     // Load the first process
     // \todo: move this to the tests and replace with a proper first process
     struct process* process = NULL;
-    int res = process_load_switch("0:/test.bin", &process);
+    int res = process_load_switch("0:/shell.bin", &process);
     if (ISERROR(res)) {
         panick("Failed to load the first process!\n");
     }
@@ -159,7 +174,7 @@ void maink(void) {
     tests_run();
 #endif
 
-    printk("Running the first task!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printk_colored("Running the first task!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     task_run_first_ever_task();
 
     // Halt the system if the first task returns

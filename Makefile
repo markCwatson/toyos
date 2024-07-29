@@ -28,6 +28,7 @@ FILES = ./build/kernel.asm.o \
 		./build/task/process.o \
 		./build/task/task.o \
 		./build/sys/sys.o \
+		./build/sys/io/io.o \
 		./build/keyboard/keyboard.o \
 		./build/drivers/keyboards/ps2.o
 
@@ -85,19 +86,6 @@ all_tests: all
 
 # The 'all' target creates the final os.bin by combining boot.bin and kernel.bin.
 # This target produces the complete operating system binary, 'os.bin', which includes both the bootloader and the kernel.
-# Steps:
-# 1. Remove any existing os.bin file to ensure a clean build.
-# 2. Append the contents of boot.bin to os.bin using the 'dd' command.
-#    - 'boot.bin' typically contains the bootloader, which is the first code that runs when the system boots.
-# 3. Append the contents of kernel.bin to os.bin using the 'dd' command.
-#    - 'kernel.bin' contains the operating system kernel, which is loaded and executed by the bootloader.
-# 4. Append zero-filled blocks to the end of os.bin using the 'dd' command with input from /dev/zero.
-#    - This step pads the file to a fixed size or ensures it aligns with certain hardware requirements, typically
-#      to create space for additional file system data or to meet the minimum disk size.
-#    - bs=1048576 sets the block size to 1 MiB, and count=16 specifies that 16 blocks should be added, resulting in
-#      16 MiB of zero-padding.
-# 5. Builds the test user program and copies it to the mounted OS image.
-# 6. Crates a test file on the mounted OS image.
 all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 	# Combines the bootloader and kernel into a single OS image.
@@ -106,10 +94,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 
-	# Mounts the generated OS image, adds a test user program and test file, and then unmounts.
+	# Mounts the generated OS image, adds a test user program and test file, the shell program, and then unmounts.
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./programs/test/test.bin /mnt/d
+	sudo cp ./programs/shell/shell.bin /mnt/d
 
 	# Create a test file on the mounted OS image.
 	touch test.txt
@@ -208,6 +197,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/sys/sys.o: ./src/sys/sys.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/sys/sys.c -o ./build/sys/sys.o
 
+./build/sys/io/io.o: ./src/sys/io/io.c
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/sys/io/io.c -o ./build/sys/io/io.o
+
 ./build/keyboard/keyboard.o: ./src/keyboard/keyboard.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/keyboard/keyboard.c -o ./build/keyboard/keyboard.o
 
@@ -216,9 +208,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 user_programs:
 	cd ./programs/test && make all
+	cd ./programs/shell && make all
 
 user_programs_clean:
 	cd ./programs/test && make clean
+	cd ./programs/shell && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

@@ -32,6 +32,14 @@
 void terminal_init(void);
 
 /**
+ * @brief Deletes the last character written to the terminal.
+ * 
+ * This function moves the cursor back by one position and writes a space character
+ * to erase the last character written to the terminal.
+ */
+void terminal_backspace(void);
+
+/**
  * @brief Writes a character to the terminal at the current cursor position.
  *
  * This function places a character at the current cursor position, updating

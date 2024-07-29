@@ -38,13 +38,14 @@
  * @brief Prints a string to the terminal.
  *
  * This function writes each character of the given string to the terminal, using a fixed
- * color attribute. It is typically used for kernel-level logging and debugging.
+ * color attribute (white on black).
+ * 
+ * This function is a light-weight alternative to printf, and is used for kernel-level logging
+ * and debugging.
  *
  * @param str The null-terminated string to print.
- * @param fg The foreground color of the text.
- * @param bg The background color of the text.
  */
-void printk(const char* str, unsigned char fg, unsigned char bg);
+void printk(const char* str);
 
 /**
  * @brief Halts the system and displays a panic message.

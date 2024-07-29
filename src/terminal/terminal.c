@@ -57,6 +57,11 @@ void terminal_writechar(char c, unsigned char fg, unsigned char bg) {
         return;
     }
 
+    if (c == 0x08) {
+        terminal_backspace();
+        return;
+    }
+
     terminal_putchar(terminal_col, terminal_row, c, ((bg & 0x0f) << 4) | (fg & 0x0f));
     terminal_col += 1;
 
@@ -65,6 +70,27 @@ void terminal_writechar(char c, unsigned char fg, unsigned char bg) {
         terminal_col = 0;
         terminal_row += 1;
     }
+}
+
+/**
+ * @brief Deletes the last character written to the terminal.
+ * 
+ * This function moves the cursor back by one position and writes a space character
+ * to erase the last character written to the terminal.
+ */
+void terminal_backspace(void) {
+    if (terminal_row == 0 && terminal_col == 0) {
+        return;
+    }
+
+    if (terminal_col == 0) {
+        terminal_row -= 1;
+        terminal_col = VGA_WIDTH;
+    }
+
+    terminal_col -=1;
+    terminal_writechar(' ', VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    terminal_col -=1;
 }
 
 /**

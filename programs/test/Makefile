@@ -3,5 +3,5 @@ all:
 	i686-elf-gcc -g -T ./linker.ld -o ./test.bin -ffreestanding -O0 -nostdlib -fpic -g ./build/test.o
 
 clean:
-	rm -f ./build/test.o
-	rm -f ./test.bin
+	rm -f ./build/*.o
+	rm -f ./*.bin
