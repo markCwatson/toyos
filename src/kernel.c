@@ -115,6 +115,25 @@ void kernel_page(void) {
 }
 
 /**
+ * @brief Prints the "ToyOS" logo using ASCII art.
+ *
+ * This function displays the "ToyOS" name in a stylized ASCII art format.
+ * The art uses simple characters to create a visually appealing representation of the OS name.
+ */
+static void print_toyos_logo(void) {
+    const char* logo =
+        "  _____              _  _     ___      ___   \n"
+        " |_   _|    ___     | || |   / _ \\    / __|  \n"
+        "   | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
+        "  _|_|_    \\___/    _|__/    \\___/    |___/  \n"
+        " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
+        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \n"
+        "                                              \n";
+
+    printk_colored(logo, VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK);
+}
+
+/**
  * @brief Entry point for the kernel after booting.
  *
  * This function initializes various subsystems of the kernel, including the terminal,
@@ -123,7 +142,7 @@ void kernel_page(void) {
  */
 void maink(void) {
     terminal_init();
-    printk_colored("Terminal initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
 
     // Initialize the global descriptor table (GDT)
     memset(gdt_real, 0, sizeof(gdt_real));
@@ -159,8 +178,6 @@ void maink(void) {
     // Initialize the keyboard
     keyboard_init();
 
-    printk_colored("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-
     // Load the first process
     // \todo: move this to the tests and replace with a proper first process
     struct process* process = NULL;
@@ -174,7 +191,8 @@ void maink(void) {
     tests_run();
 #endif
 
-    printk_colored("Running the first task!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    terminal_clear_all();
+    print_toyos_logo();
     task_run_first_ever_task();
 
     // Halt the system if the first task returns

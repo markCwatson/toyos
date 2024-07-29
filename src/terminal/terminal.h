@@ -32,6 +32,14 @@
 void terminal_init(void);
 
 /**
+ * @brief Clears the terminal screen.
+ * 
+ * This function clears the entire terminal screen by writing spaces with the default color
+ * to each character cell.
+ */
+void terminal_clear_all(void);
+
+/**
  * @brief Deletes the last character written to the terminal.
  * 
  * This function moves the cursor back by one position and writes a space character

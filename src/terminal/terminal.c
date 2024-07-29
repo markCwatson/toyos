@@ -94,6 +94,23 @@ void terminal_backspace(void) {
 }
 
 /**
+ * @brief Clears the terminal screen.
+ * 
+ * This function clears the entire terminal screen by writing spaces with the default color
+ * to each character cell.
+ */
+void terminal_clear_all(void) {
+    for (int y = 0; y < VGA_HEIGHT; y++) {
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            terminal_putchar(x, y, ' ', VGA_COLOR_BLACK);
+        }
+    }
+
+    terminal_row = 0;
+    terminal_col = 0;
+}
+
+/**
  * @brief Initializes the terminal.
  *
  * This function sets up the terminal for text output by initializing
@@ -106,9 +123,5 @@ void terminal_init(void) {
     terminal_col = 0;
 
     // Clear the terminal by writing spaces with the default color
-    for (int y = 0; y < VGA_HEIGHT; y++) {
-        for (int x = 0; x < VGA_WIDTH; x++) {
-            terminal_putchar(x, y, ' ', 0);
-        }
-    }   
+    terminal_clear_all(); 
 }
