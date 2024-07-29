@@ -6,6 +6,12 @@
 #include "task.h"
 #include "config.h"
 
+// File types supported by the process loader
+#define PROCESS_FILETYPE_ELF    0
+#define PROCESS_FILETYPE_BINARY 1
+
+typedef unsigned char process_filetype;
+
 /**
  * @struct process
  * @brief Represents a process in the system.
@@ -15,7 +21,6 @@ struct process {
     char filename[TOYOS_MAX_PATH];                      /**< The filename of the executable. */
     struct task* task;                                  /**< The main task associated with the process. */
     void* allocations[TOYOS_MAX_PROGRAM_ALLOCATIONS];   /**< Memory allocations. */
-    void* ptr;                                          /**< Physical pointer to the process memory. */
     void* stack;                                        /**< Physical pointer to the stack memory. */
     uint32_t size;                                      /**< Size of the data pointed to by 'ptr'. */
     struct keyboard_buffer {                            /**< Keyboard buffer for the process. */
@@ -23,6 +28,11 @@ struct process {
         int tail;                                       /**< Tail index. */
         int head;                                       /**< Head index. */
     } keyboard;
+    process_filetype filetype;                          /**< The type of file the process is. */
+    union {                                             /**< File data. */
+        void* ptr;                                      /**< Pointer to the process memory. */
+        struct elf_file* elf_file;                      /**< Pointer to the ELF file structure. */
+    };
 };
 
 /**

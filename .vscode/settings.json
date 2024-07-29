@@ -13,6 +13,7 @@
         "terminal.h": "c",
         "file.h": "c",
         "tests.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "printf.h": "c"
     }
 }

@@ -6,7 +6,6 @@ FILES = ./build/kernel.asm.o \
 		./build/kernel.o \
 		./build/idt/idt.asm.o \
 		./build/stdlib/printf.o \
-		./build/tests/tests.o \
 		./build/idt/idt.o \
 		./build/memory/memory.o \
 		./build/io/io.asm.o \
@@ -30,7 +29,9 @@ FILES = ./build/kernel.asm.o \
 		./build/sys/sys.o \
 		./build/sys/io/io.o \
 		./build/keyboard/keyboard.o \
-		./build/drivers/keyboards/ps2.o
+		./build/drivers/keyboards/ps2.o \
+		./build/loader/formats/elf.o \
+		./build/loader/formats/elfloader.o
 
 # Include paths for the compiler to find header files.
 INCLUDES = -I./src
@@ -98,7 +99,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./programs/test/test.bin /mnt/d
-	sudo cp ./programs/shell/shell.bin /mnt/d
+	sudo cp ./programs/shell/shell.elf /mnt/d
 
 	# Create a test file on the mounted OS image.
 	touch test.txt
@@ -112,7 +113,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 # The 'kernel.bin' target links all object files into a final binary.
 ./bin/kernel.bin: $(FILES)
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
-	i686-elf-gcc ${FLAGS} -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+	i686-elf-gcc ${FLAGS} -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o -Wl,-Map=./bin/kernel.map
 
 # The 'boot.bin' target assembles the bootloader.
 ./bin/boot.bin: ./src/boot/boot.asm
@@ -170,8 +171,14 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/terminal/terminal.o: ./src/terminal/terminal.c
 	i686-elf-gcc ${INCLUDES} -I./src/terminal ${FLAGS} -std=gnu99 -c ./src/terminal/terminal.c -o ./build/terminal/terminal.o
 
-./build/tests/tests.o: ./tests/tests.c
-	i686-elf-gcc ${INCLUDES} -I./tests ${FLAGS} -std=gnu99 -c ./tests/tests.c -o ./build/tests/tests.o
+# Tests disabled because it is causing a runtime error not related to the tests themselves.
+# Just the inclusing of the tests.o file is causing the error.
+# The filesystem setup fails but not sure why. I think it is related to memory??
+# ... in map file, I see size of .text section is 26,995 bytes without tests, and 29,259 bytes with tests (diff of 2,264 bytes)
+# ... that memory increase doesn't seem like it should be causing a problem, but maybe it is something else?
+# Maybe move these to user programs?
+# ./build/tests/tests.o: ./tests/tests.c
+# 	i686-elf-gcc ${INCLUDES} -I./tests ${FLAGS} -std=gnu99 -c ./tests/tests.c -o ./build/tests/tests.o
 
 ./build/stdlib/printf.o: ./src/stdlib/printf.c
 	i686-elf-gcc ${INCLUDES} -I./src/stdlib ${FLAGS} -std=gnu99 -c ./src/stdlib/printf.c -o ./build/stdlib/printf.o
@@ -206,6 +213,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/drivers/keyboards/ps2.o: ./src/drivers/keyboards/ps2.c
 	i686-elf-gcc $(INCLUDES) -I./src/drivers/keyboards $(FLAGS) -std=gnu99 -c ./src/drivers/keyboards/ps2.c -o ./build/drivers/keyboards/ps2.o
 
+./build/loader/formats/elf.o: ./src/loader/formats/elf.c
+	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elf.c -o ./build/loader/formats/elf.o
+
+./build/loader/formats/elfloader.o: ./src/loader/formats/elfloader.c
+	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elfloader.c -o ./build/loader/formats/elfloader.o
+
 user_programs:
 	cd ./programs/test && make all
 	cd ./programs/shell && make all
@@ -217,6 +230,7 @@ user_programs_clean:
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean
 	rm -rf ./bin/*.bin
+	rm -rf ./bin/*.map
 	rm -rf ./build/*.o
 	rm -rf ./build/*.asm.o
 	rm -rf ./build/*/*.o

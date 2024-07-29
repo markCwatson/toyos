@@ -7,6 +7,7 @@
 #include "fs/file.h"
 #include "string/string.h"
 #include "kernel.h"
+#include "loader/formats/elfloader.h"
 
 // The current process that is running
 struct process* current_process = NULL;
@@ -46,11 +47,34 @@ static int process_load_binary(const char* filename, struct process* process) {
         goto out;
     }
 
+    process->filetype = PROCESS_FILETYPE_BINARY;
     process->ptr = program_data_ptr;
     process->size = stat.filesize;
 
 out:
     fclose(fd);
+    return res;
+}
+
+/**
+ * Loads an ELF file into memory.
+ * 
+ * @param filename The name of the file to load.
+ * @param process The process structure to store the loaded ELF file.
+ * @return 0 on success, error code on failure.
+ */
+static int process_load_elf(const char* filename, struct process* process) {
+    int res = OK;
+    struct elf_file* elf_file = NULL;
+    res = elf_load(filename, &elf_file);
+    if (ISERROR(res)) {
+        goto out;
+    }
+
+    process->filetype = PROCESS_FILETYPE_ELF;
+    process->elf_file = elf_file;
+
+out:
     return res;
 }
 
@@ -75,12 +99,46 @@ static int process_map_binary(struct process* process) {
 /**
  * Loads data for a process.
  * 
+ * @details This function loads data for a process, including ELF files and binary files.
+ * 
  * @param filename The name of the file to load.
  * @param process The process structure to store the loaded data.
  * @return 0 on success, error code on failure.
  */
 static int process_load_data(const char* filename, struct process* process) {
-    return process_load_binary(filename, process);
+    int res = process_load_elf(filename, process);
+    if (res == -EINFORMAT) {
+        res = process_load_binary(filename, process);
+    }
+
+    return res;
+}
+
+/**
+ * Maps the ELF file to memory.
+ * 
+ * @details This function maps the ELF file to the virtual address space of the process.
+ * 
+ * @param process The process to map the ELF file for.
+ * @return 0 on success, error code on failure.
+ */
+static int process_map_elf(struct process* process) {
+    struct elf_file* elf_file = process->elf_file;
+
+    // Align the virtual base address to the lower page boundary
+    void* virtual_base_aligned = paging_align_to_lower_page(elf_virtual_base(elf_file));
+
+    // Get the physical base address of the ELF file
+    void* physical_base = elf_phys_base(elf_file);
+
+    // Align the physical end address to the page boundary
+    void* physical_end_aligned = paging_align_address(elf_phys_end(elf_file));
+
+    // Set the flags for the paging entry
+    uint32_t paging_flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE;
+
+    // Map the ELF file into the process's address space
+    return paging_map_to(process->task->page_directory, virtual_base_aligned, physical_base, physical_end_aligned, paging_flags);
 }
 
 /**
@@ -95,18 +153,30 @@ static void process_init(struct process* process) {
 /**
  * @brief Maps the memory for a process.
  * 
- * @details This function maps the memory for a process, including the binary data and the stack.
+ * @details This function maps the memory for a process, including the ELF file and stack.
  * 
  * @param process The process to map memory for.
  * @return 0 on success, error code on failure.
  */
 static int process_map_memory(struct process* process) {
     int res = 0;
-    res = process_map_binary(process);
+
+    switch(process->filetype) {
+        case PROCESS_FILETYPE_ELF:
+            res = process_map_elf(process);
+            break;
+        case PROCESS_FILETYPE_BINARY:
+            res = process_map_binary(process);
+            break;
+        default:
+            panick("process_map_memory: Invalid filetype\n");
+    }
+
     if (res < 0) {
         return res;
     }
 
+    // Map the stack
     res = paging_map_to(process->task->page_directory,
                         (void*)TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END,
                         process->stack,

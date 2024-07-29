@@ -15,6 +15,7 @@ Future planned features:
 - **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
 - **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
+- **Loading ELF files at runtime:** The ability to dynamically load shared libraries and user programs at runtime.
 
 ### Building
 
@@ -71,6 +72,20 @@ To debug user programs, use address `0x400000` for user space.
 
 ```shell
 (gdb) break *0x400000
+```
+
+### Elf Files
+
+To view the ocntent of ELF files, install `dumpelf`
+
+```shell
+sudo apt install pax-utils
+```
+
+and dump the contents of an ELF file, for example
+
+```shell
+dumpelf programs/shell/shell.elf
 ```
 
 ### References

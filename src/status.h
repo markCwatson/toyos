@@ -66,4 +66,11 @@
  */
 #define EISTKN      8   /** < Process slot is taken */
 
+/**
+ * @brief Status code indicating an invalid format.
+ *
+ * This error occurs when a file or data is in an invalid or unrecognized format.
+ */
+#define EINFORMAT   9   /** < Invalid format */
+
 #endif

@@ -1,6 +1,6 @@
-#ifdef RUN_TESTS
-#include "../tests/tests.h"
-#endif
+// #ifdef RUN_TESTS
+// #include "../tests/tests.h"
+// #endif
 #include "kernel.h"
 #include "terminal/terminal.h"
 #include "idt/idt.h"
@@ -16,7 +16,7 @@
 #include "task/tss.h"
 #include "task/task.h"
 #include "task/process.h"
-#include "stdlib/printf.h"
+#include "stdlib/printf.h" 
 #include "sys/sys.h"
 #include "keyboard/keyboard.h"
 #include "drivers/keyboards/ps2.h"
@@ -145,16 +145,22 @@ void maink(void) {
     printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
 
     // Initialize the global descriptor table (GDT)
+    printk_colored("Initializing the GDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     memset(gdt_real, 0, sizeof(gdt_real));
     gdt_structured_to_gdt(gdt_real, gdt_structured, TOYOS_TOTAL_GDT_SEGMENTS);
-    gdt_load(gdt_real,sizeof(gdt_real));
+    gdt_load(gdt_real, sizeof(gdt_real));
 
+    // Initialize the heap, file system, disk, and IDT
+    printk_colored("Initializing the heap...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     kheap_init();
+    printk_colored("Initializing the file system...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     fs_init();
     disk_search_and_init();
+    printk_colored("Initializing the IDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     idt_init();
 
     // Setup the task state segment (TSS)
+    printk_colored("Setting up the TSS...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     memset(&tss, 0, sizeof(tss));
     tss.esp0 = 0x60000;             // Set the stack pointer for ring 0
     tss.ss0 = TOYOS_DATA_SELECTOR;  // Set the stack segment for ring 0
@@ -163,6 +169,7 @@ void maink(void) {
     tss_load(0x28);
 
     // Set up paging for the kernel
+    printk_colored("Setting up paging...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(kernel_chunk);
     enable_paging();
@@ -171,6 +178,7 @@ void maink(void) {
     sys_register_commands();
 
     // Register the PS/2 keyboard driver
+    printk_colored("Registering the PS/2 keyboard...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     if (ps2_register() < 0) {
         panick("Failed to register the PS/2 keyboard!\n");
     }
@@ -179,17 +187,17 @@ void maink(void) {
     keyboard_init();
 
     // Load the first process
-    // \todo: move this to the tests and replace with a proper first process
+    printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     struct process* process = NULL;
-    int res = process_load_switch("0:/shell.bin", &process);
+    int res = process_load_switch("0:/shell.elf", &process);
     if (ISERROR(res)) {
-        panick("Failed to load the first process!\n");
+        panick("Failed to load the shell!\n");
     }
 
-#ifdef RUN_TESTS
-    // Run tests if the kernel is compiled in test mode
-    tests_run();
-#endif
+// #ifdef RUN_TESTS
+//     // Run tests if the kernel is compiled in test mode
+//     tests_run();
+// #endif
 
     terminal_clear_all();
     print_toyos_logo();

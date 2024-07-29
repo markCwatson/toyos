@@ -233,7 +233,6 @@ static void test_heap(void) {
  * and verifying read/write operations to a mapped virtual address.
  */
 static void test_paging(void) {
-
     char* ptr = kzalloc(4096);
     register_test("Heap block allocation", ptr != NULL);
 
