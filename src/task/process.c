@@ -156,6 +156,35 @@ out:
 }
 
 /**
+ * Switches to the given process.
+ * @param process The process to switch to.
+ * @return 0 on success, error code on failure.
+ */
+int process_switch(struct process* process) {
+    current_process = process;
+    return OK;
+}
+
+/**
+ * Loads a process from the given filename and switches to it.
+ * @param filename The name of the file to load.
+ * @param process A pointer to the process structure to store the loaded process.
+ * @return 0 on success, error code on failure.
+ */
+int process_load_switch(const char* filename, struct process** process) {
+    if (!process || !filename) {
+        return -EINVARG;
+    }
+
+    int res = process_load(filename, process);
+    if (res == OK) {
+        process_switch(*process);
+    }
+
+    return res;
+}
+
+/**
  * Retrieves the current running process.
  * @return The current process.
  */

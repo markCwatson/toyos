@@ -223,11 +223,11 @@ void task_save_state(struct task* task, struct interrupt_frame* frame) {
  * @return void
  */
 void task_current_save_state(struct interrupt_frame* frame) {
-    if (!task_current()) {
+    struct task* task = task_current();
+    if (!task) {
         panick("[task_current_save_state] No current task exists!\n");
     }
 
-    struct task* task = task_current();
     task_save_state(task, frame);
 }
 

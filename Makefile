@@ -27,7 +27,9 @@ FILES = ./build/kernel.asm.o \
 		./build/task/task.asm.o \
 		./build/task/process.o \
 		./build/task/task.o \
-		./build/sys/sys.o
+		./build/sys/sys.o \
+		./build/keyboard/keyboard.o \
+		./build/drivers/keyboards/ps2.o
 
 # Include paths for the compiler to find header files.
 INCLUDES = -I./src
@@ -205,6 +207,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 ./build/sys/sys.o: ./src/sys/sys.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/sys/sys.c -o ./build/sys/sys.o
+
+./build/keyboard/keyboard.o: ./src/keyboard/keyboard.c
+	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/keyboard/keyboard.c -o ./build/keyboard/keyboard.o
+
+./build/drivers/keyboards/ps2.o: ./src/drivers/keyboards/ps2.c
+	i686-elf-gcc $(INCLUDES) -I./src/drivers/keyboards $(FLAGS) -std=gnu99 -c ./src/drivers/keyboards/ps2.c -o ./build/drivers/keyboards/ps2.o
 
 user_programs:
 	cd ./programs/test && make all

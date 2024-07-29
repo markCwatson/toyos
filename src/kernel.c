@@ -18,6 +18,8 @@
 #include "task/process.h"
 #include "stdlib/printf.h"
 #include "sys/sys.h"
+#include "keyboard/keyboard.h"
+#include "drivers/keyboards/ps2.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
@@ -134,22 +136,28 @@ void maink(void) {
     // Initialize the sys system call handlers for system calls
     sys_register_commands();
 
-    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    // Register the PS/2 keyboard driver
+    if (ps2_register() < 0) {
+        panick("Failed to register the PS/2 keyboard!\n");
+    }
 
-#ifdef RUN_TESTS
-    // Run tests if the kernel is compiled in test mode
-    enable_interrupt();
-    tests_run();
-    disable_interrupt();
-#endif
+    // Initialize the keyboard
+    keyboard_init();
+
+    printk("\nKernel initialized!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     // Load the first process
     // \todo: move this to the tests and replace with a proper first process
     struct process* process = NULL;
-    int res = process_load("0:/test.bin", &process);
+    int res = process_load_switch("0:/test.bin", &process);
     if (ISERROR(res)) {
         panick("Failed to load the first process!\n");
     }
+
+#ifdef RUN_TESTS
+    // Run tests if the kernel is compiled in test mode
+    tests_run();
+#endif
 
     printk("Running the first task!\n", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     task_run_first_ever_task();

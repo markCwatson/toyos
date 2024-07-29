@@ -86,4 +86,9 @@
  */
 #define TOYOS_MAX_SYSCALLS  1024    /**< Maximum number of system calls. */
 
+/**
+ * @brief Configuration for the keyboard buffer.
+ */
+#define TOYOS_KEYBOARD_BUFFER_SIZE  1024    /**< Size of the keyboard buffer. */
+
 #endif

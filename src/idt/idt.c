@@ -4,16 +4,25 @@
 #include "memory/memory.h"
 #include "io/io.h"
 #include "task/task.h"
+#include "status.h"
 
+// Interrupt descriptor table (IDT) descriptors
 struct idt_desc idt_descriptors[TOYOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
+
+// Interrupt callback table
+static interrupt_cb_fp interrupt_callbacks[TOYOS_TOTAL_INTERRUPTS];
+
+// Interrupt pointer table
+extern void* interrupt_pointer_table[TOYOS_TOTAL_INTERRUPTS];
 
 extern void int80h(void);
 extern void int21h(void);
 extern void no_interrupt(void);
 extern void idt_load(struct idtr_desc* ptr);
 
-static sys_cmd sys_commands[TOYOS_MAX_SYSCALLS];
+// System call handler function pointer
+static sys_cmd_fp sys_commands[TOYOS_MAX_SYSCALLS];
 
 /**
  * @brief Handles system call interrupt
@@ -31,7 +40,7 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
         return NULL;
     }
 
-    sys_cmd handler = sys_commands[cmd];
+    sys_cmd_fp handler = sys_commands[cmd];
     if (!handler) {
         alertk("No handler for system call %d\n", cmd);
         return NULL;
@@ -51,7 +60,7 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
  * @param handler The system call handler function.
  * @return void
  */
-void register_sys_command(int cmd, sys_cmd handler) {
+void register_sys_command(int cmd, sys_cmd_fp handler) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
         panick("Invalid system call number: %d\n", cmd);
     }
@@ -90,10 +99,27 @@ void* sys_handler(int cmd, struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Handles keyboard interrupt
+ * @brief Handles an interrupt
+ * 
+ * This function is called when an interrupt occurs. It reads the interrupt number from the
+ * interrupt frame and calls the appropriate interrupt handler function.
+ * 
+ * @param interrupt The interrupt number.
+ * @param frame The interrupt frame containing the interrupt number.
  */
-void int21h_handler(void) {
-    alertk("\nKeyboard pressed\n");
+void interrupt_handler(int interrupt, struct interrupt_frame* frame) {
+    // Switch to the kernel page to access the kernel heap
+    kernel_page();
+
+    // Call the interrupt callback if registered
+    interrupt_cb_fp handler = interrupt_callbacks[interrupt];
+    if (handler != NULL) {
+        task_current_save_state(frame);
+        handler(frame);
+    }
+
+    // Switch back to the task page to return to the task
+    task_page();
 
     // ack interrupt
     outb(0x20, 0x20);
@@ -135,6 +161,24 @@ static void idt_set(int interrupt_no, void* address) {
 }
 
 /**
+ * @brief Registers an interrupt callback function
+ * 
+ * This function registers an interrupt callback function for the given interrupt number.
+ * 
+ * @param interrupt The interrupt number.
+ * @param interrupt_cb The interrupt callback function.
+ * @return 0 on success, error code on failure.
+ */
+int idt_register_interrupt_callback(int interrupt, interrupt_cb_fp interrupt_callback) {
+    if (interrupt < 0 || interrupt >= TOYOS_TOTAL_INTERRUPTS) {
+        return -EINVARG;
+    }
+
+    interrupt_callbacks[interrupt] = interrupt_callback;
+    return OK;
+}
+
+/**
  * @brief Initializes the interrupt descriptor table (IDT) with default handlers
  */
 void idt_init(void) {
@@ -144,13 +188,12 @@ void idt_init(void) {
 
     // Set all interrupts to no_interrupt
     for (int i = 0; i < TOYOS_TOTAL_INTERRUPTS; i++) {
-        idt_set(i, no_interrupt);
+        idt_set(i, interrupt_pointer_table[i]);
     }
 
+    // override some interrupts:
     // int 0: divide by zero
     idt_set(0, int0h);
-    // int 0x21: key board interrupt handler
-    idt_set(0x21, int21h);
     // int 0x80: system call interrupt handler
     idt_set(0x80, int80h);
 
