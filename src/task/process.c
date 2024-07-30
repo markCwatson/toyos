@@ -115,30 +115,56 @@ static int process_load_data(const char* filename, struct process* process) {
 }
 
 /**
- * Maps the ELF file to memory.
+ * Maps the ELF file to the process's virtual address space.
  * 
- * @details This function maps the ELF file to the virtual address space of the process.
+ * @details This function takes an ELF file associated with a process and maps its segments 
+ * into the process's virtual address space. This is a crucial step in setting up the process 
+ * for execution, as it ensures that the necessary code and data segments are accessible in 
+ * memory according to the specifications provided in the ELF headers.
  * 
- * @param process The process to map the ELF file for.
- * @return 0 on success, error code on failure.
+ * The function iterates over each program header in the ELF file, extracting the physical 
+ * memory address and other properties like permissions. It aligns the virtual and physical 
+ * addresses to page boundaries and sets appropriate flags (such as writeable if the segment 
+ * can be written to). The mapped regions in memory are then accessible to the process, 
+ * allowing it to execute the code or access data contained in these segments.
+ * 
+ * @param process The process structure that includes the ELF file to be mapped.
+ * @return 0 on success, an error code on failure.
  */
 static int process_map_elf(struct process* process) {
+    int res = OK;
     struct elf_file* elf_file = process->elf_file;
+    struct elf_header* header = elf_header(elf_file);
+    struct elf32_phdr* phdrs = elf_pheader(header);
+    
+    // Map the ELF file into the process's address space by mapping each program header
+    for (int i = 0; i < header->e_phnum; i++) {
+        // Get the program header from the table
+        struct elf32_phdr* phdr = &phdrs[i];
+        void* phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
+        
+        int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+        if (phdr->p_flags & PF_W) {
+            flags |= PAGING_IS_WRITEABLE;
+        }
 
-    // Align the virtual base address to the lower page boundary
-    void* virtual_base_aligned = paging_align_to_lower_page(elf_virtual_base(elf_file));
+        // Align the virtual base address to the lower page boundary
+        void* virt = paging_align_to_lower_page((void*)phdr->p_vaddr);
 
-    // Get the physical base address of the ELF file
-    void* physical_base = elf_phys_base(elf_file);
+        // Get the physical base address of the ELF file
+        void* phys = paging_align_to_lower_page(phdr_phys_address);
 
-    // Align the physical end address to the page boundary
-    void* physical_end_aligned = paging_align_address(elf_phys_end(elf_file));
+        // Align the physical end address to the page boundary
+        void* phys_end = paging_align_address(phdr_phys_address + phdr->p_filesz);
+        
+        // Map the ELF file into the process's virtual address space
+        res = paging_map_to(process->task->page_directory, virt, phys, phys_end, flags);
+        if (res < 0) {
+            break;
+        }
+    }
 
-    // Set the flags for the paging entry
-    uint32_t paging_flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE;
-
-    // Map the ELF file into the process's address space
-    return paging_map_to(process->task->page_directory, virtual_base_aligned, physical_base, physical_end_aligned, paging_flags);
+    return res;
 }
 
 /**

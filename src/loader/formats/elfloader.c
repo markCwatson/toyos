@@ -192,6 +192,17 @@ void* elf_phys_end(struct elf_file* file) {
 }
 
 /**
+ * @brief Retrieves the physical address of a program header.
+ * 
+ * @param file The ELF file structure.
+ * @param phdr The program header structure.
+ * @return Pointer to the physical address of the program header.
+ */
+void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr) {
+    return elf_memory(file) + phdr->p_offset;
+}
+
+/**
  * @brief Validates that the ELF file is properly loaded.
  *
  * This function checks the ELF file for a valid signature, class, encoding, and presence

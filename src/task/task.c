@@ -6,7 +6,7 @@
 #include "memory/memory.h"
 #include "string/string.h"
 #include "memory/paging/paging.h"
-// #include "loader/formats/elfloader.h"
+#include "loader/formats/elfloader.h"
 #include "idt/idt.h"
 
 // The current task that is running
@@ -344,8 +344,12 @@ static int task_init(struct task* task, struct process* process) {
         return -EIO;
     }
 
-    // Map the kernel memory
+    // Set the ip to the program's entry point
     task->registers.ip = TOYOS_PROGRAM_VIRTUAL_ADDRESS;
+    if (process->filetype == PROCESS_FILETYPE_ELF) {
+        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    }
+
     task->registers.ss = TOYOS_USER_DATA_SEGMENT;
     task->registers.cs = TOYOS_USER_CODE_SEGMENT;
     task->registers.esp = TOYOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;

@@ -14,6 +14,7 @@
         "file.h": "c",
         "tests.h": "c",
         "task.h": "c",
-        "printf.h": "c"
+        "printf.h": "c",
+        "elfloader.h": "c"
     }
 }

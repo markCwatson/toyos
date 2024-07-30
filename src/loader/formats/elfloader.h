@@ -90,6 +90,15 @@ void elf_close(struct elf_file* file);
 void* elf_virtual_base(struct elf_file* file);
 
 /**
+ * @brief Retrieves the physical address of a program header.
+ * 
+ * @param file The ELF file structure.
+ * @param phdr The program header structure.
+ * @return Pointer to the physical address of the program header.
+ */
+void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr);
+
+/**
  * @brief Retrieves the virtual end address of the ELF file.
  *
  * @param file The ELF file structure.
@@ -112,5 +121,21 @@ void* elf_phys_base(struct elf_file* file);
  * @return Pointer to the physical end address.
  */
 void* elf_phys_end(struct elf_file* file);
+
+/**
+ * @brief Retrieves the ELF header from the ELF file.
+ *
+ * @param file The ELF file structure.
+ * @return Pointer to the ELF header.
+ */
+struct elf_header* elf_header(struct elf_file* file);
+
+/**
+ * @brief Retrieves the program header table from the ELF header.
+ *
+ * @param header The ELF header structure.
+ * @return Pointer to the program header table, or NULL if not present.
+ */
+struct elf32_phdr* elf_pheader(struct elf_header* header);
 
 #endif
