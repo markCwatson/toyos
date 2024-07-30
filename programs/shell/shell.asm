@@ -23,4 +23,4 @@ getkey:
     ret
 
 section .data
-message: db 'toyos $ ', 0
+message: db '$ ', 0

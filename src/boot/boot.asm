@@ -1,36 +1,36 @@
-ORG 0x7c00                 ; Origin: Set the code's starting point to memory address 0x7C00 (standard bootloader location).
-BITS 16                   ; Tell the assembler to produce 16-bit code.
+ORG 0x7c00                          ; Origin: Set the code's starting point to memory address 0x7C00 (standard bootloader location).
+BITS 16                             ; Tell the assembler to produce 16-bit code.
 
-CODE_SEG equ gdt_code - gdt_start  ; Define segment offsets relative to GDT start.
+CODE_SEG equ gdt_code - gdt_start   ; Define segment offsets relative to GDT start.
 DATA_SEG equ gdt_data - gdt_start
 
 ; BIOS Parameter Block
-jmp short start            ; Jump to the start label, a standard boot sector entry.
-nop                        ; No operation, used for alignment.
+jmp short start                     ; Jump to the start label, a standard boot sector entry.
+nop                                 ; No operation, used for alignment.
 
 ; FAT16 Header
 ; This section describes the file system format and is crucial for the OS to recognize the disk.
-OEMIdentifier           db 'TOYOS   '  ; Identifies the system that formatted the volume.
-BytesPerSector          dw 0x200       ; Standard sector size (512 bytes).
-SectorsPerCluster       db 0x80        ; Number of sectors per cluster.
-ReservedSectors         dw 200         ; Reserved sectors (includes bootloader, etc.).
-FATCopies               db 0x02        ; Number of File Allocation Tables.
-RootDirEntries          dw 0x40        ; Number of entries in the root directory.
-NumSectors              dw 0x00        ; Total number of sectors (if zero, use SectorsBig).
-MediaType               db 0xF8        ; Media type descriptor.
-SectorsPerFat           dw 0x100       ; Number of sectors per FAT.
-SectorsPerTrack         dw 0x20        ; Number of sectors per track.
-NumberOfHeads           dw 0x40        ; Number of heads in the disk.
-HiddenSectors           dd 0x00        ; Number of hidden sectors.
-SectorsBig              dd 0x773594    ; Total number of sectors (32-bit, for large volumes).
+OEMIdentifier           db 'TOYOS   '       ; Identifies the system that formatted the volume.
+BytesPerSector          dw 0x200            ; Standard sector size (512 bytes).
+SectorsPerCluster       db 0x80             ; Number of sectors per cluster.
+ReservedSectors         dw 200              ; Reserved sectors (includes bootloader, etc.).
+FATCopies               db 0x02             ; Number of File Allocation Tables.
+RootDirEntries          dw 0x40             ; Number of entries in the root directory.
+NumSectors              dw 0x00             ; Total number of sectors (if zero, use SectorsBig).
+MediaType               db 0xF8             ; Media type descriptor.
+SectorsPerFat           dw 0x100            ; Number of sectors per FAT.
+SectorsPerTrack         dw 0x20             ; Number of sectors per track.
+NumberOfHeads           dw 0x40             ; Number of heads in the disk.
+HiddenSectors           dd 0x00             ; Number of hidden sectors.
+SectorsBig              dd 0x773594         ; Total number of sectors (32-bit, for large volumes).
 
 ; Extended BPB (BIOS Parameter Block for DOS 4.0 and higher)
-DriveNumber             db 0x80        ; BIOS drive number (0x80 for the first hard disk).
-WinNTBit                db 0x00        ; Reserved or used by Windows NT.
-Signature               db 0x29        ; Extended boot signature to indicate presence of extended BPB.
-VolumeID                dd 0xD105      ; Volume serial number.
-VolumeIDString          db 'TOYOSFOOBAR' ; Volume label.
-SystemIDString          db 'FAT16   '  ; File system type identifier.
+DriveNumber             db 0x80             ; BIOS drive number (0x80 for the first hard disk).
+WinNTBit                db 0x00             ; Reserved or used by Windows NT.
+Signature               db 0x29             ; Extended boot signature to indicate presence of extended BPB.
+VolumeID                dd 0xD105           ; Volume serial number.
+VolumeIDString          db 'TOYOSFOOBAR'    ; Volume label.
+SystemIDString          db 'FAT16   '       ; File system type identifier.
 
 ; Bootloader Entry Point
 start:
@@ -55,6 +55,7 @@ step2:
 
 ; Global Descriptor Table (GDT)
 ; Defines memory segments for the processor (needed for protected mode).
+; i.e. defines the memory layout and access permissions in protected mode.
 gdt_start:
 gdt_null:                ; Null descriptor (first entry, required to be zeroed).
     dd 0x0
@@ -83,11 +84,11 @@ gdt_descriptor:
     dd gdt_start                ; GDT base address.
 
 [BITS 32]
-load32:                     ; Switch to 32-bit code and load the kernel.
+load32:                      ; Switch to 32-bit code and load the kernel.
     mov eax, 1               ; LBA (Logical Block Addressing) starting sector.
     mov ecx, 100             ; Number of sectors to load.
     mov edi, 0x0100000       ; Memory address to load the kernel to.
-    call ata_lba_read        ; Call function to read from disk.
+    call ata_lba_read        ; Call function to read kernel from disk and load it to memory at 0x0100000.
     jmp CODE_SEG:0x0100000   ; Jump to the loaded kernel's entry point.
 
 ; ATA LBA Read Function

@@ -3,7 +3,7 @@
 
 // Defines the width and height of the terminal screen in character cells
 #define VGA_WIDTH   80  /**< The number of character columns on the screen. */
-#define VGA_HEIGHT  20  /**< The number of character rows on the screen. */
+#define VGA_HEIGHT  25  /**< The number of character rows on the screen. */
 
 // Defines for terminal colors
 #define VGA_COLOR_BLACK         0

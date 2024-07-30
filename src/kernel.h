@@ -48,6 +48,18 @@
 void printk(const char* str);
 
 /**
+ * @brief Prints a string to the terminal using color attributes.
+ *
+ * This function writes each character of the given string to the terminal, using caller defined
+ * color attribute. It is typically used for kernel-level logging and debugging.
+ *
+ * @param str The null-terminated string to print.
+ * @param fg The foreground color of the text.
+ * @param bg The background color of the text.
+ */
+void printk_colored(const char* str, unsigned char fg, unsigned char bg);
+
+/**
  * @brief Halts the system and displays a panic message.
  *
  * This function is called when the kernel encounters a critical error from which

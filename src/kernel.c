@@ -48,7 +48,7 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
  * @param fg The foreground color of the text.
  * @param bg The background color of the text.
  */
-static void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
+void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
     size_t len = strlen(str);
 
     for (int i = 0; i < len; i++) {
@@ -68,7 +68,7 @@ static void printk_colored(const char* str, unsigned char fg, unsigned char bg) 
  * @param str The null-terminated string to print.
  */
 void printk(const char* str) {
-    printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLUE);
 }
 
 /**
@@ -84,7 +84,7 @@ void printk(const char* str) {
 void panick(const char* str, ...) {
     va_list args;
     va_start(args, str);
-    printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLACK, args);
+    printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLUE, args);
     while (1);  // Infinite loop to halt the system
 }
 
@@ -99,7 +99,7 @@ void panick(const char* str, ...) {
 void alertk(const char* str, ...) {
     va_list args;
     va_start(args, str);
-    printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLACK, args);
+    printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE, args);
 }
 
 /**
@@ -122,15 +122,15 @@ void kernel_page(void) {
  */
 static void print_toyos_logo(void) {
     const char* logo =
-        "  _____              _  _     ___      ___   \n"
-        " |_   _|    ___     | || |   / _ \\    / __|  \n"
-        "   | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
-        "  _|_|_    \\___/    _|__/    \\___/    |___/  \n"
+        "   _____              _  _     ___      ___   \n"
+        "  |_   _|    ___     | || |   / _ \\    / __|  \n"
+        "    | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
+        "   _|_|_    \\___/    _|__/    \\___/    |___/  \n"
         " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
-        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \n"
-        "                                              \n";
+        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' version 0.0.0\n"
+        "\n";
 
-    printk_colored(logo, VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK);
+    printk_colored(logo, VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLUE);
 }
 
 /**
@@ -142,25 +142,25 @@ static void print_toyos_logo(void) {
  */
 void maink(void) {
     terminal_init();
-    printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
 
     // Initialize the global descriptor table (GDT)
-    printk_colored("Initializing the GDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Initializing the GDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     memset(gdt_real, 0, sizeof(gdt_real));
     gdt_structured_to_gdt(gdt_real, gdt_structured, TOYOS_TOTAL_GDT_SEGMENTS);
     gdt_load(gdt_real, sizeof(gdt_real));
 
     // Initialize the heap, file system, disk, and IDT
-    printk_colored("Initializing the heap...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Initializing the heap...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     kheap_init();
-    printk_colored("Initializing the file system...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Initializing the file system...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     fs_init();
     disk_search_and_init();
-    printk_colored("Initializing the IDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Initializing the IDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     idt_init();
 
     // Setup the task state segment (TSS)
-    printk_colored("Setting up the TSS...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Setting up the TSS...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     memset(&tss, 0, sizeof(tss));
     tss.esp0 = 0x60000;             // Set the stack pointer for ring 0
     tss.ss0 = TOYOS_DATA_SELECTOR;  // Set the stack segment for ring 0
@@ -169,7 +169,7 @@ void maink(void) {
     tss_load(0x28);
 
     // Set up paging for the kernel
-    printk_colored("Setting up paging...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Setting up paging...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(kernel_chunk);
     enable_paging();
@@ -178,7 +178,7 @@ void maink(void) {
     sys_register_commands();
 
     // Register the PS/2 keyboard driver
-    printk_colored("Registering the PS/2 keyboard...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Registering the PS/2 keyboard...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     if (ps2_register() < 0) {
         panick("Failed to register the PS/2 keyboard!\n");
     }
@@ -187,7 +187,7 @@ void maink(void) {
     keyboard_init();
 
     // Load the first process
-    printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     struct process* process = NULL;
     int res = process_load_switch("0:/shell.elf", &process);
     if (ISERROR(res)) {

@@ -76,7 +76,7 @@ To debug user programs, use address `0x400000` for user space.
 
 ### Elf Files
 
-To view the ocntent of ELF files, install `dumpelf`
+To view the content of ELF files, install `dumpelf`
 
 ```shell
 sudo apt install pax-utils

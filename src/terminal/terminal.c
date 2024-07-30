@@ -89,7 +89,7 @@ void terminal_backspace(void) {
     }
 
     terminal_col -=1;
-    terminal_writechar(' ', VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    terminal_writechar(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
     terminal_col -=1;
 }
 
@@ -102,7 +102,7 @@ void terminal_backspace(void) {
 void terminal_clear_all(void) {
     for (int y = 0; y < VGA_HEIGHT; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
-            terminal_putchar(x, y, ' ', VGA_COLOR_BLACK);
+            terminal_putchar(x, y, ' ', ((VGA_COLOR_BLUE & 0x0f) << 4) | (VGA_COLOR_BLUE & 0x0f));
         }
     }
 
@@ -118,10 +118,7 @@ void terminal_clear_all(void) {
  * to the top-left corner.
  */
 void terminal_init(void) {
-    video_mem = (uint16_t*)(0xb8000); // VGA text mode memory address
-    terminal_row = 0;
-    terminal_col = 0;
-
-    // Clear the terminal by writing spaces with the default color
+    // VGA text mode memory address starts at 0xb8000
+    video_mem = (uint16_t*)(0xb8000);
     terminal_clear_all(); 
 }
