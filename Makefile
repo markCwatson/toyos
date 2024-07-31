@@ -32,7 +32,8 @@ FILES = ./build/kernel.asm.o \
 		./build/keyboard/keyboard.o \
 		./build/drivers/keyboards/ps2.o \
 		./build/loader/formats/elf.o \
-		./build/loader/formats/elfloader.o
+		./build/loader/formats/elfloader.o \
+		./build/sys/task/process.o
 
 # Include paths for the compiler to find header files.
 INCLUDES = -I./src
@@ -101,6 +102,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./programs/test/test.bin /mnt/d
 	sudo cp ./programs/shell/shell.elf /mnt/d
+	sudo cp ./programs/echo/echo.elf /mnt/d
 
 	# Create a test file on the mounted OS image.
 	touch test.txt
@@ -223,15 +225,20 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/loader/formats/elfloader.o: ./src/loader/formats/elfloader.c
 	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elfloader.c -o ./build/loader/formats/elfloader.o
 
+./build/sys/task/process.o: ./src/sys/task/process.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/task $(FLAGS) -std=gnu99 -c ./src/sys/task/process.c -o ./build/sys/task/process.o
+
 user_programs:
 	cd ./programs/stdlib && make all
 	cd ./programs/test && make all
 	cd ./programs/shell && make all
+	cd ./programs/echo && make all
 
 user_programs_clean:
 	cd ./programs/stdlib && make clean
 	cd ./programs/test && make clean
 	cd ./programs/shell && make clean
+	cd ./programs/echo && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

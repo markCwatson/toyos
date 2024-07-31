@@ -125,4 +125,17 @@ char tolower(char s1);
  */
 int strnlen_terminator(const char* str, int max, char terminator);
 
+/**
+ * @brief Concatenates two strings.
+ * 
+ * This function appends the null-terminated string src to the end of the null-terminated
+ * string dest, overwriting the null character at the end of dest, and then adds a terminating
+ * null character.
+ * 
+ * @param dest Pointer to the destination buffer.
+ * @param src Pointer to the source string.
+ * @return The length of the concatenated string.
+ */
+int strcat(char* dest, const char* src);
+
 #endif

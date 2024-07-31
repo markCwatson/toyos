@@ -1,5 +1,5 @@
-#ifndef _ISR80H_HEAP_H_
-#define _ISR80H_HEAP_H_
+#ifndef _SYS_HEAP_H_
+#define _SYS_HEAP_H_
 
 // Forward declaration of interrupt_frame.
 struct interrupt_frame;

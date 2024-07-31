@@ -43,6 +43,35 @@ char* strcpy(char* dest, const char* src) {
 }
 
 /**
+ * @brief Concatenates two strings.
+ * 
+ * This function appends the null-terminated string src to the end of the null-terminated
+ * string dest, overwriting the null character at the end of dest, and then adds a terminating
+ * null character.
+ * 
+ * @param dest Pointer to the destination buffer.
+ * @param src Pointer to the source string.
+ * @return The length of the concatenated string.
+ */
+int strcat(char* dest, const char* src) {
+    int i = 0;
+    int j = 0;
+
+    while (dest[i] != 0) {
+        i += 1;
+    }
+
+    while (src[j] != 0) {
+        dest[i] = src[j];
+        i += 1;
+        j += 1;
+    }
+
+    dest[i] = 0x00;
+    return i;
+}
+
+/**
  * @brief Copies a string up to a specified length.
  *
  * This function copies up to n characters from the null-terminated string src to the buffer

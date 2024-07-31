@@ -18,6 +18,7 @@
         "elfloader.h": "c",
         "stdlib.h": "c",
         "stdio.h": "c",
-        "toyos.h": "c"
+        "toyos.h": "c",
+        "process.h": "c"
     }
 }

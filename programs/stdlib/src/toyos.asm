@@ -7,6 +7,7 @@ global toyos_getkey:function
 global toyos_malloc:function
 global toyos_free:function
 global toyos_putchar:function
+global toyos_process_load_start:function
 
 ; void print(const char* filename)
 print:
@@ -56,6 +57,17 @@ toyos_putchar:
     mov ebp, esp
     mov eax, 3 ; Command putchar
     push dword [ebp+8] ; Variable "c"
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; void toyos_process_load_start(const char* filename)
+toyos_process_load_start:
+    push ebp
+    mov ebp, esp
+    mov eax, 6 ; Command 6 process load start ( stars a process )
+    push dword[ebp+8] ; Variable "filename"
     int 0x80
     add esp, 4
     pop ebp

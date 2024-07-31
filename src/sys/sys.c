@@ -5,6 +5,7 @@
 // System command handlers
 #include "./io/io.h"
 #include "./memory/heap.h"
+#include "./task/process.h"
 
 // For testing purposes
 static void* sys_command0_test(struct interrupt_frame* frame) {
@@ -23,4 +24,5 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND3_PUTCHAR, sys_command3_putchar);
     register_sys_command(SYSTEM_COMMAND4_MALLOC, sys_command4_malloc);
     register_sys_command(SYSTEM_COMMAND5_FREE, sys_command5_free);
+    register_sys_command(SYSTEM_COMMAND6_PROCESS_LOAD_START, sys_command6_process_load_start);
 }
