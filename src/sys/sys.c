@@ -25,4 +25,5 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND4_MALLOC, sys_command4_malloc);
     register_sys_command(SYSTEM_COMMAND5_FREE, sys_command5_free);
     register_sys_command(SYSTEM_COMMAND6_PROCESS_LOAD_START, sys_command6_process_load_start);
+    register_sys_command(SYSTEM_COMMAND7_EXIT, sys_command7_process_exit);
 }

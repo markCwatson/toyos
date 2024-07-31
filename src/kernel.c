@@ -13,10 +13,10 @@
 #include "task/tss.h"
 #include "task/task.h"
 #include "task/process.h"
-#include "stdlib/printf.h" 
 #include "sys/sys.h"
 #include "keyboard/keyboard.h"
 #include "drivers/keyboards/ps2.h"
+#include "stdlib/printf.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;

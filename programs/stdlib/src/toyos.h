@@ -13,5 +13,6 @@ void toyos_free(void* ptr);
 int toyos_getkeyblock(void);
 void toyos_terminal_readline(char* out, int max, bool output_while_typing);
 void toyos_process_load_start(const char* filename);
+void toyos_exit(void);
 
 #endif

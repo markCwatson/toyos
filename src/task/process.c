@@ -240,7 +240,7 @@ static int process_get_free_slot(void) {
 static int process_find_free_allocation_index(struct process* process) {
     int res = -ENOMEM;
     for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
-        if (process->allocations[i] == NULL) {
+        if (process->allocations[i].ptr == NULL) {
             res = i;
             break;
         }
@@ -258,7 +258,7 @@ static int process_find_free_allocation_index(struct process* process) {
  */
 static bool process_is_process_pointer(struct process* process, void* ptr) {
     for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
-        if (process->allocations[i] == ptr)
+        if (process->allocations[i].ptr == ptr)
             return true;
     }
 
@@ -273,10 +273,27 @@ static bool process_is_process_pointer(struct process* process, void* ptr) {
  */
 static void process_allocation_unjoin(struct process* process, void* ptr) {
     for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
-        if (process->allocations[i] == ptr) {
-            process->allocations[i] = 0x00;
+        if (process->allocations[i].ptr == ptr) {
+            process->allocations[i].ptr = 0x00;;
+            process->allocations[i].size = 0;
         }
     }
+}
+
+/**
+ * Retrieves an allocation by its address.
+ * 
+ * @param process The process to retrieve the allocation from.
+ * @param addr The address of the allocation.
+ * @return The allocation structure, or NULL if not found.
+ */
+static struct process_allocation* process_get_allocation_by_addr(struct process* process, void* addr) {
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (process->allocations[i].ptr == addr)
+            return &process->allocations[i];
+    }
+
+    return 0;
 }
 
 /**
@@ -287,8 +304,15 @@ static void process_allocation_unjoin(struct process* process, void* ptr) {
  * @return void
  */
 void process_free(struct process* process, void* ptr) {
-    // Not this processes pointer? Then we cant free it.
-    if (!process_is_process_pointer(process, ptr)) {
+    // Unlink the pages from the process for the given address
+    struct process_allocation* allocation = process_get_allocation_by_addr(process, ptr);
+    if (!allocation) {
+        // Not our pointer.
+        return;
+    }
+
+    int res = paging_map_to(process->task->page_directory, allocation->ptr, allocation->ptr, paging_align_address(allocation->ptr + allocation->size), 0x00);
+    if (res < 0) {
         return;
     }
 
@@ -312,16 +336,30 @@ void process_free(struct process* process, void* ptr) {
 void* process_malloc(struct process* process, size_t size) {
     void* ptr = kzalloc(size);
     if (!ptr) {
-        return NULL;
+        goto out_err;
     }
 
     int index = process_find_free_allocation_index(process);
     if (index < 0) {
-        return NULL;
+        goto out_err;
     }
 
-    process->allocations[index] = ptr;
+    // Map the memory to the process's address space
+    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr + size), PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    if (res < 0) {
+        goto out_err;
+    }
+
+    process->allocations[index].ptr = ptr;
+    process->allocations[index].size = size;
     return ptr;
+
+out_err:
+    if(ptr) {
+        kfree(ptr);
+    }
+
+    return NULL;
 }
 
 /**
@@ -474,5 +512,142 @@ out:
         kfree(program_stack_ptr);
     }
 
+    return res;
+}
+
+/**
+ * @brief Terminates the allocations for a process.
+ * 
+ * @details This function terminates the allocations for a process, freeing the memory
+ * associated with each allocation.
+ * 
+ * @param process The process to terminate allocations for.
+ * @return 0 on success, error code on failure.
+ */
+int process_terminate_allocations(struct process* process) {
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        process_free(process, process->allocations[i].ptr);
+    }
+
+    return OK;
+}
+
+/**
+ * @brief Frees the binary data associated with a process.
+ * 
+ * @details This function frees the binary data associated with a process, deallocating the memory
+ * used to store the binary data.
+ * 
+ * @param process The process to free binary data for.
+ * @return 0 on success, error code on failure.
+ */
+int process_free_binary_data(struct process* process) {
+    kfree(process->ptr);
+    return OK;
+}
+
+/**
+ * @brief Frees the ELF data associated with a process.
+ * 
+ * @details This function frees the ELF data associated with a process, deallocating the memory
+ * used to store the ELF file structure.
+ * 
+ * @param process The process to free ELF data for.
+ * @return 0 on success, error code on failure.
+ */
+int process_free_elf_data(struct process* process) {
+    elf_close(process->elf_file);
+    return OK;
+}
+
+/**
+ * @brief Frees the program data associated with a process.
+ * 
+ * @details This function frees the program data associated with a process, including the binary
+ * data or ELF data.
+ * 
+ * @param process The process to free program data for.
+ * @return 0 on success, error code on failure.
+ */
+int process_free_program_data(struct process* process) {
+    int res = OK;
+
+    switch(process->filetype) {
+        case PROCESS_FILETYPE_BINARY:
+            res = process_free_binary_data(process);
+            break;
+
+        case PROCESS_FILETYPE_ELF:
+            res = process_free_elf_data(process);
+            break;
+
+        default:
+            res = -EINVARG;
+    }
+
+    return res;
+}
+
+/**
+ * @brief Switches to the next process in the process array.
+ * 
+ * @details This function switches to the next process in the process array. If the current process
+ * is the last process in the array, it switches to the first process in the array.
+ */
+void process_switch_to_any(void) {
+    for (int i = 0; i < TOYOS_MAX_PROCESSES; i++) {
+        if (processes[i]) {
+            process_switch(processes[i]);
+            return;
+        }
+    }
+
+    panick("No processes to switch too\n");
+}
+
+/**
+ * @brief Unlinks a process from the process array.
+ * 
+ * @details This function unlinks a process from the process array, setting the slot to NULL.
+ * 
+ * @param process The process to unlink.
+ */
+static void process_unlink(struct process* process) {
+    processes[process->id] = NULL;
+
+    if (current_process == process) {
+        process_switch_to_any();
+    }
+}
+
+/**
+ * @brief Terminates a process.
+ * 
+ * @details This function terminates a process, freeing the memory associated with the process.
+ * 
+ * @param process The process to terminate.
+ * @return 0 on success, error code on failure.
+ */
+int process_terminate(struct process* process) {
+    int res = OK;
+
+    res = process_terminate_allocations(process);
+    if (res < 0) {
+        goto out;
+    }
+
+    res = process_free_program_data(process);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Free the process stack memory.
+    kfree(process->stack);
+    // Free the task
+    task_free(process->task);
+    // Unlink the process from the process array.
+    process_unlink(process);
+
+out:
     return res;
 }

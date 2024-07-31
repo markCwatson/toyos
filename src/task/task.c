@@ -325,6 +325,22 @@ void* task_get_stack_item(struct task* task, int index) {
 }
 
 /**
+ * @brief Switches to the next task in the linked list
+ * 
+ * @details This function is called by the timer interrupt handler to switch to
+ * the next task in the linked list of tasks.
+ */
+void task_next(void) {
+    struct task* next_task = task_get_next();
+    if (!next_task) {
+        panick("No more tasks!\n");
+    }
+
+    task_switch(next_task);
+    task_return(&next_task->registers);
+}
+
+/**
  * @brief Initializes a task structure with a given process
  * 
  * @param task The task structure to initialize

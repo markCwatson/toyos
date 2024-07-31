@@ -58,14 +58,14 @@ static inline void register_test(const char* description, bool condition) {
  */
 static void print_test_summary(void) {
     printf("\n\nTest Summary:\n");
-    printf("Total tests run: %d\n", test_count);
-    printf_colored("Tests passed: %d\n", COLOR_GREEN, COLOR_BLACK, pass_count);
-    printf_colored("Tests failed: %d\n", COLOR_RED, COLOR_BLACK, fail_count);
+    printf("Total tests run: %i\n", test_count);
+    printf_colored("Tests passed: %i\n", COLOR_GREEN, COLOR_BLACK, pass_count);
+    printf_colored("Tests failed: %i\n", COLOR_RED, COLOR_BLACK, fail_count);
     if (fail_count > 0) {
         printf_colored("\nFailed Tests:\n", COLOR_RED, COLOR_BLACK);
         for (int i = 0; i < test_count; i++) {
             if (!test_results[i].passed) {
-                printf_colored("Test %d: %s\n", COLOR_RED, COLOR_BLACK, test_results[i].test_num, test_results[i].description);
+                printf_colored("Test %i: %s\n", COLOR_RED, COLOR_BLACK, test_results[i].test_num, test_results[i].description);
             }
         }
     }

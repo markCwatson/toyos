@@ -8,6 +8,7 @@ global toyos_malloc:function
 global toyos_free:function
 global toyos_putchar:function
 global toyos_process_load_start:function
+global toyos_exit:function
 
 ; void print(const char* filename)
 print:
@@ -70,5 +71,14 @@ toyos_process_load_start:
     push dword[ebp+8] ; Variable "filename"
     int 0x80
     add esp, 4
+    pop ebp
+    ret
+
+; void toyos_exit(void)
+toyos_exit:
+    push ebp
+    mov ebp, esp
+    mov eax, 7 ; Command 7 process exit
+    int 0x80
     pop ebp
     ret

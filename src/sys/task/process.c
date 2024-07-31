@@ -27,8 +27,6 @@ void* sys_command6_process_load_start(struct interrupt_frame* frame) {
     strcat(path, filename);
     strcat(path, ".elf");
 
-    printk(path);
-
     struct process* process = 0;
     res = process_load_switch(path, &process);
     if (res < 0) {
@@ -39,5 +37,20 @@ void* sys_command6_process_load_start(struct interrupt_frame* frame) {
     task_return(&process->task->registers);
 
 out:
-    return 0;
+    return NULL;
+}
+
+/**
+ * @brief System command handler for exiting the current process.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND7_PROCESS_EXIT is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command7_process_exit(struct interrupt_frame* frame) {
+    struct process* process = task_current()->process;
+    process_terminate(process);
+    task_next();
+    return NULL;
 }

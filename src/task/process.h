@@ -13,25 +13,34 @@
 typedef unsigned char process_filetype;
 
 /**
+ * @struct process_allocation
+ * @brief Represents a memory allocation for a process.
+ */
+struct process_allocation {
+    void* ptr;
+    size_t size;
+};
+
+/**
  * @struct process
  * @brief Represents a process in the system.
  */
 struct process {
-    uint16_t id;                                        /**< The process ID. */
-    char filename[TOYOS_MAX_PATH];                      /**< The filename of the executable. */
-    struct task* task;                                  /**< The main task associated with the process. */
-    void* allocations[TOYOS_MAX_PROGRAM_ALLOCATIONS];   /**< Memory allocations. */
-    void* stack;                                        /**< Physical pointer to the stack memory. */
-    uint32_t size;                                      /**< Size of the data pointed to by 'ptr'. */
-    struct keyboard_buffer {                            /**< Keyboard buffer for the process. */
-        char buffer[TOYOS_KEYBOARD_BUFFER_SIZE];        /**< The buffer. */
-        int tail;                                       /**< Tail index. */
-        int head;                                       /**< Head index. */
+    uint16_t id;                                                            /**< The process ID. */
+    char filename[TOYOS_MAX_PATH];                                          /**< The filename of the executable. */
+    struct task* task;                                                      /**< The main task associated with the process. */
+    struct process_allocation allocations[TOYOS_MAX_PROGRAM_ALLOCATIONS];   /**< Memory allocations. */
+    void* stack;                                                            /**< Physical pointer to the stack memory. */
+    uint32_t size;                                                          /**< Size of the data pointed to by 'ptr'. */
+    struct keyboard_buffer {                                                /**< Keyboard buffer for the process. */
+        char buffer[TOYOS_KEYBOARD_BUFFER_SIZE];                            /**< The buffer. */
+        int tail;                                                           /**< Tail index. */
+        int head;                                                           /**< Head index. */
     } keyboard;
-    process_filetype filetype;                          /**< The type of file the process is. */
-    union {                                             /**< File data. */
-        void* ptr;                                      /**< Pointer to the process memory. */
-        struct elf_file* elf_file;                      /**< Pointer to the ELF file structure. */
+    process_filetype filetype;                                              /**< The type of file the process is. */
+    union {                                                                 /**< File data. */
+        void* ptr;                                                          /**< Pointer to the process memory. */
+        struct elf_file* elf_file;                                          /**< Pointer to the ELF file structure. */
     };
 };
 
@@ -113,5 +122,15 @@ void* process_malloc(struct process* process, size_t size);
  * @return void
  */
 void process_free(struct process* process, void* ptr);
+
+/**
+ * @brief Terminates a process.
+ * 
+ * This function terminates a process and frees all resources associated with it.
+ * 
+ * @param process The process to terminate.
+ * @return The status of the operation.
+ */
+int process_terminate(struct process* process);
 
 #endif

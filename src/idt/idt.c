@@ -5,6 +5,7 @@
 #include "io/io.h"
 #include "task/task.h"
 #include "status.h"
+#include "task/process.h"
 
 // Interrupt descriptor table (IDT) descriptors
 struct idt_desc idt_descriptors[TOYOS_TOTAL_INTERRUPTS];
@@ -36,13 +37,13 @@ static sys_cmd_fp sys_commands[TOYOS_MAX_SYSCALLS];
  */
 static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
-        alertk("Invalid system call number: %d\n", cmd);
+        alertk("Invalid system call number: %i\n", cmd);
         return NULL;
     }
 
     sys_cmd_fp handler = sys_commands[cmd];
     if (!handler) {
-        alertk("No handler for system call %d\n", cmd);
+        alertk("No handler for system call %i\n", cmd);
         return NULL;
     }
 
@@ -62,11 +63,11 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
  */
 void register_sys_command(int cmd, sys_cmd_fp handler) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
-        panick("Invalid system call number: %d\n", cmd);
+        panick("Invalid system call number: %i\n", cmd);
     }
 
     if (sys_commands[cmd]) {
-        panick("System call %d already has a handler\n", cmd);
+        panick("System call %i already has a handler\n", cmd);
     }
 
     sys_commands[cmd] = handler;
@@ -179,6 +180,14 @@ int idt_register_interrupt_callback(int interrupt, interrupt_cb_fp interrupt_cal
 }
 
 /**
+ * @brief Handles the exception
+ */
+void idt_handle_exception(void) {
+    process_terminate(task_current()->process);
+    task_next();
+}
+
+/**
  * @brief Initializes the interrupt descriptor table (IDT) with default handlers
  */
 void idt_init(void) {
@@ -196,6 +205,11 @@ void idt_init(void) {
     idt_set(0, int0h);
     // int 0x80: system call interrupt handler
     idt_set(0x80, int80h);
+
+    // Set all exceptions to the default exception handler
+    for (int i = 0; i < 0x20; i++) {
+        idt_register_interrupt_callback(i, idt_handle_exception);
+    }
 
     // Load the interrupt descriptor table
     idt_load(&idtr_descriptor);

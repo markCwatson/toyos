@@ -140,6 +140,14 @@ int copy_string_from_task(struct task* task, void* virtual, void* phys, int max)
 void task_return(struct registers* regs);
 
 /**
+ * @brief Switches to the next task in the linked list
+ * 
+ * @details This function is called by the timer interrupt handler to switch to
+ * the next task in the linked list of tasks.
+ */
+void task_next(void);
+
+/**
  * @brief Restores general-purpose registers from the given state.
  * 
  * @param regs Pointer to the registers to restore.
