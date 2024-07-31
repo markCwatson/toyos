@@ -8,6 +8,7 @@
 #include "string/string.h"
 #include "kernel.h"
 #include "loader/formats/elfloader.h"
+#include <stdbool.h>
 
 // The current process that is running
 struct process* current_process = NULL;
@@ -155,7 +156,7 @@ static int process_map_elf(struct process* process) {
         void* phys = paging_align_to_lower_page(phdr_phys_address);
 
         // Align the physical end address to the page boundary
-        void* phys_end = paging_align_address(phdr_phys_address + phdr->p_filesz);
+        void* phys_end = paging_align_address(phdr_phys_address + phdr->p_memsz);
         
         // Map the ELF file into the process's virtual address space
         res = paging_map_to(process->task->page_directory, virt, phys, phys_end, flags);
@@ -228,6 +229,99 @@ static int process_get_free_slot(void) {
     }
 
     return -EISTKN;
+}
+
+/**
+ * Finds a free allocation index for a process.
+ * 
+ * @param process The process to find an allocation index for.
+ * @return The index of the free allocation, or -ENOMEM if no free allocations are available.
+ */
+static int process_find_free_allocation_index(struct process* process) {
+    int res = -ENOMEM;
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (process->allocations[i] == NULL) {
+            res = i;
+            break;
+        }
+    }
+
+    return res;
+}
+
+/**
+ * Checks if a pointer is allocated to a process.
+ * 
+ * @param process The process to check.
+ * @param ptr The pointer to check.
+ * @return true if the pointer is allocated to the process, false otherwise.
+ */
+static bool process_is_process_pointer(struct process* process, void* ptr) {
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (process->allocations[i] == ptr)
+            return true;
+    }
+
+    return false;
+}
+
+/**
+ * Unjoins an allocation from a process.
+ * 
+ * @param process The process to unjoin the allocation from.
+ * @param ptr The pointer to unjoin.
+ */
+static void process_allocation_unjoin(struct process* process, void* ptr) {
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (process->allocations[i] == ptr) {
+            process->allocations[i] = 0x00;
+        }
+    }
+}
+
+/**
+ * Frees memory allocated for a process.
+ * 
+ * @param process The process to free memory for.
+ * @param ptr The pointer to the memory to free.
+ * @return void
+ */
+void process_free(struct process* process, void* ptr) {
+    // Not this processes pointer? Then we cant free it.
+    if (!process_is_process_pointer(process, ptr)) {
+        return;
+    }
+
+    // Unjoin the allocation
+    process_allocation_unjoin(process, ptr);
+
+    // We can now free the memory.
+    kfree(ptr);
+}
+
+/**
+ * Allocates memory for a process.
+ * 
+ * This function allocates memory for a process. The memory is allocated from the process's
+ * memory space, and is not shared with other processes.
+ * 
+ * @param process The process to allocate memory for.
+ * @param size The size of the memory to allocate.
+ * @return void* The address of the allocated memory or NULL if allocation failed.
+ */
+void* process_malloc(struct process* process, size_t size) {
+    void* ptr = kzalloc(size);
+    if (!ptr) {
+        return NULL;
+    }
+
+    int index = process_find_free_allocation_index(process);
+    if (index < 0) {
+        return NULL;
+    }
+
+    process->allocations[index] = ptr;
+    return ptr;
 }
 
 /**

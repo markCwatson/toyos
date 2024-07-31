@@ -28,6 +28,7 @@ FILES = ./build/kernel.asm.o \
 		./build/task/task.o \
 		./build/sys/sys.o \
 		./build/sys/io/io.o \
+		./build/sys/memory/heap.o \
 		./build/keyboard/keyboard.o \
 		./build/drivers/keyboards/ps2.o \
 		./build/loader/formats/elf.o \
@@ -207,6 +208,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/sys/io/io.o: ./src/sys/io/io.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/sys/io/io.c -o ./build/sys/io/io.o
 
+./build/sys/memory/heap.o: ./src/sys/memory/heap.c
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/sys/memory/heap.c -o ./build/sys/memory/heap.o
+
 ./build/keyboard/keyboard.o: ./src/keyboard/keyboard.c
 	i686-elf-gcc ${INCLUDES} -I./src/task ${FLAGS} -std=gnu99 -c ./src/keyboard/keyboard.c -o ./build/keyboard/keyboard.o
 
@@ -220,10 +224,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elfloader.c -o ./build/loader/formats/elfloader.o
 
 user_programs:
+	cd ./programs/stdlib && make all
 	cd ./programs/test && make all
 	cd ./programs/shell && make all
 
 user_programs_clean:
+	cd ./programs/stdlib && make clean
 	cd ./programs/test && make clean
 	cd ./programs/shell && make clean
 

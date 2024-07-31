@@ -93,4 +93,25 @@ struct process* process_current(void);
  */
 struct process* process_get(int process_id);
 
+/**
+ * Allocates memory for a process.
+ * 
+ * This function allocates memory for a process. The memory is allocated from the process's
+ * memory space, and is not shared with other processes.
+ * 
+ * @param process The process to allocate memory for.
+ * @param size The size of the memory to allocate.
+ * @return void* The address of the allocated memory.
+ */
+void* process_malloc(struct process* process, size_t size);
+
+/**
+ * Frees memory allocated for a process.
+ * 
+ * @param process The process to free memory for.
+ * @param ptr The pointer to the memory to free.
+ * @return void
+ */
+void process_free(struct process* process, void* ptr);
+
 #endif

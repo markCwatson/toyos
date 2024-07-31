@@ -1,7 +1,10 @@
 #include "sys.h"
 #include "idt/idt.h"
 #include "task/task.h"
-#include "io/io.h"
+
+// System command handlers
+#include "./io/io.h"
+#include "./memory/heap.h"
 
 // For testing purposes
 static void* sys_command0_test(struct interrupt_frame* frame) {
@@ -18,4 +21,6 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND1_PRINT, sys_command1_print);
     register_sys_command(SYSTEM_COMMAND2_GETKEY, sys_command2_getkey);
     register_sys_command(SYSTEM_COMMAND3_PUTCHAR, sys_command3_putchar);
+    register_sys_command(SYSTEM_COMMAND4_MALLOC, sys_command4_malloc);
+    register_sys_command(SYSTEM_COMMAND5_FREE, sys_command5_free);
 }

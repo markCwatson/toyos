@@ -15,6 +15,9 @@
         "tests.h": "c",
         "task.h": "c",
         "printf.h": "c",
-        "elfloader.h": "c"
+        "elfloader.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "toyos.h": "c"
     }
 }

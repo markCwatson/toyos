@@ -1,6 +1,3 @@
-// #ifdef RUN_TESTS
-// #include "../tests/tests.h"
-// #endif
 #include "kernel.h"
 #include "terminal/terminal.h"
 #include "idt/idt.h"
@@ -115,25 +112,6 @@ void kernel_page(void) {
 }
 
 /**
- * @brief Prints the "ToyOS" logo using ASCII art.
- *
- * This function displays the "ToyOS" name in a stylized ASCII art format.
- * The art uses simple characters to create a visually appealing representation of the OS name.
- */
-static void print_toyos_logo(void) {
-    const char* logo =
-        "   _____              _  _     ___      ___   \n"
-        "  |_   _|    ___     | || |   / _ \\    / __|  \n"
-        "    | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
-        "   _|_|_    \\___/    _|__/    \\___/    |___/  \n"
-        " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
-        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' version 0.0.0\n"
-        "\n";
-
-    printk_colored(logo, VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLUE);
-}
-
-/**
  * @brief Entry point for the kernel after booting.
  *
  * This function initializes various subsystems of the kernel, including the terminal,
@@ -194,13 +172,7 @@ void maink(void) {
         panick("Failed to load the shell!\n");
     }
 
-// #ifdef RUN_TESTS
-//     // Run tests if the kernel is compiled in test mode
-//     tests_run();
-// #endif
-
     terminal_clear_all();
-    print_toyos_logo();
     task_run_first_ever_task();
 
     // Halt the system if the first task returns
