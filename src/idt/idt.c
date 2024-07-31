@@ -188,6 +188,14 @@ void idt_handle_exception(void) {
 }
 
 /**
+ * @brief Handles the clock interrupt for task switching
+ */
+void idt_clock(void) {
+    outb(0x20, 0x20);
+    task_next();
+}
+
+/**
  * @brief Initializes the interrupt descriptor table (IDT) with default handlers
  */
 void idt_init(void) {
@@ -210,6 +218,9 @@ void idt_init(void) {
     for (int i = 0; i < 0x20; i++) {
         idt_register_interrupt_callback(i, idt_handle_exception);
     }
+
+    // Set the clock interrupt handler
+    idt_register_interrupt_callback(0x20, idt_clock);
 
     // Load the interrupt descriptor table
     idt_load(&idtr_descriptor);
