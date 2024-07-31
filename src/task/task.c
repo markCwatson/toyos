@@ -341,6 +341,17 @@ void task_next(void) {
 }
 
 /**
+ * @brief Retrieves the physical address of a virtual address for a given task
+ * 
+ * @param task The task to retrieve the physical address for
+ * @param virtual_address The virtual address to retrieve the physical address for
+ * @return void* The physical address of the virtual address
+ */
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address) {
+    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
+}
+
+/**
  * @brief Initializes a task structure with a given process
  * 
  * @param task The task structure to initialize

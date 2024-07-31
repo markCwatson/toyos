@@ -21,6 +21,16 @@ struct process_allocation {
     size_t size;
 };
 
+struct command_argument {
+    char argument[512];
+    struct command_argument* next;
+};
+
+struct process_arguments {
+    int argc;
+    char** argv;
+};
+
 /**
  * @struct process
  * @brief Represents a process in the system.
@@ -42,6 +52,7 @@ struct process {
         void* ptr;                                                          /**< Pointer to the process memory. */
         struct elf_file* elf_file;                                          /**< Pointer to the ELF file structure. */
     };
+    struct process_arguments arguments;                                     /**< The arguments of the process. */
 };
 
 /**
@@ -132,5 +143,23 @@ void process_free(struct process* process, void* ptr);
  * @return The status of the operation.
  */
 int process_terminate(struct process* process);
+
+/**
+ * @brief Retrieves the arguments for a process.
+ * 
+ * @param process The process to retrieve arguments for.
+ * @param argc A pointer to store the number of arguments.
+ * @param argv A pointer to store the arguments.
+ */
+void process_get_arguments(struct process* process, int* argc, char*** argv);
+
+/**
+ * @brief Injects arguments into a process.
+ * 
+ * @param process The process to inject arguments into.
+ * @param root_argument The root argument in the list.
+ * @return 0 on success, error code on failure.
+ */
+int process_inject_arguments(struct process* process, struct command_argument* root_argument);
 
 #endif

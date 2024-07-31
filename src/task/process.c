@@ -651,3 +651,76 @@ int process_terminate(struct process* process) {
 out:
     return res;
 }
+
+/**
+ * @brief Retrieves the arguments for a process.
+ * 
+ * @param process The process to retrieve arguments for.
+ * @param argc A pointer to store the number of arguments.
+ * @param argv A pointer to store the arguments.
+ */
+void process_get_arguments(struct process* process, int* argc, char*** argv) {
+    *argc = process->arguments.argc;
+    *argv = process->arguments.argv;
+}
+
+/**
+ * @brief Counts the number of arguments in a command argument list.
+ * 
+ * @param root_argument The root argument in the list.
+ * @return The number of arguments.
+ */
+static int process_count_command_arguments(struct command_argument* root_argument) {
+    struct command_argument* current = root_argument;
+    int i = 0;
+    while(current) {
+        i++;
+        current = current->next;
+    }
+
+    return i;
+}
+
+/**
+ * @brief Injects arguments into a process.
+ * 
+ * @param process The process to inject arguments into.
+ * @param root_argument The root argument in the list.
+ * @return 0 on success, error code on failure.
+ */
+int process_inject_arguments(struct process* process, struct command_argument* root_argument) {
+    int res = OK;
+    struct command_argument* current = root_argument;
+    int i = 0;
+    int argc = process_count_command_arguments(root_argument);
+    if (argc == 0) {
+        res = -EIO;
+        goto out;
+    }
+
+    char **argv = process_malloc(process, sizeof(const char*) * argc);
+    if (!argv) {
+        res = -ENOMEM;
+        goto out;
+    }
+
+
+    while(current) {
+        char* argument_str = process_malloc(process, sizeof(current->argument));
+        if (!argument_str) {
+            res = -ENOMEM;
+            goto out;
+        }
+
+        strncpy(argument_str, current->argument, sizeof(current->argument));
+        argv[i] = argument_str;
+        current = current->next;
+        i++;
+    }
+
+    process->arguments.argc = argc;
+    process->arguments.argv = argv;
+    
+out:
+    return res;
+}

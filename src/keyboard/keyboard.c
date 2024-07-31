@@ -117,3 +117,27 @@ char keyboard_pop(void) {
     process->keyboard.head += 1;
     return c;
 }
+
+/**
+ * @brief Sets the state of the caps lock key for the given keyboard.
+ * 
+ * This function sets the state of the caps lock key for the given keyboard.
+ * 
+ * @param keyboard The keyboard device.
+ * @param state The state of the caps lock key.
+ */
+void keyboard_set_capslock(struct keyboard* keyboard, keyboard_capslock_state state) {
+    keyboard->capslock_state = state;
+}
+
+/**
+ * @brief Retrieves the state of the caps lock key for the given keyboard.
+ * 
+ * This function retrieves the state of the caps lock key for the given keyboard.
+ * 
+ * @param keyboard The keyboard device.
+ * @return The state of the caps lock key.
+ */
+keyboard_capslock_state keyboard_get_capslock(struct keyboard* keyboard) {
+    return keyboard->capslock_state;
+}

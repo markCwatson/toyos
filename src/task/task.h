@@ -159,4 +159,13 @@ void restore_general_purpose_registers(struct registers* regs);
  */
 void user_registers(void);
 
+/**
+ * @brief Retrieves the physical address of a virtual address for a given task
+ * 
+ * @param task The task to retrieve the physical address for
+ * @param virtual_address The virtual address to retrieve the physical address for
+ * @return void* The physical address of the virtual address
+ */
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address);
+
 #endif

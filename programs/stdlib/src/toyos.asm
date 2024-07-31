@@ -9,6 +9,8 @@ global toyos_free:function
 global toyos_putchar:function
 global toyos_process_load_start:function
 global toyos_exit:function
+global toyos_process_get_arguments:function
+global toyos_system:function
 
 ; void print(const char* filename)
 print:
@@ -80,5 +82,27 @@ toyos_exit:
     mov ebp, esp
     mov eax, 7 ; Command 7 process exit
     int 0x80
+    pop ebp
+    ret
+
+; void toyos_process_get_arguments(struct process_arguments* arguments)
+toyos_process_get_arguments:
+    push ebp
+    mov ebp, esp
+    mov eax, 8 ; Command 8 Gets the process arguments
+    push dword[ebp+8] ; Variable arguments
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; int toyos_system(struct command_argument* arguments)
+toyos_system:
+    push ebp
+    mov ebp, esp
+    mov eax, 9 ; Command 9 process_system ( runs a system command based on the arguments)
+    push dword[ebp+8] ; Variable "arguments"
+    int 0x80
+    add esp, 4
     pop ebp
     ret

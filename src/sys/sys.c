@@ -26,4 +26,6 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND5_FREE, sys_command5_free);
     register_sys_command(SYSTEM_COMMAND6_PROCESS_LOAD_START, sys_command6_process_load_start);
     register_sys_command(SYSTEM_COMMAND7_EXIT, sys_command7_process_exit);
+    register_sys_command(SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS, sys_command8_get_program_arguments);
+    register_sys_command(SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND, sys_command9_invoke_system_command);
 }

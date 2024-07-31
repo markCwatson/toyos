@@ -23,6 +23,7 @@
 
 
 #define PS2_KEYBOARD_KEY_RELEASED       0x80  /**< Bitmask for key release events. */
+#define PS2_KEYBOARD_CAPSLOCK           0x3a  /**< Scancode for the caps lock key. */
 #define PS2_ISR_KEYBOARD_INTERRUPT      0x21  /**< Keyboard interrupt number. */
 
 /**

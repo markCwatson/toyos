@@ -66,6 +66,7 @@ struct keyboard ps2_keyboard = {
  */
 int ps2_keyboard_init(void) {
     idt_register_interrupt_callback(PS2_ISR_KEYBOARD_INTERRUPT, ps2_keyboard_handle_interrupt);
+    keyboard_set_capslock(&ps2_keyboard, KEYBOARD_CAPS_LOCK_OFF);
 
     // Enable the first PS/2 port
     outb(PS2_PORT, PS2_COMMAND_ENABLE_FIRST_PORT);
@@ -87,6 +88,12 @@ uint8_t ps2_keyboard_scancode_to_char(uint8_t scancode) {
     }
 
     char c = keyboard_scan_set_one[scancode];
+    if (keyboard_get_capslock(&ps2_keyboard) == KEYBOARD_CAPS_LOCK_OFF) {
+        if (c >= 'A' && c <= 'Z') {
+            c += 32;
+        }
+    }
+
     return c;
 }
 
@@ -104,6 +111,11 @@ void ps2_keyboard_handle_interrupt(void) {
 
     if(scancode & PS2_KEYBOARD_KEY_RELEASED) {
         return;
+    }
+
+    if (scancode == PS2_KEYBOARD_CAPSLOCK) {
+        keyboard_capslock_state old_state = keyboard_get_capslock(&ps2_keyboard);
+        keyboard_set_capslock(&ps2_keyboard, old_state == KEYBOARD_CAPS_LOCK_ON ? KEYBOARD_CAPS_LOCK_OFF : KEYBOARD_CAPS_LOCK_ON);
     }
 
     uint8_t c = ps2_keyboard_scancode_to_char(scancode);

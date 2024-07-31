@@ -24,4 +24,24 @@ void* sys_command6_process_load_start(struct interrupt_frame* frame);
  */
 void* sys_command7_process_exit(struct interrupt_frame* frame);
 
+/**
+ * @brief System command handler for getting the program arguments.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command8_get_program_arguments(struct interrupt_frame* frame);;
+
+/**
+ * @brief System command handler for invoking a system command.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command9_invoke_system_command(struct interrupt_frame* frame) ;
+
 #endif

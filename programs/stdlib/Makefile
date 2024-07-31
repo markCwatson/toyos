@@ -25,7 +25,10 @@ FILES = ./build/start.o \
 		./build/toyos.o \
 		./build/toyos.asm.o \
 		./build/stdlib.o \
-		./build/stdio.o
+		./build/stdio.o \
+		./build/string.o \
+		./build/memory.o \
+		./build/c_start.o
 
 all: ${FILES}
 	i686-elf-ld -m elf_i386 -relocatable ${FILES} -o ./stdlib.elf
@@ -47,6 +50,15 @@ all: ${FILES}
 
 ./build/stdio.o: ./src/stdio.c
 	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/stdio.c -o ./build/stdio.o
+
+./build/string.o: ./src/string.c
+	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/string.c -o ./build/string.o
+
+./build/memory.o: ./src/memory.c
+	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/memory.c -o ./build/memory.o
+
+./build/c_start.o: ./src/c_start.c
+	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/c_start.c -o ./build/c_start.o
 
 clean:
 	rm -rf ./build/*.o

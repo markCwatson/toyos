@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
         char buf[1024];
         toyos_terminal_readline(buf, sizeof(buf), true);
         print("\n");
-        toyos_process_load_start(buf);
+        toyos_system_run(buf);
         print("\n");
     }
 
