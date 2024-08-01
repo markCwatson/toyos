@@ -51,6 +51,8 @@ void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
     for (int i = 0; i < len; i++) {
         terminal_writechar(str[i], fg, bg);
     }
+
+    terminal_update_cursor();
 }
 
 /**
@@ -112,6 +114,25 @@ void kernel_page(void) {
 }
 
 /**
+ * @brief Prints the "ToyOS" logo using ASCII art.
+ *
+ * This function displays the "ToyOS" name in a stylized ASCII art format.
+ * The art uses simple characters to create a visually appealing representation of the OS name.
+ */
+static void print_toyos_logo(void) {
+    const char* logo =
+        "   _____              _  _     ___      ___   \n"
+        "  |_   _|    ___     | || |   / _ \\    / __|  \n"
+        "    | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
+        "   _|_|_    \\___/    _|__/    \\___/    |___/  \n"
+        " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
+        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' version 0.0.0\n"
+        "\n";
+
+    printk(logo);
+}
+
+/**
  * @brief Entry point for the kernel after booting.
  *
  * This function initializes various subsystems of the kernel, including the terminal,
@@ -163,6 +184,13 @@ void maink(void) {
 
     // Initialize the keyboard
     keyboard_init();
+
+    // Print the ToyOS logo
+    print_toyos_logo();
+    // pause for one second
+    for (int i = 0; i < 100000000; i++) {
+        asm volatile("nop");
+    }
 
     // Load the first process
     printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);

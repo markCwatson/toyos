@@ -95,6 +95,8 @@ int printf(const char *fmt, ...) {
 
     va_end(ap);
 
+    terminal_update_cursor();
+
     return 0;
 }
 
@@ -139,6 +141,8 @@ int printf_colored(const char* fmt, unsigned char fg, unsigned char bg, ...) {
     }
 
     va_end(ap);
+
+    terminal_update_cursor();
 
     return 0;
 }

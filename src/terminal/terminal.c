@@ -1,5 +1,6 @@
 #include "terminal.h"
 #include "string/string.h"
+#include "io/io.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -9,6 +10,70 @@ static uint16_t* video_mem = 0;
 // Current position of the cursor in terms of row and column
 static uint16_t terminal_row = 0;
 static uint16_t terminal_col = 0;
+
+/**
+ * @brief Reads the current cursor position from the VGA hardware.
+ * 
+ * This function reads the current cursor position from the VGA hardware and returns
+ * the position as a 16-bit value.
+ * 
+ * @return The current cursor position.
+ */
+uint16_t terminal_get_cursor_position(void) {
+    uint16_t pos = 0;
+    outb(VGA_CMD_PORT, 0x0f);
+    pos |= insb(VGA_DATA_PORT);
+    outb(VGA_CMD_PORT, 0x0e);
+    pos |= ((uint16_t)insb(VGA_DATA_PORT)) << 8;
+    return pos;
+}
+
+/**
+ * @brief Disables the VGA hardware cursor.
+ */
+static void terminal_disable_cursor(void) {
+	outb(VGA_CMD_PORT, 0x0a);
+	outb(VGA_DATA_PORT, 0x20);
+}
+
+/**
+ * @brief Enables the VGA hardware cursor.
+ * 
+ * This function enables the VGA hardware cursor by setting the cursor start and end
+ * scanlines. The cursor start and end values are the scanlines that define the cursor shape.
+ * 
+ * @example values of 15 and 15 create an underline cursor.
+ * 
+ * @param cursor_start The scanline where the cursor starts.
+ * @param cursor_end The scanline where the cursor ends.
+ */
+static void terminal_enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
+    // Set cursor start scanline register
+	outb(VGA_CMD_PORT, 0x0a);
+	outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xc0) | cursor_start);
+
+    // Set cursor end scanline register
+	outb(VGA_CMD_PORT, 0x0b);
+	outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xe0) | cursor_end);
+}
+
+/**
+ * @brief Updates the hardware cursor to the current position.
+ * 
+ * This function sets the VGA hardware cursor to the position specified by
+ * the global variables terminal_row and terminal_col.
+ */
+void terminal_update_cursor(void) {
+    uint16_t position = terminal_row * VGA_WIDTH + terminal_col;
+
+    // Send the low byte of the cursor position
+    outb(VGA_CMD_PORT, VGA_CURSOR_LOW);
+    outb(VGA_DATA_PORT, (uint8_t)(position & 0xff));
+
+    // Send the high byte of the cursor position
+    outb(VGA_CMD_PORT, VGA_CURSOR_HIGH);
+    outb(VGA_DATA_PORT, (uint8_t)((position >> 8) & 0xff));
+}
 
 /**
  * @brief Combines a character and its color attribute into a single value.
@@ -108,6 +173,7 @@ void terminal_clear_all(void) {
 
     terminal_row = 0;
     terminal_col = 0;
+    terminal_update_cursor();
 }
 
 /**
@@ -120,5 +186,6 @@ void terminal_clear_all(void) {
 void terminal_init(void) {
     // VGA text mode memory address starts at 0xb8000
     video_mem = (uint16_t*)(0xb8000);
+    terminal_enable_cursor(15, 15);
     terminal_clear_all(); 
 }

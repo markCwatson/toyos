@@ -1,6 +1,10 @@
 # ToyOS
 
-ToyOS is a work-in-progress (WIP) hobby operating system designed for educational and experimental purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. Current features include:
+ToyOS is a work-in-progress (WIP) hobby operating system designed for educational and experimental purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. The following GIF shows ToyOS running in QEMU. In this demonstration, the shell is interacting with the kernel to execute commands (currently, only the `echo` command is supported).
+
+![alt-text][1]
+
+Current features include:
 
 - **16-bit Bootloader:** A basic bootloader that initializes the system and loads the 32-bit kernel.
 - **32-bit Kernel:** The core of ToyOS, built for x86 platforms, handling essential system tasks.
@@ -9,9 +13,6 @@ ToyOS is a work-in-progress (WIP) hobby operating system designed for educationa
 - **FAT16 Filesystem:** Supports reading and writing files using the FAT16 format. Writing in append mode is under development.
 - **Simple Terminal:** A basic terminal interface for user interaction, currently under development.
 - **Simple Test Framework:** A basic test framework for functional testing, currently under development.
-
-Future planned features:
-
 - **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
 - **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
@@ -95,3 +96,5 @@ dumpelf programs/shell/shell.elf
 3. [OSdev.org](https://wiki.osdev.org/Expanded_Main_Page)
 4. [Modern Operating Systems 4th Edition by Andrew Tanenbaum and Herbert Bos](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf)
 5. Various OS courses on Udemy by the group [Abhishek CSEPracticals](https://www.udemy.com/user/abhishek-sagar-8/), [Ekta Ekta](https://www.udemy.com/user/ekta-272/), and [Shiwani Nigam](https://www.udemy.com/user/shivani-nigam-2/)
+
+[1]: gif/toyos-demo.gif "ToyOS running in QEMU"

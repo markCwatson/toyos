@@ -62,6 +62,7 @@ void* sys_command3_putchar(struct interrupt_frame* frame) {
 
     // Get the character from the user space and write it to the console
     char c = (char)(int)task_get_stack_item(task_current(), 0);
+    terminal_update_cursor();
     terminal_writechar(c, VGA_COLOR_WHITE, VGA_COLOR_BLUE);
 
     return NULL;

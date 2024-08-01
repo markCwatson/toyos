@@ -2,8 +2,16 @@
 #define _TERMINAL_H_
 
 // Defines the width and height of the terminal screen in character cells
-#define VGA_WIDTH   80  /**< The number of character columns on the screen. */
-#define VGA_HEIGHT  25  /**< The number of character rows on the screen. */
+#define VGA_WIDTH               80  /**< The number of character columns on the screen. */
+#define VGA_HEIGHT              25  /**< The number of character rows on the screen. */
+
+// Cursor ports
+#define VGA_CMD_PORT            0x3d4 /**< The I/O port for the VGA command register. */
+#define VGA_DATA_PORT           0x3d5 /**< The I/O port for the VGA data register. */
+
+// Cursor positions
+#define VGA_CURSOR_HIGH         0x0e /**< The high byte of the cursor position. */
+#define VGA_CURSOR_LOW          0x0f /**< The low byte of the cursor position. */
 
 // Defines for terminal colors
 #define VGA_COLOR_BLACK         0
@@ -59,5 +67,13 @@ void terminal_backspace(void);
  * @param bg The background color of the character.
  */
 void terminal_writechar(char c, unsigned char fg, unsigned char bg);
+
+/**
+ * @brief Updates the hardware cursor to the current position.
+ * 
+ * This function sets the VGA hardware cursor to the position specified by
+ * the global variables terminal_row and terminal_col.
+ */
+void terminal_update_cursor(void);
 
 #endif

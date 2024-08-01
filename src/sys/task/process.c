@@ -96,6 +96,7 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
     struct process* process = 0;
     int res = process_load_switch(path, &process);
     if (res < 0) {
+        alertk("Command not recognized.\n");
         return ERROR(res);
     }
 

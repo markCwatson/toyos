@@ -220,7 +220,8 @@ void idt_init(void) {
     }
 
     // Set the clock interrupt handler
-    idt_register_interrupt_callback(0x20, idt_clock);
+    // \todo: was causing echo comands to print on same line as shell prompt
+    // idt_register_interrupt_callback(0x20, idt_clock);
 
     // Load the interrupt descriptor table
     idt_load(&idtr_descriptor);
