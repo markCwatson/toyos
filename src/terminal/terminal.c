@@ -5,11 +5,14 @@
 #include <stdint.h>
 
 // Base address of the VGA video memory
-static uint16_t* video_mem = 0;
+static uint16_t* video_mem = NULL;
 
 // Current position of the cursor in terms of row and column
 static uint16_t terminal_row = 0;
 static uint16_t terminal_col = 0;
+
+// Screen buffer
+static uint16_t screen_buffer[VGA_HEIGHT][VGA_WIDTH];
 
 /**
  * @brief Reads the current cursor position from the VGA hardware.
@@ -105,6 +108,51 @@ static void terminal_putchar(int x, int y, char c, unsigned char color) {
 }
 
 /**
+ * @brief Places a character at a specific position in the buffer.
+ *
+ * This function writes a character with the specified color at the given
+ * (x, y) coordinates in the screen buffer.
+ *
+ * @param x The column position.
+ * @param y The row position.
+ * @param c The character to display.
+ * @param color The color attribute for the character.
+ */
+static void terminal_buffer_putchar(int x, int y, char c, unsigned char color) {
+    screen_buffer[y][x] = terminal_make_char(c, color);
+}
+
+/**
+ * @brief Updates the VGA video memory with the screen buffer contents.
+ */
+static void terminal_update_vga_memory(void) {
+    for (int y = 0; y < VGA_HEIGHT; y++) {
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            video_mem[(y * VGA_WIDTH) + x] = screen_buffer[y][x];
+        }
+    }
+}
+
+/**
+ * @brief Scrolls the screen buffer up by one row.
+ */
+static void terminal_scroll(void) {
+    // Copy each row to the row above it
+    for (int y = 1; y < VGA_HEIGHT; y++) {
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            screen_buffer[y - 1][x] = screen_buffer[y][x];
+        }
+    }
+
+    // Clear the last line
+    for (int x = 0; x < VGA_WIDTH; x++) {
+        screen_buffer[VGA_HEIGHT - 1][x] = terminal_make_char(' ', (VGA_COLOR_BLUE << 4) | VGA_COLOR_WHITE);
+    }
+
+    terminal_row = VGA_HEIGHT - 1;
+}
+
+/**
  * @brief Writes a character to the terminal at the current cursor position.
  *
  * This function places a character at the current cursor position, updating
@@ -119,22 +167,35 @@ void terminal_writechar(char c, unsigned char fg, unsigned char bg) {
     if (c == '\n') {
         terminal_row += 1;
         terminal_col = 0;
-        return;
+
+        if (terminal_row >= VGA_HEIGHT) {
+            terminal_scroll();
+        }
+
+        goto update;
     }
 
     if (c == 0x08) {
         terminal_backspace();
-        return;
+        goto update;
     }
 
-    terminal_putchar(terminal_col, terminal_row, c, ((bg & 0x0f) << 4) | (fg & 0x0f));
+    terminal_buffer_putchar(terminal_col, terminal_row, c, ((bg & 0x0f) << 4) | (fg & 0x0f));
     terminal_col += 1;
 
     // If the cursor reaches the end of the line, move to the next line
     if (terminal_col >= VGA_WIDTH) {
         terminal_col = 0;
         terminal_row += 1;
+
+        // If the cursor reaches the end of the screen, scroll the screen
+        if (terminal_row >= VGA_HEIGHT) {
+            terminal_scroll();
+        }
     }
+
+update:
+    terminal_update_vga_memory();
 }
 
 /**
@@ -153,9 +214,9 @@ void terminal_backspace(void) {
         terminal_col = VGA_WIDTH;
     }
 
-    terminal_col -=1;
+    terminal_col -= 1;
     terminal_writechar(' ', VGA_COLOR_WHITE, VGA_COLOR_BLUE);
-    terminal_col -=1;
+    terminal_col -= 1;
 }
 
 /**
@@ -167,13 +228,13 @@ void terminal_backspace(void) {
 void terminal_clear_all(void) {
     for (int y = 0; y < VGA_HEIGHT; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
-            terminal_putchar(x, y, ' ', ((VGA_COLOR_BLUE & 0x0f) << 4) | (VGA_COLOR_BLUE & 0x0f));
+            terminal_buffer_putchar(x, y, ' ', ((VGA_COLOR_BLUE & 0x0f) << 4) | (VGA_COLOR_BLUE & 0x0f));
+            video_mem[(y * VGA_WIDTH) + x] = screen_buffer[y][x];
         }
     }
 
     terminal_row = 0;
     terminal_col = 0;
-    terminal_update_cursor();
 }
 
 /**
