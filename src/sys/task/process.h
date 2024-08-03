@@ -45,14 +45,17 @@ void* sys_command8_get_program_arguments(struct interrupt_frame* frame);;
 void* sys_command9_invoke_system_command(struct interrupt_frame* frame) ;
 
 /**
- * @brief System command handler for printing the process list.
+ * @brief System command handler for fetching the process list.
  * 
- * This function is called when the system command SYSTEM_COMMAND11_PRINT_PROCESS_LIST is invoked.
- * It prints the list of processes to the terminal.
+ * This function is called when the system command SYSTEM_COMMAND11_GET_PROCESSES is invoked.
+ * It returns a list of processes.
+ * 
+ * @warning The memory for the list is allocated from the current process's memory space
+ * and must be freed by the caller.
  * 
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command11_print_process_list(struct interrupt_frame* frame);
+void* sys_command11_get_processes(struct interrupt_frame* frame);
 
 #endif

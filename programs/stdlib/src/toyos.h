@@ -3,6 +3,14 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
+
+#define TOYOS_MAX_PROCESSES 12
+
+struct process_info {
+    int id;
+    char filename[64];
+};
 
 struct command_argument {
     char argument[512];
@@ -17,7 +25,6 @@ struct process_arguments {
 void print(const char* filename);
 int toyos_getkey(void);
 void* toyos_malloc(size_t size);
-void* toyos_malloc(size_t size);
 void toyos_putchar(char c);
 void toyos_free(void* ptr);
 int toyos_getkeyblock(void);
@@ -29,6 +36,6 @@ void toyos_process_get_arguments(struct process_arguments* arguments);;
 int toyos_system(struct command_argument* arguments);
 int toyos_system_run(const char* command);
 void toyos_clear_terminal(void);
-void toyos_display_process_list(void);
+void* toyos_get_processes(void);
 
 #endif

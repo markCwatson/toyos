@@ -6,12 +6,12 @@
 
 int main(int argc, char** argv) {
     while(1)  {
-        print("$ ");
+        print("ToyOS $ ");
 
         char buf[1024];
         toyos_terminal_readline(buf, sizeof(buf), true);
 
-        print("\n");
+        print("\n\n");
         toyos_system_run(buf);
     }
 

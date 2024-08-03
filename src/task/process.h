@@ -21,14 +21,31 @@ struct process_allocation {
     size_t size;
 };
 
+/**
+ * @struct command_argument
+ * @brief Represents an argument in a command.
+ */
 struct command_argument {
     char argument[512];
     struct command_argument* next;
 };
 
+/**
+ * @struct process_arguments
+ * @brief Represents the arguments of a process.
+ */
 struct process_arguments {
     int argc;
     char** argv;
+};
+
+/**
+ * @struct process_info
+ * @brief Represents information about a process.
+ */
+struct process_info {
+    int id;
+    char filename[64];
 };
 
 /**

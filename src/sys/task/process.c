@@ -97,7 +97,7 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
     struct process* process = 0;
     int res = process_load_switch(path, &process);
     if (res < 0) {
-        alertk("Command not recognized.\n");
+        alertk("Command not recognized.\n\n");
         return ERROR(res);
     }
 
@@ -113,49 +113,42 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
 }
 
 /**
- * @brief System command handler for printing the process list.
+ * @brief System command handler for fetching the process list.
  * 
- * This function is called when the system command SYSTEM_COMMAND11_PRINT_PROCESS_LIST is invoked.
- * It prints the list of processes to the terminal.
+ * This function is called when the system command SYSTEM_COMMAND11_GET_PROCESSES is invoked.
+ * It returns a list of processes.
+ * 
+ * @warning The memory for the list is allocated from the current process's memory space
+ * and must be freed by the caller.
  * 
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command11_print_process_list(struct interrupt_frame* frame) {
-    // find process with longest filename for formatting purposes
-    int max_pid_len = 0;
-    for (int pid = 0; pid < TOYOS_MAX_PROCESSES; pid++) {
-        struct process* process = process_get(pid);
-        if (!process) {
-            continue;
-        }
-
-        int pid_len = strlen(itoa(pid));
-        if (pid_len > max_pid_len) {
-            max_pid_len = pid_len;
-        }
+void* sys_command11_get_processes(struct interrupt_frame* frame) {
+    struct process_info* info = (struct process_info*)process_malloc(task_current()->process,
+                                                                     sizeof(struct process_info) * TOYOS_MAX_PROCESSES);
+    if (!info) {
+        return ERROR(-ENOMEM);
     }
 
-    // print process list
-    char padding[max_pid_len];
-    strncpy(padding, "     ", max_pid_len);
-        
-    printf_colored(" PID  %sPATH\n", COLOR_LIGHT_BROWN, COLOR_BLUE, padding);
-    printf_colored(" ---  %s----\n", COLOR_LIGHT_BROWN, COLOR_BLUE, padding);
+    // keep separate index for info array (note: not mapped 1:1 with pid)
+    int index = 0;
 
     for (int pid = 0; pid < TOYOS_MAX_PROCESSES; pid++) {
+        // indicates no process
+        info[index].id = -1;
+
         struct process* process = process_get(pid);
         if (!process) {
-            continue;
+            goto next;
         }
 
-        // add any necessary padding to the filename
-        int diff = max_pid_len - strlen(process->filename);
-        char this_padding[diff];
-        strncpy(this_padding, "     ", max_pid_len);
+        info[index].id = process->id;
+        strcpy(info[index].filename, process->filename);
 
-        printf_colored("  %i   %s%s\n", COLOR_LIGHT_GREEN, COLOR_BLUE, process->id, process->filename, this_padding);
+next:
+        index += 1;
     }
 
-    return OK;
+    return info;
 }

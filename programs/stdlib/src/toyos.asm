@@ -12,7 +12,7 @@ global toyos_exit:function
 global toyos_process_get_arguments:function
 global toyos_system:function
 global toyos_clear_terminal:function
-global toyos_display_process_list:function
+global toyos_get_processes:function
 
 ; void print(const char* filename)
 print:
@@ -34,6 +34,15 @@ toyos_getkey:
     pop ebp
     ret
 
+; void* toyos_get_processes(void)
+toyos_get_processes:
+    push ebp
+    mov ebp, esp
+    mov eax, 11 ; Command 11 display process list
+    int 0x80
+    pop ebp
+    ret
+    
 ; void* toyos_malloc(size_t size)
 toyos_malloc:
     push ebp
@@ -114,15 +123,6 @@ toyos_clear_terminal:
     push ebp
     mov ebp, esp
     mov eax, 10 ; Command 10 clear terminal
-    int 0x80
-    pop ebp
-    ret
-
-; void toyos_display_process_list(void)
-toyos_display_process_list:
-    push ebp
-    mov ebp, esp
-    mov eax, 11 ; Command 11 display process list
     int 0x80
     pop ebp
     ret

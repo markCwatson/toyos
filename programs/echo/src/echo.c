@@ -6,14 +6,14 @@
 int main(int argc, char** argv) {
     char quote = argv[1][0];
     if (quote != '\'' && quote != '"') {
-        printf("[Err-1] Usage: echo 'message contained in quotes'\n");
+        printf("[Err-1] Usage: echo 'message contained in quotes'\n\n");
         return -1;
     }
 
     int len = strlen(argv[argc - 1]);
     char last = argv[argc - 1][len - 1];
     if (last != quote) {
-        printf("[Err-2] Usage: echo 'message contained in quotes'\n");
+        printf("[Err-2] Usage: echo 'message contained in quotes'\n\n");
         return -1;
     }
 
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         printf("%s ", argv[i]);
     }
 
-    printf("\n");
+    printf("\n\n");
 
     return 0;
 }
