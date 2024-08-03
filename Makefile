@@ -104,6 +104,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	sudo cp ./programs/shell/shell.elf /mnt/d
 	sudo cp ./programs/echo/echo.elf /mnt/d
 	sudo cp ./programs/clear/clear.elf /mnt/d
+	sudo cp ./programs/ps/ps.elf /mnt/d
 
 	# Create a test file on the mounted OS image.
 	touch test.txt
@@ -235,6 +236,7 @@ user_programs:
 	cd ./programs/shell && make all
 	cd ./programs/echo && make all
 	cd ./programs/clear && make all
+	cd ./programs/ps && make all
 
 user_programs_clean:
 	cd ./programs/stdlib && make clean
@@ -242,6 +244,7 @@ user_programs_clean:
 	cd ./programs/shell && make clean
 	cd ./programs/echo && make clean
 	cd ./programs/clear && make clean
+	cd ./programs/ps && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

@@ -162,6 +162,39 @@ int strnlen_terminator(const char* str, int max, char terminator) {
 }
 
 /**
+ * @brief Converts an integer to a string.
+ * 
+ * @param i The integer to convert.
+ * @return char* The string representation of the integer.
+ */
+char* itoa(int i) {
+    static char text[12];
+    int loc = 11;
+    text[11] = 0;
+    char neg = 1;
+
+    if (i >= 0) {
+        neg = 0;
+        i = -i;
+    }
+
+    while(i) {
+        text[--loc] = '0' - (i % 10);
+        i /= 10;
+    }
+
+    if (loc == 11) {
+        text[--loc] = '0';
+    }
+
+    if (neg) {
+        text[--loc] = '-';
+    }
+
+    return &text[loc];
+}
+
+/**
  * @brief Converts a character to an integer.
  *
  * Converts a character representing a digit ('0'-'9') to its corresponding integer value.
@@ -169,7 +202,7 @@ int strnlen_terminator(const char* str, int max, char terminator) {
  * @param c The character to convert.
  * @return The integer value of the character, or -1 if the character is not a digit.
  */
-int c_to_i(char c) {
+int ctoi(char c) {
     return c - 48;  // '0' character has ASCII value 48
 }
 

@@ -169,7 +169,7 @@ int strnlen_terminator(const char* str, int max, char terminator) {
  * @param c The character to convert.
  * @return The integer value of the character, or -1 if the character is not a digit.
  */
-int c_to_i(char c) {
+int ctoi(char c) {
     return c - 48;  // '0' character has ASCII value 48
 }
 

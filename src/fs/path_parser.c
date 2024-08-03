@@ -34,7 +34,7 @@ static int path_parser_get_drive_by_path(const char** path) {
         return -EBADPATH;
     }
 
-    return c_to_i(*path[0]);
+    return ctoi(*path[0]);
 }
 
 /**

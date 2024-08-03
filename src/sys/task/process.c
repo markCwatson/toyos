@@ -5,6 +5,7 @@
 #include "status.h"
 #include "config.h"
 #include "kernel.h"
+#include "stdlib/printf.h"
 
 /**
  * @brief System command handler for loading and starting a new process.
@@ -109,4 +110,52 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
     task_return(&process->task->registers);
 
     return 0;
+}
+
+/**
+ * @brief System command handler for printing the process list.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND11_PRINT_PROCESS_LIST is invoked.
+ * It prints the list of processes to the terminal.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command11_print_process_list(struct interrupt_frame* frame) {
+    // find process with longest filename for formatting purposes
+    int max_pid_len = 0;
+    for (int pid = 0; pid < TOYOS_MAX_PROCESSES; pid++) {
+        struct process* process = process_get(pid);
+        if (!process) {
+            continue;
+        }
+
+        int pid_len = strlen(itoa(pid));
+        if (pid_len > max_pid_len) {
+            max_pid_len = pid_len;
+        }
+    }
+
+    // print process list
+    char padding[max_pid_len];
+    strncpy(padding, "     ", max_pid_len);
+        
+    printf_colored(" PID  %sPATH\n", COLOR_LIGHT_BROWN, COLOR_BLUE, padding);
+    printf_colored(" ---  %s----\n", COLOR_LIGHT_BROWN, COLOR_BLUE, padding);
+
+    for (int pid = 0; pid < TOYOS_MAX_PROCESSES; pid++) {
+        struct process* process = process_get(pid);
+        if (!process) {
+            continue;
+        }
+
+        // add any necessary padding to the filename
+        int diff = max_pid_len - strlen(process->filename);
+        char this_padding[diff];
+        strncpy(this_padding, "     ", max_pid_len);
+
+        printf_colored("  %i   %s%s\n", COLOR_LIGHT_GREEN, COLOR_BLUE, process->id, process->filename, this_padding);
+    }
+
+    return OK;
 }

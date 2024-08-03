@@ -101,19 +101,6 @@ int process_switch(struct process* process);
 int process_load_switch(const char* filename, struct process** process);
 
 /**
- * Retrieves the current running process.
- * @return The current process.
- */
-struct process* process_current(void);
-
-/**
- * Retrieves a process by its process ID.
- * @param process_id The process ID.
- * @return The process with the given ID, or NULL if not found.
- */
-struct process* process_get(int process_id);
-
-/**
  * Allocates memory for a process.
  * 
  * This function allocates memory for a process. The memory is allocated from the process's

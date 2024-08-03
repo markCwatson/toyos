@@ -1,6 +1,6 @@
 # ToyOS
 
-ToyOS is a work-in-progress (WIP) hobby operating system designed for educational and experimental purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. The following GIF shows ToyOS running in QEMU. In this demonstration, the shell is interacting with the kernel to execute commands (currently, only the `echo` command is supported).
+ToyOS is a work-in-progress (WIP) hobby operating system meant for educational purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. The following GIF shows ToyOS running in QEMU. In this demonstration, the shell is interacting with the kernel to execute commands (currently, only the `echo` command is supported).
 
 ![alt-text][1]
 

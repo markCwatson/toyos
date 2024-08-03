@@ -23,7 +23,7 @@ int strlen(const char* ptr);
  * @param c The character to convert.
  * @return The integer value of the character, or -1 if the character is not a digit.
  */
-int c_to_i(char c);
+int ctoi(char c);
 
 /**
  * @brief Checks if a character is a digit.

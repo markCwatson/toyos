@@ -20,6 +20,7 @@
         "stdio.h": "c",
         "toyos.h": "c",
         "process.h": "c",
-        "keyboard.h": "c"
+        "keyboard.h": "c",
+        "heap.h": "c"
     }
 }
