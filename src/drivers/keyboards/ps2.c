@@ -26,6 +26,11 @@
 int ps2_keyboard_init(void);
 
 /**
+ * @brief Converts a PS/2 keyboard scancode to an ASCII character.
+ */
+void ps2_keyboard_handle_interrupt(void);
+
+/**
  * @brief Array mapping PS/2 scan codes to ASCII characters (Set 1).
  *
  * This array contains the mapping from scan codes to ASCII characters for the PS/2 keyboard's Set 1 scan code set.
@@ -44,8 +49,6 @@ static uint8_t keyboard_scan_set_one[] = {
     0x00, '7', '8', '9', '-', '4', '5',
     '6', '+', '1', '2', '3', '0', '.'
 };
-
-void ps2_keyboard_handle_interrupt(void);
 
 /**
  * @brief PS/2 keyboard structure definition.
@@ -99,8 +102,6 @@ uint8_t ps2_keyboard_scancode_to_char(uint8_t scancode) {
 
 /**
  * @brief Handles PS/2 keyboard interrupts.
- *
- * This function is intended to handle interrupts from the PS/2 keyboard. Currently, it is not implemented.
  */
 void ps2_keyboard_handle_interrupt(void) {
     kernel_page();

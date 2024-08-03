@@ -3,7 +3,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "memory/memory.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "disk/streamer.h"
 #include "disk/disk.h"
 #include "memory/heap/kheap.h"

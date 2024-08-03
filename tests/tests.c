@@ -1,6 +1,6 @@
 #include "tests.h"
 #include "fs/file.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "stdlib/printf.h"
 #include "disk/streamer.h"
 #include "memory/paging/paging.h"

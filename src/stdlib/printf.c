@@ -4,7 +4,7 @@
 
 #include "printf.h"
 #include "terminal/terminal.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 
 /**
  * @brief Prints a string to the terminal using color attributes.

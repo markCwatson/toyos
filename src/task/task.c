@@ -4,7 +4,7 @@
 #include "process.h"
 #include "memory/heap/kheap.h"
 #include "memory/memory.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "memory/paging/paging.h"
 #include "loader/formats/elfloader.h"
 #include "idt/idt.h"
@@ -311,7 +311,7 @@ void* task_get_stack_item(struct task* task, int index) {
     void* result = 0;
 
     // Get the stack pointer from the task
-    uint32_t* sp_ptr = (uint32_t*) task->registers.esp;
+    uint32_t* sp_ptr = (uint32_t*)task->registers.esp;
 
     // Switch to the given tasks page
     task_page_task(task);

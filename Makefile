@@ -19,7 +19,7 @@ FILES = ./build/kernel.asm.o \
 		./build/fs/file.o \
 		./build/fs/path_parser.o \
 		./build/fs/fat/fat16.o \
-		./build/string/string.o \
+		./build/stdlib/string.o \
 		./build/gdt/gdt.asm.o \
 		./build/gdt/gdt.o \
 		./build/task/tss.asm.o \
@@ -159,8 +159,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/disk/streamer.o: ./src/disk/streamer.c
 	i686-elf-gcc ${INCLUDES} -I./src/disk ${FLAGS} -std=gnu99 -c ./src/disk/streamer.c -o ./build/disk/streamer.o
 
-./build/string/string.o: ./src/string/string.c
-	i686-elf-gcc ${INCLUDES} -I./src/string ${FLAGS} -std=gnu99 -c ./src/string/string.c -o ./build/string/string.o
+./build/stdlib/string.o: ./src/stdlib/string.c
+	i686-elf-gcc ${INCLUDES} -I./src/string ${FLAGS} -std=gnu99 -c ./src/stdlib/string.c -o ./build/stdlib/string.o
 
 ./build/fs/path_parser.o: ./src/fs/path_parser.c
 	i686-elf-gcc ${INCLUDES} -I./src/fs ${FLAGS} -std=gnu99 -c ./src/fs/path_parser.c -o ./build/fs/path_parser.o

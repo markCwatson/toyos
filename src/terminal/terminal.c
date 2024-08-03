@@ -1,5 +1,5 @@
 #include "terminal.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "io/io.h"
 #include <stddef.h>
 #include <stdint.h>

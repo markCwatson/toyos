@@ -6,7 +6,7 @@
 #include "memory/heap/kheap.h"
 #include "status.h"
 #include "disk/disk.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 
 // Array of supported file systems
 struct filesystem* filesystems[TOYOS_MAX_FILESYSTEMS] = { NULL };

@@ -5,7 +5,7 @@
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "fs/file.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "kernel.h"
 #include "loader/formats/elfloader.h"
 #include <stdbool.h>

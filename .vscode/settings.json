@@ -19,6 +19,7 @@
         "stdlib.h": "c",
         "stdio.h": "c",
         "toyos.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "keyboard.h": "c"
     }
 }

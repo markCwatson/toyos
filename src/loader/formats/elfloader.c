@@ -3,7 +3,7 @@
 #include "status.h"
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
-#include "string/string.h"
+#include "stdlib/string.h"
 #include "memory/paging/paging.h"
 #include "kernel.h"
 #include "config.h"

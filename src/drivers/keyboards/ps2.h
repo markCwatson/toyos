@@ -21,10 +21,18 @@
 #define PS2_COMMAND_ENABLE_FIRST_PORT   0xae  /**< Command to enable the first PS/2 port (usually used for keyboard). */
 #define PS2_KEYBOARD_INPUT_PORT         0x60  /**< The I/O port address for the PS/2 keyboard input. */
 
+/**
+ * @brief PS/2 keyboard interrupt definitions.
+ */
+#define PS2_ISR_KEYBOARD_INTERRUPT      0x21  /**< Keyboard interrupt number. */
 
+/**
+ * @brief PS/2 keyboard scancode definitions.
+ */
 #define PS2_KEYBOARD_KEY_RELEASED       0x80  /**< Bitmask for key release events. */
 #define PS2_KEYBOARD_CAPSLOCK           0x3a  /**< Scancode for the caps lock key. */
-#define PS2_ISR_KEYBOARD_INTERRUPT      0x21  /**< Keyboard interrupt number. */
+#define PS2_KEYBOARD_ARROW_UP           0x48  /**< Scancode for the up arrow key. */
+#define PS2_KEYBOARD_ARROW_DOWN         0x50  /**< Scancode for the down arrow key. */
 
 /**
  * @brief Registers the PS/2 keyboard with the keyboard system.
