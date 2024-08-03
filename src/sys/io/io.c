@@ -67,3 +67,21 @@ void* sys_command3_putchar(struct interrupt_frame* frame) {
 
     return NULL;
 }
+
+/**
+ * @brief Clears the terminal.
+ * 
+ * This function is a system command that can be invoked using interrupt 0x80. It clears the
+ * terminal using the terminal_clear function.
+ * 
+ * @param frame The interrupt frame containing the system call arguments.
+ * @return void
+ */
+void* sys_command10_clear_terminal(struct interrupt_frame* frame) {
+    if (!frame) {
+        return NULL;
+    }
+
+    terminal_clear_all();
+    return NULL;
+}

@@ -28,5 +28,6 @@ struct command_argument* toyos_parse_command(const char* command, int max);
 void toyos_process_get_arguments(struct process_arguments* arguments);;
 int toyos_system(struct command_argument* arguments);
 int toyos_system_run(const char* command);
+void toyos_clear_terminal(void);
 
 #endif
