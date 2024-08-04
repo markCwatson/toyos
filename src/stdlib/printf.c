@@ -7,7 +7,7 @@
 #include "stdlib/string.h"
 
 /**
- * @brief Prints a string to the terminal using color attributes.
+ * Prints a string to the terminal using color attributes.
  * 
  * This function writes each character of the given string to the terminal, using caller defined
  * color attribute. It is typically used for kernel-level logging and debugging.
@@ -25,7 +25,7 @@ static void print(const char* str, unsigned char fg, unsigned char bg) {
 }
 
 /**
- * @brief ToyOS printf implementation.
+ * ToyOS printf implementation.
  *
  * @param fmt A string that specifies the format of the output.
  * @return The number of characters that are written into the array, not counting the terminating null character.
@@ -68,7 +68,7 @@ int printf(const char *fmt, ...) {
 }
 
 /**
- * @brief ToyOS printf implementation with color support.
+ * ToyOS printf implementation with color support.
  * 
  * This function is similar to `printf` but accepts additional arguments for foreground and background colors.
  * 

@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /**
- * @brief File seek modes.
+ * File seek modes.
  *
  * These modes define how the file pointer is moved within a file.
  */
@@ -18,7 +18,7 @@ enum {
 };
 
 /**
- * @brief File access modes.
+ * File access modes.
  *
  * These modes determine how a file is opened and accessed.
  */
@@ -32,7 +32,7 @@ enum {
 };
 
 /**
- * @brief File status flags.
+ * File status flags.
  *
  * Flags providing additional status information about a file.
  */
@@ -46,7 +46,7 @@ enum {
 struct disk;
 
 /**
- * @brief Structure for storing file status information.
+ * Structure for storing file status information.
  *
  * This structure holds flags and the size of the file.
  */
@@ -65,7 +65,7 @@ typedef int (*fs_seek_fp)(void* private_data, uint32_t offset, file_seek_mode se
 typedef int (*fs_stat_fp)(struct disk* disk, void* private_data, struct file_stat* stat);
 
 /**
- * @brief File system interface structure.
+ * File system interface structure.
  *
  * This structure defines the interface for a file system, including functions
  * for resolving, opening, reading, writing, seeking, getting status, and closing files.
@@ -82,7 +82,7 @@ struct filesystem {
 };
 
 /**
- * @brief Structure representing a file descriptor.
+ * Structure representing a file descriptor.
  *
  * A file descriptor contains information about an open file, including its index,
  * the file system it belongs to, and any private data needed for file operations.
@@ -97,7 +97,7 @@ struct file_descriptor {
 /* File system function declarations */
 
 /**
- * @brief Initializes the file system infrastructure.
+ * Initializes the file system infrastructure.
  *
  * This function should be called during system initialization to set up
  * the necessary structures and states for file system operations.
@@ -105,7 +105,7 @@ struct file_descriptor {
 void fs_init(void);
 
 /**
- * @brief Opens a file with the specified filename and mode.
+ * Opens a file with the specified filename and mode.
  *
  * This function attempts to open a file and returns a file descriptor if successful.
  *
@@ -116,7 +116,7 @@ void fs_init(void);
 int fopen(const char* filename, const char* mode_str);
 
 /**
- * @brief Seeks to a specific position in an open file.
+ * Seeks to a specific position in an open file.
  *
  * This function moves the file pointer to a specified offset, based on the seek mode.
  *
@@ -128,7 +128,7 @@ int fopen(const char* filename, const char* mode_str);
 int fseek(int fd, int offset, file_seek_mode whence);
 
 /**
- * @brief Reads data from an open file.
+ * Reads data from an open file.
  *
  * This function reads data from a file into a buffer.
  *
@@ -141,7 +141,7 @@ int fseek(int fd, int offset, file_seek_mode whence);
 int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 
 /**
- * @brief Writes data to an open file.
+ * Writes data to an open file.
  *
  * This function writes data from a buffer to a file.
  *
@@ -154,7 +154,7 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 
 /**
- * @brief Retrieves the status of an open file.
+ * Retrieves the status of an open file.
  *
  * This function fills a file_stat structure with information about a file, such as its size and flags.
  *
@@ -165,7 +165,7 @@ int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 int fstat(int fd, struct file_stat* stat);
 
 /**
- * @brief Closes an open file.
+ * Closes an open file.
  *
  * This function closes a file and releases any resources associated with the file descriptor.
  *
@@ -175,7 +175,7 @@ int fstat(int fd, struct file_stat* stat);
 int fclose(int fd);
 
 /**
- * @brief Inserts a new file system into the system's list of available file systems.
+ * Inserts a new file system into the system's list of available file systems.
  *
  * This function registers a file system, making it available for resolving and managing files.
  *
@@ -184,7 +184,7 @@ int fclose(int fd);
 void fs_insert_filesystem(struct filesystem* filesystem);
 
 /**
- * @brief Resolves the file system used by a specific disk.
+ * Resolves the file system used by a specific disk.
  *
  * This function determines which file system is used by a disk and returns a pointer to the corresponding filesystem structure.
  *

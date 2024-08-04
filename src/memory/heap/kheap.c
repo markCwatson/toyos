@@ -9,7 +9,7 @@ struct heap kernel_heap;
 struct heap_table kernel_heap_table;
 
 /**
- * @brief Initializes the kernel heap.
+ * Initializes the kernel heap.
  * 
  * This function sets up the kernel heap by creating a heap structure at a specified memory
  * region defined by the configuration. It calculates the total number of entries in the heap table
@@ -34,7 +34,7 @@ void kheap_init() {
 }
 
 /**
- * @brief Allocates a block of memory from the kernel heap.
+ * Allocates a block of memory from the kernel heap.
  * 
  * This function allocates a block of memory of the specified size from the kernel heap.
  * 
@@ -46,7 +46,7 @@ void* kmalloc(size_t size) {
 }
 
 /**
- * @brief Allocates and zeroes a block of memory from the kernel heap.
+ * Allocates and zeroes a block of memory from the kernel heap.
  * 
  * This function allocates memory and initializes it to zero. It's useful when the allocated memory
  * needs to be in a known state.
@@ -65,7 +65,7 @@ void* kzalloc(size_t size) {
 }
 
 /**
- * @brief Frees a previously allocated block of memory.
+ * Frees a previously allocated block of memory.
  * 
  * This function frees the memory block pointed to by ptr, returning it to the kernel heap.
  * 

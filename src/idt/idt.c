@@ -23,10 +23,10 @@ extern void no_interrupt(void);
 extern void idt_load(struct idtr_desc* ptr);
 
 // System call handler function pointer
-static sys_cmd_fp sys_commands[TOYOS_MAX_SYSCALLS];
+static sys_cmd_fp sys_cmds[TOYOS_MAX_SYSCALLS];
 
 /**
- * @brief Handles system call interrupt
+ * Handles system call interrupt
  * 
  * This function is called when a system call interrupt occurs. It reads the system call
  * number from the interrupt frame and calls the appropriate system call handler function.
@@ -41,7 +41,7 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
         return NULL;
     }
 
-    sys_cmd_fp handler = sys_commands[cmd];
+    sys_cmd_fp handler = sys_cmds[cmd];
     if (!handler) {
         alertk("No handler for system call %i\n", cmd);
         return NULL;
@@ -51,7 +51,7 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Registers a system call handler function
+ * Registers a system call handler function
  * 
  * This function registers a system call handler function for the given system call number.
  * When the system call interrupt occurs, the handler function will be called to handle the
@@ -61,20 +61,20 @@ static void* sys_handle_command(int cmd, struct interrupt_frame* frame) {
  * @param handler The system call handler function.
  * @return void
  */
-void register_sys_command(int cmd, sys_cmd_fp handler) {
+void register_sys_cmd(int cmd, sys_cmd_fp handler) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
         panick("Invalid system call number: %i\n", cmd);
     }
 
-    if (sys_commands[cmd]) {
+    if (sys_cmds[cmd]) {
         panick("System call %i already has a handler\n", cmd);
     }
 
-    sys_commands[cmd] = handler;
+    sys_cmds[cmd] = handler;
 }
 
 /**
- * @brief Handles system call interrupt
+ * Handles system call interrupt
  * 
  * This function is called when a system call interrupt occurs. It reads the system call
  * number from the interrupt frame and calls the appropriate system call handler function.
@@ -100,7 +100,7 @@ void* sys_handler(int cmd, struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Handles an interrupt
+ * Handles an interrupt
  * 
  * This function is called when an interrupt occurs. It reads the interrupt number from the
  * interrupt frame and calls the appropriate interrupt handler function.
@@ -127,14 +127,14 @@ void interrupt_handler(int interrupt, struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Handles the divide by zero exception
+ * Handles the divide by zero exception
  */
 static void int0h(void) {
     panick("\nDivide by zero error!\n");
 }
 
 /**
- * @brief Handles no interrupt
+ * Handles no interrupt
  */
 void no_interrupt_handler(void) {
     // ack interrupt
@@ -142,7 +142,7 @@ void no_interrupt_handler(void) {
 }
 
 /**
- * @brief Sets an interrupt descriptor in the IDT
+ * Sets an interrupt descriptor in the IDT
  * 
  * This function sets the interrupt descriptor at the specified index in the interrupt descriptor
  * table (IDT) to the given address. The address should be the entry point of the interrupt handler
@@ -162,7 +162,7 @@ static void idt_set(int interrupt_no, void* address) {
 }
 
 /**
- * @brief Registers an interrupt callback function
+ * Registers an interrupt callback function
  * 
  * This function registers an interrupt callback function for the given interrupt number.
  * 
@@ -180,7 +180,7 @@ int idt_register_interrupt_callback(int interrupt, interrupt_cb_fp interrupt_cal
 }
 
 /**
- * @brief Handles the exception
+ * Handles the exception
  */
 void idt_handle_exception(void) {
     process_terminate(task_current()->process);
@@ -188,7 +188,7 @@ void idt_handle_exception(void) {
 }
 
 /**
- * @brief Handles the clock interrupt for task switching
+ * Handles the clock interrupt for task switching
  */
 void idt_clock(void) {
     outb(0x20, 0x20);
@@ -196,7 +196,7 @@ void idt_clock(void) {
 }
 
 /**
- * @brief Initializes the interrupt descriptor table (IDT) with default handlers
+ * Initializes the interrupt descriptor table (IDT) with default handlers
  */
 void idt_init(void) {
     memset(idt_descriptors, 0, sizeof(idt_descriptors));

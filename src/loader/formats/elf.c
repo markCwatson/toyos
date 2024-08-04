@@ -1,7 +1,7 @@
 #include "elf.h"
 
 /**
- * @brief Retrieves the entry point address from the ELF header.
+ * Retrieves the entry point address from the ELF header.
  *
  * This function extracts the entry point address from the given ELF header.
  * The entry point is where execution will begin when the ELF file is run.
@@ -14,7 +14,7 @@ void* elf_get_entry_ptr(struct elf_header* elf_header) {
 }
 
 /**
- * @brief Retrieves the entry point address as a uint32_t from the ELF header.
+ * Retrieves the entry point address as a uint32_t from the ELF header.
  *
  * This function returns the entry point address from the ELF header
  * as a 32-bit unsigned integer. The entry point is the starting address

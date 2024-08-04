@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief Task State Segment (TSS) structure.
+ * Task State Segment (TSS) structure.
  *
  * This structure defines the Task State Segment (TSS) in the x86 architecture.
  * The TSS is used to hold information about a task, including its registers, stack pointers,
@@ -40,7 +40,7 @@ struct tss {
 } __attribute__((packed));
 
 /**
- * @brief Loads the TSS.
+ * Loads the TSS.
  *
  * This function loads the Task State Segment (TSS) using the `ltr` instruction,
  * which sets the TR register to point to the TSS descriptor in the GDT.

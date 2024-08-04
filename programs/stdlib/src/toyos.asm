@@ -13,6 +13,9 @@ global toyos_process_get_arguments:function
 global toyos_system:function
 global toyos_clear_terminal:function
 global toyos_get_processes:function
+global toyos_fork:function
+global toyos_kill:function
+global toyos_wait:function
 
 ; void print(const char* filename)
 print:
@@ -124,5 +127,36 @@ toyos_clear_terminal:
     mov ebp, esp
     mov eax, 10 ; Command 10 clear terminal
     int 0x80
+    pop ebp
+    ret
+
+; int toyos_fork(void) (returns the pid of the child process)
+toyos_fork:
+    push ebp
+    mov ebp, esp
+    mov eax, 12 ; Command 12 fork
+    int 0x80
+    pop ebp
+    ret
+
+; void toyos_kill(int id)
+toyos_kill:
+    push ebp
+    mov ebp, esp
+    mov eax, 13 ; Command 13 kill
+    push dword[ebp+8] ; Variable "id"
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; void toyos_wait(int id)
+toyos_wait:
+    push ebp
+    mov ebp, esp
+    mov eax, 14 ; Command 14 wait
+    push dword[ebp+8] ; Variable "id"
+    int 0x80
+    add esp, 4
     pop ebp
     ret

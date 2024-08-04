@@ -3,7 +3,7 @@
 extern int main(int argc, char** argv);
 
 /**
- * @brief Entry point for C programs.
+ * Entry point for C programs.
  * 
  * This function is called by the ToyOS process loader to start the C program. It
  * retrieves the arguments for the process and calls the main function.

@@ -14,7 +14,7 @@ typedef unsigned char process_filetype;
 
 /**
  * @struct process_allocation
- * @brief Represents a memory allocation for a process.
+ * Represents a memory allocation for a process.
  */
 struct process_allocation {
     void* ptr;
@@ -23,7 +23,7 @@ struct process_allocation {
 
 /**
  * @struct command_argument
- * @brief Represents an argument in a command.
+ * Represents an argument in a command.
  */
 struct command_argument {
     char argument[512];
@@ -32,7 +32,7 @@ struct command_argument {
 
 /**
  * @struct process_arguments
- * @brief Represents the arguments of a process.
+ * Represents the arguments of a process.
  */
 struct process_arguments {
     int argc;
@@ -41,7 +41,7 @@ struct process_arguments {
 
 /**
  * @struct process_info
- * @brief Represents information about a process.
+ * Represents information about a process.
  */
 struct process_info {
     int id;
@@ -50,7 +50,7 @@ struct process_info {
 
 /**
  * @struct process
- * @brief Represents a process in the system.
+ * Represents a process in the system.
  */
 struct process {
     uint16_t id;                                                            /**< The process ID. */
@@ -139,7 +139,7 @@ void* process_malloc(struct process* process, size_t size);
 void process_free(struct process* process, void* ptr);
 
 /**
- * @brief Terminates a process.
+ * Terminates a process.
  * 
  * This function terminates a process and frees all resources associated with it.
  * 
@@ -149,7 +149,7 @@ void process_free(struct process* process, void* ptr);
 int process_terminate(struct process* process);
 
 /**
- * @brief Retrieves the arguments for a process.
+ * Retrieves the arguments for a process.
  * 
  * @param process The process to retrieve arguments for.
  * @param argc A pointer to store the number of arguments.
@@ -158,12 +158,61 @@ int process_terminate(struct process* process);
 void process_get_arguments(struct process* process, int* argc, char*** argv);
 
 /**
- * @brief Injects arguments into a process.
+ * Injects arguments into a process.
  * 
  * @param process The process to inject arguments into.
  * @param root_argument The root argument in the list.
  * @return 0 on success, error code on failure.
  */
 int process_inject_arguments(struct process* process, struct command_argument* root_argument);
+
+/**
+ * Forks a new process from the given parent process.
+ *
+ * This function creates a new child process by duplicating the state of the
+ * parent process. It allocates necessary memory for the child process structure,
+ * loads the process data, creates a new task for the process, and maps the memory.
+ * It also copies the parent's memory allocations to the child process.
+ *
+ * @param parent The parent process from which to fork the new process.
+ * @param[out] child A pointer to store the address of the newly created child process.
+ * @return Returns 0 (OK) on success, or a negative error code on failure.
+ */
+int process_fork(struct process* parent, struct process** child);
+
+/**
+ * Waits for a process to finish execution.
+ * 
+ * This function waits for a process to finish execution. It blocks the current process
+ * until the target process has finished execution.
+ * 
+ * @param process The process to wait for.
+ * @return 0 on success, error code on failure.
+ */
+int process_wait(struct process* process);
+
+/**
+ * Kills a process.
+ * 
+ * This function kills a process. It terminates the process and frees all resources
+ * associated with it.
+ * 
+ * @param process The process to kill.
+ * @return void
+ */
+void process_kill(struct process* process);
+
+/**
+ * Replaces the current process with a new program.
+ * 
+ * This function replaces the current process with a new program. It loads the new program
+ * into memory, maps the memory for the new program, and frees the memory and state of the
+ * current process.
+ * 
+ * @param process The process to replace.
+ * @param path The path to the new program.
+ * @return 0 on success, error code on failure.
+ */
+int process_load_replace(struct process* process, const char* path);
 
 #endif

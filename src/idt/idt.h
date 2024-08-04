@@ -13,7 +13,7 @@ typedef void* (*sys_cmd_fp)(struct interrupt_frame* frame);
 typedef void (*interrupt_cb_fp)();
 
 /**
- * @brief Structure representing an entry in the interrupt descriptor table (IDT)
+ * Structure representing an entry in the interrupt descriptor table (IDT)
  * 
  * The IDT is an array of these structures, each representing a single interrupt or exception
  * that the CPU can raise. Each entry contains the address of the interrupt handler function
@@ -28,7 +28,7 @@ struct idt_desc {
 } __attribute__((packed));
 
 /**
- * @brief Structure representing the interrupt descriptor table register (IDTR)
+ * Structure representing the interrupt descriptor table register (IDTR)
  * 
  * The IDTR is a special register that holds the base address and size of the interrupt
  * descriptor table. When an interrupt occurs, the CPU uses this information to find the
@@ -40,7 +40,7 @@ struct idtr_desc {
 } __attribute__((packed));
 
 /**
- * @brief Structure representing the state of the CPU when an interrupt occurs
+ * Structure representing the state of the CPU when an interrupt occurs
  * 
  * When an interrupt occurs, the CPU pushes the state of the current process onto the stack
  * before calling the interrupt handler. This structure represents the state that is pushed
@@ -64,7 +64,7 @@ struct interrupt_frame {
 } __attribute__((packed));
 
 /**
- * @brief Registers a system call handler function
+ * Registers a system call handler function
  * 
  * This function registers a system call handler function for the given system call number.
  * When the system call interrupt occurs, the handler function will be called to handle the
@@ -74,10 +74,10 @@ struct interrupt_frame {
  * @param handler The system call handler function.
  * @return void
  */
-void register_sys_command(int cmd, sys_cmd_fp handler);
+void register_sys_cmd(int cmd, sys_cmd_fp handler);
 
 /**
- * @brief Registers an interrupt callback function
+ * Registers an interrupt callback function
  * 
  * This function registers an interrupt callback function for the given interrupt number.
  * 
@@ -88,17 +88,17 @@ void register_sys_command(int cmd, sys_cmd_fp handler);
 int idt_register_interrupt_callback(int interrupt, interrupt_cb_fp interrupt_cb);
 
 /**
- * @brief Initializes the interrupt descriptor table (IDT) with default handlers
+ * Initializes the interrupt descriptor table (IDT) with default handlers
  */
 void idt_init(void);
 
 /**
- * @brief Enables interrupts on the CPU
+ * Enables interrupts on the CPU
  */
 void enable_interrupt(void);
 
 /**
- * @brief Disables interrupts on the CPU
+ * Disables interrupts on the CPU
  */
 void disable_interrupt(void);
 

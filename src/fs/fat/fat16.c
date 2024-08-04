@@ -35,7 +35,7 @@ typedef unsigned int fat_item_type;
 
 /**
  * @struct fat_header_extended
- * @brief Extended header structure for FAT16, includes additional metadata.
+ * Extended header structure for FAT16, includes additional metadata.
  */
 struct fat_header_extended {
     uint8_t drive_number;
@@ -48,7 +48,7 @@ struct fat_header_extended {
 
 /**
  * @struct fat_header
- * @brief Primary header structure for FAT16, describes the general disk layout.
+ * Primary header structure for FAT16, describes the general disk layout.
  */
 struct fat_header {
     uint8_t short_jmp_ins[3];
@@ -69,7 +69,7 @@ struct fat_header {
 
 /**
  * @struct fat_h
- * @brief Combined header structure for FAT16, including primary and extended headers.
+ * Combined header structure for FAT16, including primary and extended headers.
  */
 struct fat_h {
     struct fat_header primary_header;
@@ -80,7 +80,7 @@ struct fat_h {
 
 /**
  * @struct fat_directory_item
- * @brief Structure representing a directory entry in FAT16.
+ * Structure representing a directory entry in FAT16.
  */
 struct fat_directory_item {
     uint8_t filename[8];
@@ -100,7 +100,7 @@ struct fat_directory_item {
 
 /**
  * @struct fat_directory
- * @brief Represents a directory in FAT16, containing multiple directory items.
+ * Represents a directory in FAT16, containing multiple directory items.
  */
 struct fat_directory {
     struct fat_directory_item* item;  /**< Pointer to array of directory items */
@@ -111,7 +111,7 @@ struct fat_directory {
 
 /**
  * @struct fat_item
- * @brief Union structure representing either a file or a directory in FAT16.
+ * Union structure representing either a file or a directory in FAT16.
  */
 struct fat_item {
     union {
@@ -123,7 +123,7 @@ struct fat_item {
 
 /**
  * @struct fat_file_descriptor
- * @brief Descriptor for open files in FAT16, tracks the position within the file.
+ * Descriptor for open files in FAT16, tracks the position within the file.
  */
 struct fat_file_descriptor {
     struct fat_item* item;            /**< Associated FAT item */
@@ -132,7 +132,7 @@ struct fat_file_descriptor {
 
 /**
  * @struct fat_private
- * @brief Private data for FAT16 filesystem, used for maintaining filesystem state.
+ * Private data for FAT16 filesystem, used for maintaining filesystem state.
  */
 struct fat_private {
     struct fat_h header;              /**< Combined header for FAT16 */
@@ -156,7 +156,7 @@ int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat);
 int fat16_close(void* private_data);
 
 /**
- * @brief FAT16 filesystem structure with function pointers to filesystem operations.
+ * FAT16 filesystem structure with function pointers to filesystem operations.
  */
 struct filesystem fat16_fs = {
     .resolve = fat16_resolve,
@@ -169,7 +169,7 @@ struct filesystem fat16_fs = {
 };
 
 /**
- * @brief Initializes the FAT16 filesystem and registers it.
+ * Initializes the FAT16 filesystem and registers it.
  * @return Pointer to the filesystem structure.
  */
 struct filesystem* fat16_init(void) {
@@ -178,7 +178,7 @@ struct filesystem* fat16_init(void) {
 }
 
 /**
- * @brief Initializes the private FAT16 structure for a disk.
+ * Initializes the private FAT16 structure for a disk.
  * @param disk Pointer to the disk structure.
  * @param private Pointer to the FAT16 private structure.
  */
@@ -190,7 +190,7 @@ static void fat16_init_private(struct disk *disk, struct fat_private *private) {
 }
 
 /**
- * @brief Retrieves the directory stream for the disk.
+ * Retrieves the directory stream for the disk.
  * @param disk Pointer to the disk structure.
  * @return Pointer to the directory stream.
  */
@@ -199,7 +199,7 @@ static inline struct disk_stream* get_disk_directory_stream(const struct disk* d
 }
 
 /**
- * @brief Counts the total items in a directory starting from a given sector.
+ * Counts the total items in a directory starting from a given sector.
  * @param disk Pointer to the disk structure.
  * @param directory_start_sector Sector where the directory starts.
  * @return Total number of items in the directory.
@@ -239,7 +239,7 @@ int fat16_get_total_items_for_directory(struct disk* disk, uint32_t directory_st
 }
 
 /**
- * @brief Converts a logical sector number to an absolute byte offset.
+ * Converts a logical sector number to an absolute byte offset.
  * @param disk Pointer to the disk structure.
  * @param sector The logical sector number.
  * @return The absolute byte offset.
@@ -249,7 +249,7 @@ int fat16_sector_to_absolute(struct disk *disk, int sector) {
 }
 
 /**
- * @brief Retrieves the root directory of the FAT16 filesystem.
+ * Retrieves the root directory of the FAT16 filesystem.
  * @param disk Pointer to the disk structure.
  * @param fat_private Pointer to the FAT16 private structure.
  * @param directory Pointer to the directory structure to be filled.
@@ -309,7 +309,7 @@ err_out:
 }
 
 /**
- * @brief Resolves the FAT16 filesystem on the given disk.
+ * Resolves the FAT16 filesystem on the given disk.
  * @param disk Pointer to the disk structure.
  * @return Status code indicating success or failure.
  */
@@ -360,7 +360,7 @@ out:
 }
 
 /**
- * @brief Clones a FAT16 directory item.
+ * Clones a FAT16 directory item.
  * @param item Pointer to the directory item to clone.
  * @param size Size of the item structure.
  * @return Pointer to the cloned item.
@@ -380,7 +380,7 @@ struct fat_directory_item* fat16_clone_directory_item(struct fat_directory_item*
 }
 
 /**
- * @brief Gets the first cluster number from a FAT16 directory item.
+ * Gets the first cluster number from a FAT16 directory item.
  * @param item Pointer to the directory item.
  * @return First cluster number.
  */
@@ -389,7 +389,7 @@ static uint32_t fat16_get_first_cluster(struct fat_directory_item* item) {
 }
 
 /**
- * @brief Converts a cluster number to an absolute sector number.
+ * Converts a cluster number to an absolute sector number.
  * @param private Pointer to the FAT16 private structure.
  * @param cluster Cluster number.
  * @return Absolute sector number.
@@ -399,7 +399,7 @@ static int fat16_cluster_to_sector(struct fat_private* private, int cluster) {
 }
 
 /**
- * @brief Gets the starting sector of the FAT table.
+ * Gets the starting sector of the FAT table.
  * @param private Pointer to the FAT16 private structure.
  * @return Starting sector of the FAT table.
  */
@@ -408,7 +408,7 @@ static uint32_t fat16_get_first_fat_sector(struct fat_private* private) {
 }
 
 /**
- * @brief Retrieves a FAT table entry for a given cluster.
+ * Retrieves a FAT table entry for a given cluster.
  * @param disk Pointer to the disk structure.
  * @param cluster Cluster number.
  * @return FAT table entry value.
@@ -440,7 +440,7 @@ out:
 }
 
 /**
- * @brief Finds the cluster corresponding to a given offset in a file.
+ * Finds the cluster corresponding to a given offset in a file.
  * @param disk Pointer to the disk structure.
  * @param starting_cluster Starting cluster of the file.
  * @param offset Byte offset within the file.
@@ -489,7 +489,7 @@ out:
 }
 
 /**
- * @brief Reads data from a FAT16 filesystem into a buffer using a disk stream.
+ * Reads data from a FAT16 filesystem into a buffer using a disk stream.
  * @param disk Pointer to the disk structure.
  * @param stream Pointer to the disk stream.
  * @param cluster Starting cluster of the file.
@@ -535,7 +535,7 @@ out:
 }
 
 /**
- * @brief Reads data from a FAT16 file into a buffer.
+ * Reads data from a FAT16 file into a buffer.
  * @param disk Pointer to the disk structure.
  * @param starting_cluster Starting cluster of the file.
  * @param offset Offset within the file.
@@ -551,7 +551,7 @@ static int fat16_read_internal(struct disk* disk, int starting_cluster, int offs
 }
 
 /**
- * @brief Frees a FAT16 directory structure.
+ * Frees a FAT16 directory structure.
  * @param directory Pointer to the directory structure to free.
  */
 static void fat16_free_directory(struct fat_directory* directory) {
@@ -567,7 +567,7 @@ static void fat16_free_directory(struct fat_directory* directory) {
 }
 
 /**
- * @brief Frees a FAT16 item structure (file or directory).
+ * Frees a FAT16 item structure (file or directory).
  * @param item Pointer to the item structure to free.
  */
 static void fat16_fat_item_free(struct fat_item *item) {
@@ -581,7 +581,7 @@ static void fat16_fat_item_free(struct fat_item *item) {
 }
 
 /**
- * @brief Loads a FAT16 directory structure from a directory item.
+ * Loads a FAT16 directory structure from a directory item.
  * @param disk Pointer to the disk structure.
  * @param item Pointer to the directory item structure.
  * @return Pointer to the loaded directory structure.
@@ -629,7 +629,7 @@ out:
 }
 
 /**
- * @brief Creates a new FAT16 item structure for a directory item.
+ * Creates a new FAT16 item structure for a directory item.
  * @param disk Pointer to the disk structure.
  * @param item Pointer to the directory item structure.
  * @return Pointer to the new FAT16 item structure.
@@ -653,7 +653,7 @@ struct fat_item* fat16_new_fat_item_for_directory_item(struct disk* disk, struct
 }
 
 /**
- * @brief Converts a FAT16 filename to a proper string, removing padding spaces.
+ * Converts a FAT16 filename to a proper string, removing padding spaces.
  * @param out Pointer to the output buffer.
  * @param in Pointer to the input FAT16 filename.
  * @param size Size of the input filename.
@@ -678,7 +678,7 @@ void fat16_to_proper_string(char** out, const char* in, size_t size) {
 }
 
 /**
- * @brief Retrieves the full relative filename for a FAT16 directory item.
+ * Retrieves the full relative filename for a FAT16 directory item.
  * @param item Pointer to the directory item.
  * @param out Output buffer for the filename.
  * @param max_len Maximum length of the output buffer.
@@ -697,7 +697,7 @@ void fat16_get_full_relative_filename(struct fat_directory_item *item, char *out
 }
 
 /**
- * @brief Finds a FAT16 item in a directory by its name.
+ * Finds a FAT16 item in a directory by its name.
  * @param disk Pointer to the disk structure.
  * @param directory Pointer to the directory structure.
  * @param name Name of the item to find.
@@ -720,7 +720,7 @@ struct fat_item *fat16_find_item_in_directory(struct disk *disk, struct fat_dire
 }
 
 /**
- * @brief Retrieves the FAT16 item for a directory entry from a given path.
+ * Retrieves the FAT16 item for a directory entry from a given path.
  * @param disk Pointer to the disk structure.
  * @param path Pointer to the parsed path structure.
  * @return Pointer to the found FAT16 item structure.
@@ -759,7 +759,7 @@ struct fat_item* fat16_get_directory_entry(struct disk* disk, struct path_part* 
 }
 
 /**
- * @brief Sets a FAT entry value for a given cluster in the FAT table.
+ * Sets a FAT entry value for a given cluster in the FAT table.
  * @param disk Pointer to the disk structure.
  * @param cluster Cluster number.
  * @param value Value to set in the FAT entry.
@@ -790,7 +790,7 @@ static int fat16_set_fat_entry(struct disk* disk, int cluster, int value) {
 }
 
 /**
- * @brief Allocates a new cluster in the FAT table.
+ * Allocates a new cluster in the FAT table.
  * @param disk Pointer to the disk structure.
  * @param current_cluster Current cluster number.
  * @return The new cluster number or an error code.
@@ -823,7 +823,7 @@ static int fat16_allocate_cluster(struct disk* disk, int current_cluster) {
 }
 
 /**
- * @brief Gets the sector number for a given directory item.
+ * Gets the sector number for a given directory item.
  * @param private Pointer to the FAT16 private structure.
  * @param item Pointer to the directory item.
  * @return Sector number or an error code.
@@ -846,7 +846,7 @@ static int fat16_get_directory_sector(struct fat_private* private, struct fat_di
 }
 
 /**
- * @brief Gets the offset within a directory for a given item.
+ * Gets the offset within a directory for a given item.
  * @param private Pointer to the FAT16 private structure.
  * @param item Pointer to the directory item.
  * @return Offset or an error code.
@@ -875,7 +875,7 @@ static int fat16_get_directory_offset(struct fat_private* private, struct fat_di
 }
 
 /**
- * @brief Opens a file or directory in the FAT16 filesystem.
+ * Opens a file or directory in the FAT16 filesystem.
  * @param disk Pointer to the disk structure.
  * @param path Pointer to the parsed path structure.
  * @param mode Mode to open the file (read or write).
@@ -914,7 +914,7 @@ err_out:
 }
 
 /**
- * @brief Reads data from a FAT16 file.
+ * Reads data from a FAT16 file.
  * @param disk Pointer to the disk structure.
  * @param private_data Pointer to the file descriptor.
  * @param size Size of each element to read.
@@ -945,7 +945,7 @@ int fat16_read(struct disk* disk, void* private_data, uint32_t size, uint32_t nm
 } 
 
 /**
- * @brief Seeks to a position within a FAT16 file.
+ * Seeks to a position within a FAT16 file.
  * @param private_data Pointer to the file descriptor.
  * @param offset Offset to seek to.
  * @param seek_mode Seek mode (SEEK_SET, SEEK_CUR, SEEK_END).
@@ -986,7 +986,7 @@ int fat16_seek(void* private_data, uint32_t offset, file_seek_mode seek_mode) {
 }
 
 /**
- * @brief Retrieves the status (metadata) of a FAT16 file.
+ * Retrieves the status (metadata) of a FAT16 file.
  * @param disk Pointer to the disk structure.
  * @param private_data Pointer to the file descriptor.
  * @param stat Output structure for the file status.
@@ -1019,7 +1019,7 @@ int fat16_stat(struct disk* disk, void* private_data, struct file_stat* stat) {
 }
 
 /**
- * @brief Writes data to a FAT16 file.
+ * Writes data to a FAT16 file.
  * @param disk Pointer to the disk structure.
  * @param private_data Pointer to the file descriptor.
  * @param size Size of each element to write.
@@ -1116,7 +1116,7 @@ int fat16_write(struct disk* disk, void* private_data, uint32_t size, uint32_t n
 }
 
 /**
- * @brief Closes a FAT16 file or directory.
+ * Closes a FAT16 file or directory.
  * @param private_data Pointer to the file descriptor.
  * @return Status code indicating success or failure.
  */

@@ -2,7 +2,7 @@
 #define _PATH_PARSER_H_
 
 /**
- * @brief Structure representing the root of a parsed path.
+ * Structure representing the root of a parsed path.
  *
  * This structure holds the drive number and the first part of the path.
  * For example, in the path "0:/tmp/file.txt", "0:/" would be the first part.
@@ -13,7 +13,7 @@ struct path_root {
 };
 
 /**
- * @brief Structure representing a part of a parsed path.
+ * Structure representing a part of a parsed path.
  *
  * This structure holds a single part of a path and a pointer to the next part.
  * For example, in the path "0:/tmp/file.txt", "tmp/" and "file.txt" are parts.
@@ -24,7 +24,7 @@ struct path_part {
 };
 
 /**
- * @brief Parses a file path into its components.
+ * Parses a file path into its components.
  *
  * This function takes a full file path and optionally a current directory path,
  * and parses it into its individual components, separating the drive, directories,
@@ -37,7 +37,7 @@ struct path_part {
 struct path_root* path_parser_parse(const char* path, const char* current_directory_path);
 
 /**
- * @brief Frees the memory allocated for a parsed path.
+ * Frees the memory allocated for a parsed path.
  *
  * This function deallocates the memory used by a `path_root` structure and its associated
  * `path_part` structures. It should be called to avoid memory leaks after the parsed path

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 /**
- * @brief Computes the length of a string.
+ * Computes the length of a string.
  *
  * This function calculates the number of characters in the string pointed to by ptr,
  * excluding the terminating null byte ('\0').
@@ -15,7 +15,7 @@
 int strlen(const char* ptr);
 
 /**
- * @brief Converts a character to an integer.
+ * Converts a character to an integer.
  *
  * This function converts a character representing a digit ('0' to '9') to its corresponding
  * integer value.
@@ -26,7 +26,7 @@ int strlen(const char* ptr);
 int ctoi(char c);
 
 /**
- * @brief Converts an integer to a string.
+ * Converts an integer to a string.
  * 
  * @param i The integer to convert.
  * @return char* The string representation of the integer.
@@ -34,7 +34,7 @@ int ctoi(char c);
 char* itoa(int i);
 
 /**
- * @brief Checks if a character is a digit.
+ * Checks if a character is a digit.
  *
  * This function determines whether the given character is a numeric digit ('0' to '9').
  *
@@ -44,7 +44,7 @@ char* itoa(int i);
 bool is_digit(char c);
 
 /**
- * @brief Computes the length of a string up to a maximum number of characters.
+ * Computes the length of a string up to a maximum number of characters.
  *
  * This function calculates the number of characters in the string pointed to by ptr,
  * up to a maximum of max characters, excluding the terminating null byte ('\0').
@@ -56,7 +56,7 @@ bool is_digit(char c);
 int strnlen(const char* ptr, int max);
 
 /**
- * @brief Copies a string.
+ * Copies a string.
  *
  * This function copies the null-terminated string pointed to by src into the buffer
  * pointed to by dest, including the terminating null byte.
@@ -68,7 +68,7 @@ int strnlen(const char* ptr, int max);
 char* strcpy(char* dest, const char* src);
 
 /**
- * @brief Copies a string up to a specified length.
+ * Copies a string up to a specified length.
  *
  * This function copies up to n characters from the null-terminated string src to the buffer
  * pointed to by dest. If the length of src is less than n, the remaining bytes in dest are
@@ -82,7 +82,7 @@ char* strcpy(char* dest, const char* src);
 char *strncpy(char *dest, const char *src, int n);
 
 /**
- * @brief Compares two strings up to a specified length.
+ * Compares two strings up to a specified length.
  *
  * This function compares up to n characters of the null-terminated strings str1 and str2.
  * The comparison is case-sensitive.
@@ -96,7 +96,7 @@ char *strncpy(char *dest, const char *src, int n);
 int strncmp(const char* str1, const char* str3, int n);
 
 /**
- * @brief Case-insensitive comparison of two strings up to a specified length.
+ * Case-insensitive comparison of two strings up to a specified length.
  *
  * This function compares up to n characters of the null-terminated strings s1 and s2,
  * ignoring the case of the characters.
@@ -110,7 +110,7 @@ int strncmp(const char* str1, const char* str3, int n);
 int istrncmp(const char* s1, const char* s2, int n);
 
 /**
- * @brief Converts a character to lowercase.
+ * Converts a character to lowercase.
  *
  * This function converts an uppercase letter to its corresponding lowercase letter.
  * If the character is not an uppercase letter, it is returned unchanged.
@@ -121,7 +121,7 @@ int istrncmp(const char* s1, const char* s2, int n);
 char tolower(char s1);
 
 /**
- * @brief Computes the length of a string up to a specified terminator or maximum length.
+ * Computes the length of a string up to a specified terminator or maximum length.
  *
  * This function calculates the number of characters in the string pointed to by str,
  * up to a maximum of max characters, or until the terminator character is encountered.
@@ -134,7 +134,7 @@ char tolower(char s1);
 int strnlen_terminator(const char* str, int max, char terminator);
 
 /**
- * @brief Concatenates two strings.
+ * Concatenates two strings.
  * 
  * This function appends the null-terminated string src to the end of the null-terminated
  * string dest, overwriting the null character at the end of dest, and then adds a terminating

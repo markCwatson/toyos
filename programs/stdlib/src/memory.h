@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 /**
- * @brief Sets a block of memory to a specified value.
+ * Sets a block of memory to a specified value.
  * 
  * This function sets the first 'size' bytes of the memory area pointed to by 'ptr' 
  * to the specified value 'c'.
@@ -17,7 +17,7 @@
 void* memset(void* ptr, int c, size_t size);
 
 /**
- * @brief Compares two blocks of memory.
+ * Compares two blocks of memory.
  * 
  * This function compares the first 'count' bytes of the memory areas 's1' and 's2'.
  * 
@@ -31,7 +31,7 @@ void* memset(void* ptr, int c, size_t size);
 int memcmp(void* s1, void* s2, int count);
 
 /**
- * @brief Copies a block of memory from one location to another.
+ * Copies a block of memory from one location to another.
  * 
  * This function copies 'len' bytes from the memory area 'src' to the memory area 'dest'.
  * The memory areas must not overlap, as this may lead to undefined behavior.

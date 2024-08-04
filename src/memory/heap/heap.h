@@ -15,7 +15,7 @@
 typedef unsigned char heap_block_table_entry; /**< Type definition for heap block table entries. */
 
 /**
- * @brief Structure representing a heap's block table.
+ * Structure representing a heap's block table.
  * 
  * The block table keeps track of the status of blocks in the heap, such as whether they are free or allocated.
  */
@@ -25,7 +25,7 @@ struct heap_table {
 };
 
 /**
- * @brief Structure representing a heap.
+ * Structure representing a heap.
  * 
  * This structure holds information about the heap, including its block table and the start address of the heap memory.
  */
@@ -37,7 +37,7 @@ struct heap {
 };
 
 /**
- * @brief Initializes a heap structure.
+ * Initializes a heap structure.
  * 
  * Sets up a heap with a specified memory range and block table. This function initializes the heap's
  * block table and prepares the heap for memory allocations.
@@ -51,7 +51,7 @@ struct heap {
 int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* table);
 
 /**
- * @brief Allocates a block of memory from the heap.
+ * Allocates a block of memory from the heap.
  * 
  * This function allocates a block of memory of the specified size from the given heap. The allocated memory
  * is not initialized.
@@ -63,7 +63,7 @@ int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* tabl
 void* malloc(struct heap* heap, size_t size);
 
 /**
- * @brief Frees a previously allocated block of memory.
+ * Frees a previously allocated block of memory.
  * 
  * Releases a block of memory back to the heap, making it available for future allocations.
  * The block must have been previously allocated using malloc.

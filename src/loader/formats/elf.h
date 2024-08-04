@@ -67,7 +67,7 @@ typedef uint32_t elf32_addr;            //< Address
 typedef int32_t elf32_off;              //< Offset
 
 /**
- * @brief ELF program header for 32-bit executables.
+ * ELF program header for 32-bit executables.
  *
  * This structure contains information about how to create a process image,
  * mapping from a file to the memory segments. It includes the segment type,
@@ -85,7 +85,7 @@ struct elf32_phdr {
 } __attribute__((packed));
 
 /**
- * @brief ELF section header for 32-bit executables.
+ * ELF section header for 32-bit executables.
  *
  * This structure describes a section in an ELF file, including its name,
  * type, flags, addresses, and size.
@@ -104,7 +104,7 @@ struct elf32_shdr {
 } __attribute__((packed));
 
 /**
- * @brief ELF file header for 32-bit executables.
+ * ELF file header for 32-bit executables.
  *
  * This structure contains information about the ELF file, including its type,
  * architecture, entry point, and offsets to the program and section headers.
@@ -127,7 +127,7 @@ struct elf_header {
 } __attribute__((packed));
 
 /**
- * @brief ELF dynamic section entry for 32-bit executables.
+ * ELF dynamic section entry for 32-bit executables.
  *
  * This structure defines entries in the dynamic section of an ELF file,
  * which provide information used by the dynamic linker to load and link
@@ -142,7 +142,7 @@ struct elf32_dyn {
 } __attribute__((packed));
 
 /**
- * @brief ELF symbol table entry for 32-bit executables.
+ * ELF symbol table entry for 32-bit executables.
  *
  * This structure defines entries in the symbol table, including the symbol's
  * name, value, size, and type.
@@ -157,7 +157,7 @@ struct elf32_sym {
 } __attribute__((packed));
 
 /**
- * @brief Retrieves the entry point address from the ELF header.
+ * Retrieves the entry point address from the ELF header.
  *
  * This function extracts the entry point address from the given ELF header.
  * The entry point is where execution will begin when the ELF file is run.
@@ -168,7 +168,7 @@ struct elf32_sym {
 void* elf_get_entry_ptr(struct elf_header* elf_header);
 
 /**
- * @brief Retrieves the entry point address as a uint32_t from the ELF header.
+ * Retrieves the entry point address as a uint32_t from the ELF header.
  *
  * This function returns the entry point address from the ELF header
  * as a 32-bit unsigned integer. The entry point is the starting address

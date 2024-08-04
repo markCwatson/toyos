@@ -26,7 +26,7 @@ static int pass_count = 0;
 static int fail_count = 0;
 
 /**
- * @brief Registers the result of a test.
+ * Registers the result of a test.
  *
  * This function stores the result of a test, including its number, description,
  * and whether it passed or failed. It also updates the count of passed and failed tests.
@@ -51,7 +51,7 @@ static inline void register_test(const char* description, bool condition) {
 }
 
 /**
- * @brief Prints a summary of the test results.
+ * Prints a summary of the test results.
  *
  * This function outputs the total number of tests run, the number of tests passed,
  * and the number of tests failed. It also lists the details of any failed tests.
@@ -72,7 +72,7 @@ static void print_test_summary(void) {
 }
 
 /**
- * @brief Tests the keyboard functionality.
+ * Tests the keyboard functionality.
  */
 static void test_keyboard(void) {
     keyboard_push('A');
@@ -87,7 +87,7 @@ static void test_keyboard(void) {
 }
 
 /**
- * @brief Tests loading and switching to a user program.
+ * Tests loading and switching to a user program.
  */
 static void test_user_program(void) {
     struct process* cur_process = process_current();
@@ -103,7 +103,7 @@ static void test_user_program(void) {
 }
 
 /**
- * @brief Tests the disk streamer functionality.
+ * Tests the disk streamer functionality.
  *
  * This function tests creating a disk stream, reading from it, and closing it.
  */
@@ -124,7 +124,7 @@ static void test_streamer(void) {
 }
 
 /**
- * @brief Tests reading the initial content of a file.
+ * Tests reading the initial content of a file.
  *
  * This function tests opening a file, reading its content, and verifying the read data.
  */
@@ -144,7 +144,7 @@ static void test_read_initial_content(void) {
 }
 
 /**
- * @brief Tests writing new content to a file.
+ * Tests writing new content to a file.
  *
  * This function tests opening a file for writing, writing new content, and then verifying the content.
  */
@@ -173,7 +173,7 @@ static void test_write_new_content(void) {
 }
 
 /**
- * @brief Tests appending content to a file.
+ * Tests appending content to a file.
  *
  * This function tests opening a file for appending, writing additional data, and then verifying the appended content.
  */
@@ -202,7 +202,7 @@ static void test_append_content(void) {
 }
 
 /**
- * @brief Runs a series of file operation tests.
+ * Runs a series of file operation tests.
  *
  * This function includes tests for reading initial content, writing new content,
  * and appending content to files.
@@ -214,7 +214,7 @@ static void test_file_operations(void) {
 }
 
 /**
- * @brief Tests the kernel heap functionality.
+ * Tests the kernel heap functionality.
  *
  * This function tests memory allocation and deallocation using the kernel heap.
  */
@@ -227,7 +227,7 @@ static void test_heap(void) {
 }
 
 /**
- * @brief Tests the paging system functionality.
+ * Tests the paging system functionality.
  *
  * This function includes tests for allocating a heap block, setting paging,
  * and verifying read/write operations to a mapped virtual address.
@@ -252,7 +252,7 @@ static void test_paging(void) {
 }
 
 /**
- * @brief Main function to run all tests.
+ * Main function to run all tests.
  *
  * This function orchestrates the running of all test cases, including heap,
  * paging, file operations, and disk streamer functionality. It also prints a summary of the results.

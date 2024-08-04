@@ -4,14 +4,14 @@
 #include "fs/file.h"
 
 /**
- * @brief Represents the type of a physical hard disk.
+ * Represents the type of a physical hard disk.
  */
 #define DISK_TYPE_REAL 0
 
 typedef unsigned int disk_type;
 
 /**
- * @brief Structure representing a disk.
+ * Structure representing a disk.
  */
 struct disk {
     disk_type type;             /**< Type of the disk. */
@@ -19,18 +19,18 @@ struct disk {
     int id;                     /**< Identifier for the disk. */
     
     /**
-     * @brief Filesystem associated with the disk.
+     * Filesystem associated with the disk.
      */
     struct filesystem* fs;
 
     /**
-     * @brief Private data for the filesystem.
+     * Private data for the filesystem.
      */
     void* fs_private;
 };
 
 /**
- * @brief Reads a block of data from the disk.
+ * Reads a block of data from the disk.
  *
  * @param idisk Pointer to the disk structure.
  * @param lba Logical Block Addressing (LBA) address to read from.
@@ -41,7 +41,7 @@ struct disk {
 int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf);
 
 /**
- * @brief Writes a block of data to the disk.
+ * Writes a block of data to the disk.
  *
  * @param idisk Pointer to the disk structure.
  * @param lba LBA address to write to.
@@ -52,12 +52,12 @@ int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf);
 int disk_write_block(struct disk* idisk, unsigned int lba, int total, void* buf);
 
 /**
- * @brief Searches for available disks and initializes them.
+ * Searches for available disks and initializes them.
  */
 void disk_search_and_init(void);
 
 /**
- * @brief Retrieves a disk by its index.
+ * Retrieves a disk by its index.
  *
  * @param index Index of the disk.
  * @return Pointer to the disk structure, or NULL if not found.

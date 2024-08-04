@@ -2,7 +2,7 @@
 #include "kernel.h"
 
 /**
- * @brief Encodes a structured GDT entry into a raw GDT format.
+ * Encodes a structured GDT entry into a raw GDT format.
  *
  * This function takes a structured GDT entry and converts it into the raw
  * byte format required by the GDT. It encodes the segment limit, base address,
@@ -43,7 +43,7 @@ static void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
 }
 
 /**
- * @brief Converts an array of structured GDT entries into a raw GDT format array.
+ * Converts an array of structured GDT entries into a raw GDT format array.
  *
  * This function takes an array of structured GDT entries and converts each one into
  * the raw byte format required by the GDT, storing them in the provided `gdt` array.

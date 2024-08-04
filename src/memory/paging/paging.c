@@ -7,7 +7,7 @@ void paging_load_directory(uint32_t* directory);
 static uint32_t* current_directory = 0;
 
 /**
- * @brief Creates a new 4GB paging chunk with specified flags.
+ * Creates a new 4GB paging chunk with specified flags.
  *
  * Allocates a page directory and associated page tables, setting each entry with
  * the given flags. This setup is necessary for creating a paging environment that
@@ -38,9 +38,9 @@ struct paging_4gb_chunk* paging_new_4gb(uint8_t flags) {
 }
 
 /**
- * @brief Switches the current page directory.
+ * Switches the current page directory.
  *
- * @details This function switches the currently active page directory to the one provided.
+ * This function switches the currently active page directory to the one provided.
  * It updates the CR3 register with the new directory base address, effectively changing
  * the virtual-to-physical address mapping.
  *
@@ -52,7 +52,7 @@ void paging_switch(struct paging_4gb_chunk* directory) {
 }
 
 /**
- * @brief Frees a 4GB paging chunk.
+ * Frees a 4GB paging chunk.
  *
  * This function releases the memory allocated for a 4GB paging chunk, including
  * all its page tables and the page directory.
@@ -71,7 +71,7 @@ void paging_free_4gb(struct paging_4gb_chunk* chunk) {
 }
 
 /**
- * @brief Retrieves the directory entry for a 4GB paging chunk.
+ * Retrieves the directory entry for a 4GB paging chunk.
  *
  * This function returns a pointer to the page directory associated with the
  * given 4GB paging chunk.
@@ -84,7 +84,7 @@ uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk) {
 }
 
 /**
- * @brief Checks if an address is aligned to the page size.
+ * Checks if an address is aligned to the page size.
  *
  * This function checks whether a given address is aligned to the system's page size,
  * which is typically 4 KB.
@@ -97,7 +97,7 @@ bool paging_is_aligned(void* addr) {
 }
 
 /**
- * @brief Gets the directory and table indexes from a virtual address.
+ * Gets the directory and table indexes from a virtual address.
  *
  * This function calculates the indexes into the page directory and page table
  * for a given virtual address. These indexes are used to locate the corresponding
@@ -120,7 +120,7 @@ int paging_get_indexes(void* virtual_addr, uint32_t* directory_index, uint32_t* 
 }
 
 /**
- * @brief Aligns a pointer to the nearest page boundary.
+ * Aligns a pointer to the nearest page boundary.
  *
  * This function adjusts a pointer to ensure it is aligned to the start of the next
  * page boundary. If the pointer is already aligned, it is returned unchanged.
@@ -137,7 +137,7 @@ void* paging_align_address(void* ptr) {
 }
 
 /**
- * @brief Aligns a pointer down to the nearest lower page boundary.
+ * Aligns a pointer down to the nearest lower page boundary.
  *
  * This function takes a pointer and aligns it downwards to the start of the
  * nearest page boundary.
@@ -152,7 +152,7 @@ void* paging_align_to_lower_page(void* addr) {
 }
 
 /**
- * @brief Maps a virtual address to a physical address.
+ * Maps a virtual address to a physical address.
  *
  * This function maps a given virtual address to a specified physical address in the
  * paging directory, with the given flags. The addresses must be page-aligned.
@@ -172,7 +172,7 @@ int paging_map(struct paging_4gb_chunk* directory, void* virt, void* phys, int f
 }
 
 /**
- * @brief Maps a range of virtual addresses to physical addresses.
+ * Maps a range of virtual addresses to physical addresses.
  *
  * This function maps a sequence of virtual addresses to corresponding physical addresses
  * in the paging structure, for a specified number of pages.
@@ -199,7 +199,7 @@ int paging_map_range(struct paging_4gb_chunk* directory, void* virt, void* phys,
 }
 
 /**
- * @brief Maps a range of physical addresses to virtual addresses.
+ * Maps a range of physical addresses to virtual addresses.
  *
  * This function maps a specified range of physical addresses to virtual addresses in the
  * paging structure. The addresses and the size of the range must be page-aligned.
@@ -235,7 +235,7 @@ int paging_map_to(struct paging_4gb_chunk* directory, void* virt, void* phys, vo
 }
 
 /**
- * @brief Sets a page table entry for a given virtual address.
+ * Sets a page table entry for a given virtual address.
  *
  * This function updates the page directory to map a virtual address to a physical address
  * with specified flags. It requires that the address is page-aligned.
@@ -266,7 +266,7 @@ int paging_set(uint32_t* directory, void* virt, uint32_t val) {
 }
 
 /**
- * @brief Retrieves the physical address corresponding to a virtual address.
+ * Retrieves the physical address corresponding to a virtual address.
  *
  * This function calculates the physical address that corresponds to a given virtual address
  * using the provided page directory.
@@ -286,7 +286,7 @@ void* paging_get_physical_address(uint32_t* directory, void* virt) {
 }
 
 /**
- * @brief Retrieves the page table entry for a given virtual address.
+ * Retrieves the page table entry for a given virtual address.
  *
  * This function returns the page table entry value for a given virtual address from the
  * specified page directory. This value includes the physical address and the flags set for the page.

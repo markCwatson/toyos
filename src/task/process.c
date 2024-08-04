@@ -82,7 +82,7 @@ out:
 /**
  * Maps the binary data to memory.
  * 
- * @details This function maps the binary data to the virtual address space of the process.
+ * This function maps the binary data to the virtual address space of the process.
  * 
  * @param process The process to map.
  * @return 0 on success, error code on failure.
@@ -100,7 +100,7 @@ static int process_map_binary(struct process* process) {
 /**
  * Loads data for a process.
  * 
- * @details This function loads data for a process, including ELF files and binary files.
+ * This function loads data for a process, including ELF files and binary files.
  * 
  * @param filename The name of the file to load.
  * @param process The process structure to store the loaded data.
@@ -118,7 +118,7 @@ static int process_load_data(const char* filename, struct process* process) {
 /**
  * Maps the ELF file to the process's virtual address space.
  * 
- * @details This function takes an ELF file associated with a process and maps its segments 
+ * This function takes an ELF file associated with a process and maps its segments 
  * into the process's virtual address space. This is a crucial step in setting up the process 
  * for execution, as it ensures that the necessary code and data segments are accessible in 
  * memory according to the specifications provided in the ELF headers.
@@ -178,9 +178,9 @@ static void process_init(struct process* process) {
 }
 
 /**
- * @brief Maps the memory for a process.
+ * Maps the memory for a process.
  * 
- * @details This function maps the memory for a process, including the ELF file and stack.
+ * This function maps the memory for a process, including the ELF file and stack.
  * 
  * @param process The process to map memory for.
  * @return 0 on success, error code on failure.
@@ -326,8 +326,7 @@ void process_free(struct process* process, void* ptr) {
 /**
  * Allocates memory for a process.
  * 
- * This function allocates memory for a process. The memory is allocated from the process's
- * memory space, and is not shared with other processes.
+ * The memory is allocated from the process's memory space, and is not shared with other processes.
  * 
  * @param process The process to allocate memory for.
  * @param size The size of the memory to allocate.
@@ -434,9 +433,9 @@ struct process* process_get(int process_id) {
 }
 
 /**
- * @brief Loads a process into a specific slot.
+ * Loads a process into a specific slot.
  * 
- * @details This function loads a process into a specific slot in the process array.
+ * This function loads a process into a specific slot in the process array.
  * 
  * @param filename The name of the file to load.
  * @param process A pointer to the process structure to store the loaded process.
@@ -516,9 +515,9 @@ out:
 }
 
 /**
- * @brief Terminates the allocations for a process.
+ * Terminates the allocations for a process.
  * 
- * @details This function terminates the allocations for a process, freeing the memory
+ * This function terminates the allocations for a process, freeing the memory
  * associated with each allocation.
  * 
  * @param process The process to terminate allocations for.
@@ -533,9 +532,9 @@ int process_terminate_allocations(struct process* process) {
 }
 
 /**
- * @brief Frees the binary data associated with a process.
+ * Frees the binary data associated with a process.
  * 
- * @details This function frees the binary data associated with a process, deallocating the memory
+ * This function frees the binary data associated with a process, deallocating the memory
  * used to store the binary data.
  * 
  * @param process The process to free binary data for.
@@ -547,9 +546,9 @@ int process_free_binary_data(struct process* process) {
 }
 
 /**
- * @brief Frees the ELF data associated with a process.
+ * Frees the ELF data associated with a process.
  * 
- * @details This function frees the ELF data associated with a process, deallocating the memory
+ * This function frees the ELF data associated with a process, deallocating the memory
  * used to store the ELF file structure.
  * 
  * @param process The process to free ELF data for.
@@ -561,9 +560,9 @@ int process_free_elf_data(struct process* process) {
 }
 
 /**
- * @brief Frees the program data associated with a process.
+ * Frees the program data associated with a process.
  * 
- * @details This function frees the program data associated with a process, including the binary
+ * This function frees the program data associated with a process, including the binary
  * data or ELF data.
  * 
  * @param process The process to free program data for.
@@ -589,9 +588,9 @@ int process_free_program_data(struct process* process) {
 }
 
 /**
- * @brief Switches to the next process in the process array.
+ * Switches to the next process in the process array.
  * 
- * @details This function switches to the next process in the process array. If the current process
+ * This function switches to the next process in the process array. If the current process
  * is the last process in the array, it switches to the first process in the array.
  */
 void process_switch_to_any(void) {
@@ -606,9 +605,9 @@ void process_switch_to_any(void) {
 }
 
 /**
- * @brief Unlinks a process from the process array.
+ * Unlinks a process from the process array.
  * 
- * @details This function unlinks a process from the process array, setting the slot to NULL.
+ * This function unlinks a process from the process array, setting the slot to NULL.
  * 
  * @param process The process to unlink.
  */
@@ -621,9 +620,9 @@ static void process_unlink(struct process* process) {
 }
 
 /**
- * @brief Terminates a process.
+ * Terminates a process.
  * 
- * @details This function terminates a process, freeing the memory associated with the process.
+ * This function terminates a process, freeing the memory associated with the process.
  * 
  * @param process The process to terminate.
  * @return 0 on success, error code on failure.
@@ -653,7 +652,7 @@ out:
 }
 
 /**
- * @brief Retrieves the arguments for a process.
+ * Retrieves the arguments for a process.
  * 
  * @param process The process to retrieve arguments for.
  * @param argc A pointer to store the number of arguments.
@@ -665,7 +664,7 @@ void process_get_arguments(struct process* process, int* argc, char*** argv) {
 }
 
 /**
- * @brief Counts the number of arguments in a command argument list.
+ * Counts the number of arguments in a command argument list.
  * 
  * @param root_argument The root argument in the list.
  * @return The number of arguments.
@@ -682,7 +681,7 @@ static int process_count_command_arguments(struct command_argument* root_argumen
 }
 
 /**
- * @brief Injects arguments into a process.
+ * Injects arguments into a process.
  * 
  * @param process The process to inject arguments into.
  * @param root_argument The root argument in the list.
@@ -723,4 +722,168 @@ int process_inject_arguments(struct process* process, struct command_argument* r
     
 out:
     return res;
+}
+
+/**
+ * Forks a new process from the given parent process.
+ *
+ * This function creates a new child process by duplicating the state of the
+ * parent process. It allocates necessary memory for the child process structure,
+ * loads the process data, creates a new task for the process, and maps the memory.
+ * It also copies the parent's memory allocations to the child process.
+ *
+ * @param parent The parent process from which to fork the new process.
+ * @param[out] child A pointer to store the address of the newly created child process.
+ * @return Returns 0 (OK) on success, or a negative error code on failure.
+ */
+int process_fork(struct process* parent, struct process** child) {
+    int res = OK;
+    struct process* _child = NULL;
+    struct task* task = NULL;
+    void* program_stack_ptr = NULL;
+
+    if (!parent || !child) {
+        res = -EINVARG;
+        goto out;
+    }
+
+    int process_slot = process_get_free_slot();
+    if (process_slot < 0) {
+        res = -EISTKN;
+        goto out;
+    }
+
+    // Allocate memory for the child process
+    _child = kmalloc(sizeof(struct process));
+    if (!_child) {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Load the data for the process
+    process_init(_child);
+    res = process_load_data(parent->filename, _child);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Allocate a stack for the process
+    program_stack_ptr = kzalloc(TOYOS_USER_PROGRAM_STACK_SIZE);
+    if (!program_stack_ptr) {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Set the process properties
+    strncpy(_child->filename, parent->filename, sizeof(_child->filename));
+    _child->stack = program_stack_ptr;
+    _child->id = process_slot;
+
+    // Create a task
+    task = task_new(_child);
+    if (task == NULL) {
+        res = ERROR_I(task);
+        goto out;
+    }
+
+    // Set as the main task of the process
+    _child->task = task;
+
+    // Map the memory for the process
+    res = process_map_memory(_child);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Copy the parent's allocations
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (!parent->allocations[i].ptr) {
+            continue;
+        }
+        
+        void* ptr = process_malloc(_child, parent->allocations[i].size);
+        if (!ptr) {
+            res = -ENOMEM;
+            goto out;
+        }
+
+        memcpy(ptr, parent->allocations[i].ptr, parent->allocations[i].size);
+    }
+
+    processes[process_slot] = _child;
+    *child = _child;
+
+out:
+    if (res < 0 && _child) {
+        // Cleanup in case of failure
+        if (_child->stack) {
+            kfree(_child->stack);
+        }
+        
+        kfree(_child);
+    }
+
+    return res;
+}
+
+/**
+ * Waits for a process to finish execution.
+ * 
+ * This function waits for a process to finish execution. It blocks the current process
+ * until the target process has finished execution.
+ * 
+ * @param process The process to wait for.
+ * @return 0 on success, error code on failure.
+ */
+int process_wait(struct process* process) {
+    while (processes[process->id]) {
+        task_yield();
+    }
+
+    return OK;
+}
+
+/**
+ * Kills a process.
+ * 
+ * This function kills a process. It terminates the process and frees all resources
+ * associated with it.
+ * 
+ * @param process The process to kill.
+ * @return void
+ */
+void process_kill(struct process* process) {
+    process_terminate(process);
+}
+
+
+/**
+ * Replaces the current process with a new program.
+ * 
+ * This function replaces the current process with a new program. It loads the new program
+ * into memory, maps the memory for the new program, and frees the memory and state of the
+ * current process.
+ * 
+ * @param process The process to replace.
+ * @param path The path to the new program.
+ * @return 0 on success, error code on failure.
+ */
+int process_load_replace(struct process* process, const char* path) {
+    // Free the current process memory and state, except for PID and file descriptors
+    process_terminate_allocations(process);
+    process_free_program_data(process);
+
+    // Load the new program
+    int res = process_load_data(path, process);
+    if (res < 0) {
+        return res;
+    }
+
+    // Map the memory for the new program
+    res = process_map_memory(process);
+    if (res < 0) {
+        return res;
+    }
+
+    return OK;
 }

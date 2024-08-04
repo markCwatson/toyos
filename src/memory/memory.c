@@ -1,7 +1,7 @@
 #include "memory.h"
 
 /**
- * @brief Sets a block of memory to a specified value.
+ * Sets a block of memory to a specified value.
  *
  * This function sets each byte in the block of memory pointed to by 'ptr' to the value of 'c'.
  *
@@ -21,7 +21,7 @@ void* memset(void* ptr, int c, size_t size) {
 }
 
 /**
- * @brief Compares two blocks of memory.
+ * Compares two blocks of memory.
  *
  * This function compares 'count' bytes of the memory areas 's1' and 's2'.
  * The comparison is done lexicographically and stops as soon as a difference is found.
@@ -48,7 +48,7 @@ int memcmp(void* s1, void* s2, int count) {
 }
 
 /**
- * @brief Copies a block of memory.
+ * Copies a block of memory.
  *
  * This function copies 'len' bytes from the source memory area 'src' to the destination memory area 'dest'.
  * The memory areas should not overlap, as the behavior in that case is undefined.

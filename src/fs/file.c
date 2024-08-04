@@ -15,7 +15,7 @@ struct filesystem* filesystems[TOYOS_MAX_FILESYSTEMS] = { NULL };
 struct file_descriptor* file_descriptors[TOYOS_MAX_FILE_DESCRIPTORS] = { NULL };
 
 /**
- * @brief Finds a free slot in the filesystems array.
+ * Finds a free slot in the filesystems array.
  *
  * This function searches for a NULL entry in the filesystems array
  * where a new filesystem can be inserted.
@@ -33,7 +33,7 @@ static struct filesystem** fs_get_free_filesystem(void) {
 }
 
 /**
- * @brief Inserts a new filesystem into the list of available filesystems.
+ * Inserts a new filesystem into the list of available filesystems.
  *
  * This function adds a filesystem to the global list, enabling the system
  * to recognize and use it.
@@ -50,7 +50,7 @@ void fs_insert_filesystem(struct filesystem* filesystem) {
 }
 
 /**
- * @brief Loads static filesystems into the system.
+ * Loads static filesystems into the system.
  *
  * This function initializes and inserts static filesystems like FAT16.
  */
@@ -59,7 +59,7 @@ static void fs_static_load(void) {
 }
 
 /**
- * @brief Loads the filesystems supported by the system.
+ * Loads the filesystems supported by the system.
  *
  * This function is responsible for loading all filesystems that the system
  * can use. It currently loads only static filesystems.
@@ -69,7 +69,7 @@ void fs_load(void) {
 }
 
 /**
- * @brief Initializes the filesystem infrastructure.
+ * Initializes the filesystem infrastructure.
  *
  * This function initializes the arrays for filesystems and file descriptors
  * and then loads the available filesystems.
@@ -81,7 +81,7 @@ void fs_init(void) {
 }
 
 /**
- * @brief Converts a mode string to a file_mode enum.
+ * Converts a mode string to a file_mode enum.
  *
  * This function interprets a string representing the file access mode
  * and converts it to the corresponding file_mode enumeration value.
@@ -102,7 +102,7 @@ static file_mode file_get_mode_by_string(const char* str) {
 }
 
 /**
- * @brief Allocates a new file descriptor.
+ * Allocates a new file descriptor.
  *
  * This function allocates a new file descriptor from the global array.
  * It initializes the descriptor and returns a pointer to it.
@@ -132,7 +132,7 @@ static int file_new_descriptor(struct file_descriptor** file_desc) {
 }
 
 /**
- * @brief Retrieves a file descriptor by its ID.
+ * Retrieves a file descriptor by its ID.
  *
  * This function looks up a file descriptor using its ID. Descriptors are
  * stored in an array, and IDs start from 1.
@@ -150,7 +150,7 @@ static struct file_descriptor* file_get_descriptor(int file_desc_id) {
 }
 
 /**
- * @brief Resolves the filesystem for a given disk.
+ * Resolves the filesystem for a given disk.
  *
  * This function checks each registered filesystem to see if it can handle
  * the given disk. If a suitable filesystem is found, it is returned.
@@ -169,7 +169,7 @@ struct filesystem* fs_resolve(struct disk* disk) {
 }
 
 /**
- * @brief Opens a file.
+ * Opens a file.
  *
  * This function attempts to open a file with the specified filename and mode.
  * It parses the path, verifies the disk and filesystem, and creates a file descriptor.
@@ -227,7 +227,7 @@ out:
 }
 
 /**
- * @brief Reads data from a file.
+ * Reads data from a file.
  *
  * This function reads data from an open file into a buffer.
  *
@@ -251,7 +251,7 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
 }
 
 /**
- * @brief Writes data to a file.
+ * Writes data to a file.
  *
  * This function writes data from a buffer to an open file.
  *
@@ -275,7 +275,7 @@ int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
 }
 
 /**
- * @brief Moves the file pointer to a specific location in a file.
+ * Moves the file pointer to a specific location in a file.
  *
  * This function adjusts the file pointer position within an open file.
  *
@@ -298,7 +298,7 @@ int fseek(int fd, int offset, file_seek_mode whence) {
 }
 
 /**
- * @brief Retrieves the status of an open file.
+ * Retrieves the status of an open file.
  *
  * This function obtains information about an open file, such as its size and flags.
  *
@@ -320,7 +320,7 @@ int fstat(int fd, struct file_stat* stat) {
 }
 
 /**
- * @brief Closes an open file.
+ * Closes an open file.
  *
  * This function closes an open file and releases any resources associated with it.
  *

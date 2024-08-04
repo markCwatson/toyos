@@ -32,7 +32,7 @@
 #define VGA_COLOR_WHITE         15
 
 /**
- * @brief Initializes the terminal interface.
+ * Initializes the terminal interface.
  *
  * This function sets up the terminal for text output. It typically initializes the screen,
  * sets the default text color, clears the screen, and sets the cursor position to the top-left corner.
@@ -40,7 +40,7 @@
 void terminal_init(void);
 
 /**
- * @brief Clears the terminal screen.
+ * Clears the terminal screen.
  * 
  * This function clears the entire terminal screen by writing spaces with the default color
  * to each character cell.
@@ -48,7 +48,7 @@ void terminal_init(void);
 void terminal_clear_all(void);
 
 /**
- * @brief Deletes the last character written to the terminal.
+ * Deletes the last character written to the terminal.
  * 
  * This function moves the cursor back by one position and writes a space character
  * to erase the last character written to the terminal.
@@ -56,7 +56,7 @@ void terminal_clear_all(void);
 void terminal_backspace(void);
 
 /**
- * @brief Writes a character to the terminal at the current cursor position.
+ * Writes a character to the terminal at the current cursor position.
  *
  * This function places a character at the current cursor position, updating
  * the cursor position afterwards. It handles newline characters by moving
@@ -69,7 +69,7 @@ void terminal_backspace(void);
 void terminal_writechar(char c, unsigned char fg, unsigned char bg);
 
 /**
- * @brief Updates the hardware cursor to the current position.
+ * Updates the hardware cursor to the current position.
  * 
  * This function sets the VGA hardware cursor to the position specified by
  * the global variables terminal_row and terminal_col.

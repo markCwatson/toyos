@@ -7,7 +7,7 @@
 struct disk disk;
 
 /**
- * @brief Writes data to a specific sector on the disk.
+ * Writes data to a specific sector on the disk.
  *
  * @param lba Logical Block Addressing (LBA) address of the sector to write to.
  * @param total Number of sectors to write.
@@ -46,7 +46,7 @@ int disk_write_sector(int lba, int total, void* buf) {
 }
 
 /**
- * @brief Reads data from a specific sector on the disk.
+ * Reads data from a specific sector on the disk.
  *
  * @param lba Logical Block Addressing (LBA) address of the sector to read from.
  * @param total Number of sectors to read.
@@ -86,7 +86,7 @@ static int disk_read_sector(int lba, int total, void* buf) {
 }
 
 /**
- * @brief Searches for available disks and initializes them.
+ * Searches for available disks and initializes them.
  *
  * This function initializes the disk structure and binds a filesystem
  * to the disk if one is found.
@@ -100,7 +100,7 @@ void disk_search_and_init(void) {
 }
 
 /**
- * @brief Retrieves the disk structure for a given index.
+ * Retrieves the disk structure for a given index.
  *
  * Currently, this function only supports retrieving the primary disk (index 0).
  *
@@ -116,7 +116,7 @@ struct disk* disk_get(int index) {
 }
 
 /**
- * @brief Reads a block of data from the disk.
+ * Reads a block of data from the disk.
  *
  * @param idisk Pointer to the disk structure.
  * @param lba LBA address to read from.
@@ -133,7 +133,7 @@ int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf) 
 }
 
 /**
- * @brief Writes a block of data to the disk.
+ * Writes a block of data to the disk.
  *
  * @param idisk Pointer to the disk structure.
  * @param lba LBA address to write to.

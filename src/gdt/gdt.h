@@ -5,7 +5,7 @@
 
 /**
  * @struct gdt
- * @brief Represents a Global Descriptor Table (GDT) entry in raw format.
+ * Represents a Global Descriptor Table (GDT) entry in raw format.
  *
  * This structure is used to define a segment descriptor in the GDT, which
  * includes information about the segment's base address, limit, access rights,
@@ -22,7 +22,7 @@ struct gdt {
 
 /**
  * @struct gdt_structured
- * @brief Represents a GDT entry in a structured format.
+ * Represents a GDT entry in a structured format.
  *
  * This structure is used for easier manipulation and definition of GDT entries.
  * It abstracts the raw format into base address, limit, and type fields.
@@ -34,7 +34,7 @@ struct gdt_structured {
 };
 
 /**
- * @brief Loads the GDT with the given entries.
+ * Loads the GDT with the given entries.
  *
  * This function sets up the GDT with the entries provided in the `gdt` array and loads it.
  *
@@ -44,7 +44,7 @@ struct gdt_structured {
 void gdt_load(struct gdt* gdt, int size);
 
 /**
- * @brief Converts structured GDT entries into raw GDT format.
+ * Converts structured GDT entries into raw GDT format.
  *
  * This function takes an array of structured GDT entries and converts them
  * into the raw GDT format that the hardware expects.

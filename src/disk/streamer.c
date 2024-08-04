@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /**
- * @brief Creates a new disk stream for the specified disk.
+ * Creates a new disk stream for the specified disk.
  *
  * Allocates and initializes a disk_stream structure for the disk with the given ID.
  *
@@ -30,7 +30,7 @@ struct disk_stream* streamer_new(int disk_id) {
 }
 
 /**
- * @brief Sets the position in the disk stream.
+ * Sets the position in the disk stream.
  *
  * Changes the position in the stream to the specified byte offset, enabling subsequent read/write operations to begin at this position.
  *
@@ -48,7 +48,7 @@ int streamer_seek(struct disk_stream* stream, int pos) {
 }
 
 /**
- * @brief Reads data from the disk into a buffer.
+ * Reads data from the disk into a buffer.
  *
  * Reads `total` bytes from the current position in the disk stream into the provided buffer.
  * If the read operation crosses sector boundaries, it handles the overflow by reading the next sector.
@@ -94,7 +94,7 @@ out:
 }
 
 /**
- * @brief Writes data from a buffer to the disk.
+ * Writes data from a buffer to the disk.
  *
  * Writes `total` bytes from the provided buffer into the disk stream starting at the current position.
  * Handles writes that span multiple sectors by managing overflow appropriately.
@@ -150,7 +150,7 @@ out:
 }
 
 /**
- * @brief Closes the disk stream and frees its resources.
+ * Closes the disk stream and frees its resources.
  *
  * This function frees the memory allocated for the disk stream structure.
  *

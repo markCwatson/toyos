@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /**
- * @brief Validates the heap table size.
+ * Validates the heap table size.
  *
  * This function checks if the heap table size matches the total number of blocks
  * that can fit between the provided start and end addresses.
@@ -27,7 +27,7 @@ static int heap_validate_table(void* ptr, void* end, struct heap_table* table) {
 }
 
 /**
- * @brief Checks if a pointer is aligned to the heap block size.
+ * Checks if a pointer is aligned to the heap block size.
  *
  * This function ensures that the pointer is aligned to the start of a block,
  * which is necessary for proper heap management.
@@ -40,7 +40,7 @@ static bool heap_validate_alignment(void* ptr) {
 }
 
 /**
- * @brief Creates a heap.
+ * Creates a heap.
  *
  * Initializes a heap structure with a specified memory range and a block table.
  * This function sets up the heap's block table and prepares the heap for allocations.
@@ -72,7 +72,7 @@ int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* tabl
 }
 
 /**
- * @brief Aligns a value to the next upper block boundary.
+ * Aligns a value to the next upper block boundary.
  *
  * This function rounds up the given value to the nearest block size boundary,
  * which is necessary for block-aligned memory allocations.
@@ -91,7 +91,7 @@ static uint32_t heap_align_value_to_upper(uint32_t val) {
 }
 
 /**
- * @brief Retrieves the type of a heap block entry.
+ * Retrieves the type of a heap block entry.
  *
  * This function extracts the block entry type from the block table entry, 
  * which indicates whether the block is free, taken, the first block in an allocation, etc.
@@ -104,7 +104,7 @@ static int heap_get_entry_type(heap_block_table_entry entry) {
 }
 
 /**
- * @brief Finds the start block for an allocation.
+ * Finds the start block for an allocation.
  *
  * This function searches the heap for a sequence of free blocks that can accommodate
  * the requested number of blocks. It returns the index of the first block in the sequence.
@@ -138,7 +138,7 @@ int heap_get_start_block(struct heap* heap, uint32_t total_blocks) {
 }
 
 /**
- * @brief Converts a block index to a memory address.
+ * Converts a block index to a memory address.
  *
  * This function calculates the memory address corresponding to a given block index
  * within the heap.
@@ -152,7 +152,7 @@ void* heap_block_to_address(struct heap* heap, int block) {
 }
 
 /**
- * @brief Marks a series of blocks as taken.
+ * Marks a series of blocks as taken.
  *
  * This function updates the heap block table to mark a sequence of blocks as taken,
  * indicating that they are part of an allocated memory region.
@@ -181,7 +181,7 @@ void heap_mark_blocks_taken(struct heap* heap, int start_block, int total_blocks
 }
 
 /**
- * @brief Allocates a sequence of blocks from the heap.
+ * Allocates a sequence of blocks from the heap.
  *
  * This function finds a sequence of free blocks in the heap and marks them as taken.
  * It returns the memory address corresponding to the first block in the sequence.
@@ -211,7 +211,7 @@ out:
 }
 
 /**
- * @brief Frees a series of blocks in the heap.
+ * Frees a series of blocks in the heap.
  *
  * This function marks a sequence of blocks as free, making them available for future allocations.
  * It starts from the specified block index and continues until a block without the HEAP_BLOCK_HAS_NEXT flag is found.
@@ -232,7 +232,7 @@ void heap_mark_blocks_free(struct heap* heap, int starting_block) {
 }
 
 /**
- * @brief Converts a memory address to a block index.
+ * Converts a memory address to a block index.
  *
  * This function calculates the block index corresponding to a given memory address
  * within the heap.
@@ -246,7 +246,7 @@ int heap_address_to_block(struct heap* heap, void* address) {
 }
 
 /**
- * @brief Allocates a block of memory from the heap.
+ * Allocates a block of memory from the heap.
  *
  * This function allocates a block of memory of the specified size from the heap.
  * The size is aligned to the nearest upper block size boundary.
@@ -262,7 +262,7 @@ void* malloc(struct heap* heap, size_t size) {
 }
 
 /**
- * @brief Frees a previously allocated block of memory.
+ * Frees a previously allocated block of memory.
  *
  * This function releases a block of memory back to the heap, making it available for future allocations.
  * The block must have been previously allocated using malloc.

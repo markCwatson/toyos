@@ -1,9 +1,9 @@
 [BITS 32]
 section .asm
 
-global restore_general_purpose_registers
+global task_restore_general_purpose_registers
 global task_return
-global user_registers
+global task_user_registers
 
 ; void task_return(struct registers* regs);
 ; Restores the state of a task and returns to user mode
@@ -34,15 +34,15 @@ task_return:
 
     ; Call to restore general-purpose registers
     push dword [ebp+4]
-    call restore_general_purpose_registers
+    call task_restore_general_purpose_registers
     add esp, 4
 
     ; Return from interrupt, transitioning to user mode
     iretd
     
-; void restore_general_purpose_registers(struct registers* regs);
+; void task_restore_general_purpose_registers(struct registers* regs);
 ; Restores general-purpose registers from a saved state
-restore_general_purpose_registers:
+task_restore_general_purpose_registers:
     push ebp
     mov ebp, esp
     mov ebx, [ebp+8]
@@ -56,9 +56,9 @@ restore_general_purpose_registers:
     add esp, 4
     ret
 
-; void user_registers()
+; void task_user_registers()
 ; Sets segment registers to user mode segments
-user_registers:
+task_user_registers:
     mov ax, 0x23         ; User data segment selector
     mov ds, ax
     mov es, ax

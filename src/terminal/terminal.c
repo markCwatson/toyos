@@ -15,7 +15,7 @@ static uint16_t terminal_col = 0;
 static uint16_t screen_buffer[VGA_HEIGHT][VGA_WIDTH];
 
 /**
- * @brief Reads the current cursor position from the VGA hardware.
+ * Reads the current cursor position from the VGA hardware.
  * 
  * This function reads the current cursor position from the VGA hardware and returns
  * the position as a 16-bit value.
@@ -32,7 +32,7 @@ uint16_t terminal_get_cursor_position(void) {
 }
 
 /**
- * @brief Disables the VGA hardware cursor.
+ * Disables the VGA hardware cursor.
  */
 static void terminal_disable_cursor(void) {
 	outb(VGA_CMD_PORT, 0x0a);
@@ -40,7 +40,7 @@ static void terminal_disable_cursor(void) {
 }
 
 /**
- * @brief Enables the VGA hardware cursor.
+ * Enables the VGA hardware cursor.
  * 
  * This function enables the VGA hardware cursor by setting the cursor start and end
  * scanlines. The cursor start and end values are the scanlines that define the cursor shape.
@@ -61,7 +61,7 @@ static void terminal_enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
 }
 
 /**
- * @brief Updates the hardware cursor to the current position.
+ * Updates the hardware cursor to the current position.
  * 
  * This function sets the VGA hardware cursor to the position specified by
  * the global variables terminal_row and terminal_col.
@@ -79,7 +79,7 @@ void terminal_update_cursor(void) {
 }
 
 /**
- * @brief Combines a character and its color attribute into a single value.
+ * Combines a character and its color attribute into a single value.
  *
  * This function creates a 16-bit value combining a character (in the lower 8 bits)
  * and its color attribute (in the upper 8 bits). This format is used by the VGA text mode.
@@ -93,7 +93,7 @@ static uint16_t terminal_make_char(char c, char color) {
 }
 
 /**
- * @brief Places a character at a specific position on the screen.
+ * Places a character at a specific position on the screen.
  *
  * This function writes a character with the specified color at the given
  * (x, y) coordinates in the terminal.
@@ -108,7 +108,7 @@ static void terminal_putchar(int x, int y, char c, unsigned char color) {
 }
 
 /**
- * @brief Places a character at a specific position in the buffer.
+ * Places a character at a specific position in the buffer.
  *
  * This function writes a character with the specified color at the given
  * (x, y) coordinates in the screen buffer.
@@ -123,7 +123,7 @@ static void terminal_buffer_putchar(int x, int y, char c, unsigned char color) {
 }
 
 /**
- * @brief Updates the VGA video memory with the screen buffer contents.
+ * Updates the VGA video memory with the screen buffer contents.
  */
 static void terminal_update_vga_memory(void) {
     for (int y = 0; y < VGA_HEIGHT; y++) {
@@ -134,7 +134,7 @@ static void terminal_update_vga_memory(void) {
 }
 
 /**
- * @brief Scrolls the screen buffer up by one row.
+ * Scrolls the screen buffer up by one row.
  */
 static void terminal_scroll(void) {
     // Copy each row to the row above it
@@ -153,7 +153,7 @@ static void terminal_scroll(void) {
 }
 
 /**
- * @brief Writes a character to the terminal at the current cursor position.
+ * Writes a character to the terminal at the current cursor position.
  *
  * This function places a character at the current cursor position, updating
  * the cursor position afterwards. It handles newline characters by moving
@@ -199,7 +199,7 @@ update:
 }
 
 /**
- * @brief Deletes the last character written to the terminal.
+ * Deletes the last character written to the terminal.
  * 
  * This function moves the cursor back by one position and writes a space character
  * to erase the last character written to the terminal.
@@ -220,7 +220,7 @@ void terminal_backspace(void) {
 }
 
 /**
- * @brief Clears the terminal screen.
+ * Clears the terminal screen.
  * 
  * This function clears the entire terminal screen by writing spaces with the default color
  * to each character cell.
@@ -238,7 +238,7 @@ void terminal_clear_all(void) {
 }
 
 /**
- * @brief Initializes the terminal.
+ * Initializes the terminal.
  *
  * This function sets up the terminal for text output by initializing
  * the video memory pointer and clearing the screen. It sets the cursor

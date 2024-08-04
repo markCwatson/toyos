@@ -27,7 +27,7 @@ int toyos_getkey(void);
 void* toyos_malloc(size_t size);
 void toyos_putchar(char c);
 void toyos_free(void* ptr);
-int toyos_getkeyblock(void);
+int toyos_get_key_block(void);
 void toyos_terminal_readline(char* out, int max, bool output_while_typing);
 void toyos_process_load_start(const char* filename);
 void toyos_exit(void);
@@ -37,5 +37,8 @@ int toyos_system(struct command_argument* arguments);
 int toyos_system_run(const char* command);
 void toyos_clear_terminal(void);
 void* toyos_get_processes(void);
+int toyos_fork(void);
+void toyos_wait(int id);
+void toyos_kill(int id);
 
 #endif

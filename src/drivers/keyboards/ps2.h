@@ -1,6 +1,6 @@
 /**
  * @file ps2.h
- * @brief PS/2 keyboard controller interface definitions.
+ * PS/2 keyboard controller interface definitions.
  * 
  * This file contains definitions and function declarations for interacting with a PS/2 keyboard controller.
  * The PS/2 controller is a hardware device used to interface with keyboards and mice, commonly found in older computer systems.
@@ -11,7 +11,7 @@
 #define _PS2_KEYBOARD_H_
 
 /**
- * @brief PS/2 controller I/O port addresses.
+ * PS/2 controller I/O port addresses.
  * 
  * These constants define the I/O port addresses used to communicate with the PS/2 controller.
  * 
@@ -22,12 +22,12 @@
 #define PS2_KEYBOARD_INPUT_PORT         0x60  /**< The I/O port address for the PS/2 keyboard input. */
 
 /**
- * @brief PS/2 keyboard interrupt definitions.
+ * PS/2 keyboard interrupt definitions.
  */
 #define PS2_ISR_KEYBOARD_INTERRUPT      0x21  /**< Keyboard interrupt number. */
 
 /**
- * @brief PS/2 keyboard scancode definitions.
+ * PS/2 keyboard scancode definitions.
  */
 #define PS2_KEYBOARD_KEY_RELEASED       0x80  /**< Bitmask for key release events. */
 #define PS2_KEYBOARD_CAPSLOCK           0x3a  /**< Scancode for the caps lock key. */
@@ -35,7 +35,7 @@
 #define PS2_KEYBOARD_ARROW_DOWN         0x50  /**< Scancode for the down arrow key. */
 
 /**
- * @brief Registers the PS/2 keyboard with the keyboard system.
+ * Registers the PS/2 keyboard with the keyboard system.
  * 
  * This function registers the PS/2 keyboard with the keyboard system, allowing it to be used for input.
  * 

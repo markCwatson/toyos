@@ -12,7 +12,7 @@
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
 /**
- * @brief Checks if the ELF signature is valid.
+ * Checks if the ELF signature is valid.
  *
  * This function compares the buffer against the known ELF signature to verify
  * the file's format.
@@ -25,7 +25,7 @@ static bool elf_valid_signature(void* buffer) {
 }
 
 /**
- * @brief Checks if the ELF class is supported.
+ * Checks if the ELF class is supported.
  *
  * This function checks whether the ELF file is 32-bit, which is the only supported
  * class.
@@ -39,7 +39,7 @@ static bool elf_valid_class(struct elf_header* header) {
 }
 
 /**
- * @brief Checks if the ELF data encoding is supported.
+ * Checks if the ELF data encoding is supported.
  *
  * This function ensures that the ELF file uses a supported data encoding.
  *
@@ -51,7 +51,7 @@ static bool elf_valid_encoding(struct elf_header* header) {
 }
 
 /**
- * @brief Checks if the ELF file is executable.
+ * Checks if the ELF file is executable.
  *
  * This function checks if the ELF file is of type executable and has a valid entry point.
  *
@@ -63,7 +63,7 @@ static bool elf_is_executable(struct elf_header* header) {
 }
 
 /**
- * @brief Checks if the ELF file has a program header.
+ * Checks if the ELF file has a program header.
  *
  * This function verifies the presence of a program header table in the ELF file.
  *
@@ -75,7 +75,7 @@ static bool elf_has_program_header(struct elf_header* header) {
 }
 
 /**
- * @brief Retrieves the memory location of the ELF file.
+ * Retrieves the memory location of the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the ELF memory location.
@@ -85,7 +85,7 @@ void* elf_memory(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the ELF header from the ELF file.
+ * Retrieves the ELF header from the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the ELF header.
@@ -95,7 +95,7 @@ struct elf_header* elf_header(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the section header table from the ELF header.
+ * Retrieves the section header table from the ELF header.
  *
  * @param header The ELF header structure.
  * @return Pointer to the section header table.
@@ -105,7 +105,7 @@ struct elf32_shdr* elf_sheader(struct elf_header* header) {
 }
 
 /**
- * @brief Retrieves the program header table from the ELF header.
+ * Retrieves the program header table from the ELF header.
  *
  * @param header The ELF header structure.
  * @return Pointer to the program header table, or NULL if not present.
@@ -119,7 +119,7 @@ struct elf32_phdr* elf_pheader(struct elf_header* header) {
 }
 
 /**
- * @brief Retrieves a specific program header from the ELF header.
+ * Retrieves a specific program header from the ELF header.
  *
  * @param header The ELF header structure.
  * @param index The index of the program header to retrieve.
@@ -130,7 +130,7 @@ struct elf32_phdr* elf_program_header(struct elf_header* header, int index) {
 }
 
 /**
- * @brief Retrieves a specific section header from the ELF header.
+ * Retrieves a specific section header from the ELF header.
  *
  * @param header The ELF header structure.
  * @param index The index of the section header to retrieve.
@@ -141,7 +141,7 @@ struct elf32_shdr* elf_section(struct elf_header* header, int index) {
 }
 
 /**
- * @brief Retrieves the string table from the ELF header.
+ * Retrieves the string table from the ELF header.
  *
  * @param header The ELF header structure.
  * @return Pointer to the string table.
@@ -152,7 +152,7 @@ char* elf_str_table(struct elf_header* header) {
 }
 
 /**
- * @brief Retrieves the virtual base address of the ELF file.
+ * Retrieves the virtual base address of the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the virtual base address.
@@ -162,7 +162,7 @@ void* elf_virtual_base(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the virtual end address of the ELF file.
+ * Retrieves the virtual end address of the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the virtual end address.
@@ -172,7 +172,7 @@ void* elf_virtual_end(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the physical base address of the ELF file.
+ * Retrieves the physical base address of the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the physical base address.
@@ -182,7 +182,7 @@ void* elf_phys_base(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the physical end address of the ELF file.
+ * Retrieves the physical end address of the ELF file.
  *
  * @param file The ELF file structure.
  * @return Pointer to the physical end address.
@@ -192,7 +192,7 @@ void* elf_phys_end(struct elf_file* file) {
 }
 
 /**
- * @brief Retrieves the physical address of a program header.
+ * Retrieves the physical address of a program header.
  * 
  * @param file The ELF file structure.
  * @param phdr The program header structure.
@@ -203,7 +203,7 @@ void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr) {
 }
 
 /**
- * @brief Validates that the ELF file is properly loaded.
+ * Validates that the ELF file is properly loaded.
  *
  * This function checks the ELF file for a valid signature, class, encoding, and presence
  * of a program header.
@@ -219,7 +219,7 @@ static int elf_validate_loaded(struct elf_header* header) {
 }
 
 /**
- * @brief Processes the PT_LOAD segment in the program header.
+ * Processes the PT_LOAD segment in the program header.
  *
  * This function updates the virtual and physical base and end addresses of the ELF file
  * based on the PT_LOAD segment's virtual address and size.
@@ -244,7 +244,7 @@ static int elf_process_phdr_pt_load(struct elf_file* elf_file, struct elf32_phdr
 }
 
 /**
- * @brief Processes a single program header entry.
+ * Processes a single program header entry.
  *
  * This function processes the specified program header entry, handling different types
  * of segments such as PT_LOAD.
@@ -264,7 +264,7 @@ static int elf_process_pheader(struct elf_file* elf_file, struct elf32_phdr* phd
 }
 
 /**
- * @brief Processes all program headers in the ELF file.
+ * Processes all program headers in the ELF file.
  *
  * This function iterates over all program header entries in the ELF file and processes each one.
  *
@@ -285,7 +285,7 @@ static int elf_process_pheaders(struct elf_file* elf_file) {
 }
 
 /**
- * @brief Validates and processes the loaded ELF file.
+ * Validates and processes the loaded ELF file.
  *
  * This function checks the validity of the ELF file and processes its program headers.
  *
@@ -310,7 +310,7 @@ out:
 }
 
 /**
- * @brief Loads an ELF file from the filesystem.
+ * Loads an ELF file from the filesystem.
  *
  * This function opens the specified ELF file, reads its contents into memory, and processes it.
  *
@@ -353,7 +353,7 @@ out:
 }
 
 /**
- * @brief Frees the resources associated with an ELF file.
+ * Frees the resources associated with an ELF file.
  *
  * This function deallocates the memory used by the ELF file structure and its contents.
  *

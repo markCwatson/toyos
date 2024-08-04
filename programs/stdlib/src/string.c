@@ -1,7 +1,7 @@
 #include "string.h"
 
 /**
- * @brief Converts a character to lowercase.
+ * Converts a character to lowercase.
  *
  * Converts the given character to lowercase if it is an uppercase letter.
  * If the character is not an uppercase letter, it is returned unchanged.
@@ -18,7 +18,7 @@ char tolower(char s1) {
 }
 
 /**
- * @brief Copies a string from source to destination.
+ * Copies a string from source to destination.
  *
  * Copies the null-terminated string pointed to by src into the buffer pointed to by dest.
  * The destination buffer must be large enough to hold the copied string including the null terminator.
@@ -43,7 +43,7 @@ char* strcpy(char* dest, const char* src) {
 }
 
 /**
- * @brief Concatenates two strings.
+ * Concatenates two strings.
  * 
  * This function appends the null-terminated string src to the end of the null-terminated
  * string dest, overwriting the null character at the end of dest, and then adds a terminating
@@ -72,7 +72,7 @@ int strcat(char* dest, const char* src) {
 }
 
 /**
- * @brief Copies a string up to a specified length.
+ * Copies a string up to a specified length.
  *
  * This function copies up to n characters from the null-terminated string src to the buffer
  * pointed to by dest. If the length of src is less than n, the remaining bytes in dest are
@@ -101,7 +101,7 @@ char *strncpy(char *dest, const char *src, int n) {
 }
 
 /**
- * @brief Computes the length of a string.
+ * Computes the length of a string.
  *
  * Returns the number of characters in the string pointed to by ptr, excluding the terminating null byte.
  *
@@ -120,7 +120,7 @@ int strlen(const char* ptr) {
 }
 
 /**
- * @brief Computes the length of a string up to a maximum number of characters.
+ * Computes the length of a string up to a maximum number of characters.
  *
  * Calculates the number of characters in the string pointed to by ptr,
  * up to a maximum of max characters, excluding the terminating null byte.
@@ -141,7 +141,7 @@ int strnlen(const char* ptr, int max) {
 }
 
 /**
- * @brief Computes the length of a string up to a specified terminator or maximum length.
+ * Computes the length of a string up to a specified terminator or maximum length.
  *
  * Calculates the number of characters in the string pointed to by str,
  * up to a maximum of max characters, or until the terminator character is encountered.
@@ -162,7 +162,7 @@ int strnlen_terminator(const char* str, int max, char terminator) {
 }
 
 /**
- * @brief Converts a character to an integer.
+ * Converts a character to an integer.
  *
  * Converts a character representing a digit ('0'-'9') to its corresponding integer value.
  *
@@ -174,7 +174,7 @@ int ctoi(char c) {
 }
 
 /**
- * @brief Checks if a character is a digit.
+ * Checks if a character is a digit.
  *
  * Determines whether the given character is a numeric digit ('0' to '9').
  *
@@ -186,7 +186,7 @@ bool is_digit(char c) {
 }
 
 /**
- * @brief Case-insensitive comparison of two strings up to a specified length.
+ * Case-insensitive comparison of two strings up to a specified length.
  *
  * Compares up to n characters of the null-terminated strings s1 and s2,
  * ignoring the case of the characters. The comparison stops at the first
@@ -218,7 +218,7 @@ int istrncmp(const char* s1, const char* s2, int n) {
 }
 
 /**
- * @brief Compares two strings up to a specified length.
+ * Compares two strings up to a specified length.
  *
  * Compares up to n characters of the null-terminated strings str1 and str2.
  * The comparison is case-sensitive and stops at the first mismatching character
@@ -249,7 +249,7 @@ int strncmp(const char* str1, const char* str2, int n) {
 }
 
 /**
- * @brief Tokenizes a string.
+ * Tokenizes a string.
  * 
  * This function finds the next token in a null-terminated string, using the specified delimiters.
  * 

@@ -23,7 +23,7 @@
 #define COLOR_WHITE         15
 
 /**
- * @brief ToyOS printf implementation.
+ * ToyOS printf implementation.
  *
  * @param fmt A string that specifies the format of the output.
  * @return The number of characters that are written into the array, not counting the terminating null character.
@@ -31,7 +31,7 @@
 int printf(const char *fmt, ...);
 
 /**
- * @brief ToyOS printf implementation with color support.
+ * ToyOS printf implementation with color support.
  * 
  * This function is similar to `printf` but accepts additional arguments for foreground and background colors.
  * 

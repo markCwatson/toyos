@@ -1,6 +1,6 @@
 /**
  * @file ps2.c
- * @brief PS/2 keyboard driver implementation.
+ * PS/2 keyboard driver implementation.
  *
  * This file implements functions for initializing and handling input from a PS/2 keyboard.
  * It includes translation of scancodes to ASCII characters and setting up the keyboard for use.
@@ -17,7 +17,7 @@
 #include <stddef.h>
 
 /**
- * @brief Initializes the PS/2 keyboard.
+ * Initializes the PS/2 keyboard.
  *
  * This function sends a command to the PS/2 controller to enable the first PS/2 port, which is typically used for the keyboard.
  *
@@ -26,12 +26,12 @@
 int ps2_keyboard_init(void);
 
 /**
- * @brief Converts a PS/2 keyboard scancode to an ASCII character.
+ * Converts a PS/2 keyboard scancode to an ASCII character.
  */
 void ps2_keyboard_handle_interrupt(void);
 
 /**
- * @brief Array mapping PS/2 scan codes to ASCII characters (Set 1).
+ * Array mapping PS/2 scan codes to ASCII characters (Set 1).
  *
  * This array contains the mapping from scan codes to ASCII characters for the PS/2 keyboard's Set 1 scan code set.
  */
@@ -51,7 +51,7 @@ static uint8_t keyboard_scan_set_one[] = {
 };
 
 /**
- * @brief PS/2 keyboard structure definition.
+ * PS/2 keyboard structure definition.
  *
  * This structure defines the PS/2 keyboard, including its name and initialization function.
  */
@@ -61,7 +61,7 @@ struct keyboard ps2_keyboard = {
 };
 
 /**
- * @brief Initializes the PS/2 keyboard.
+ * Initializes the PS/2 keyboard.
  *
  * This function enables the first PS/2 port, preparing it for keyboard input.
  *
@@ -77,7 +77,7 @@ int ps2_keyboard_init(void) {
 }
 
 /**
- * @brief Converts a PS/2 keyboard scancode to an ASCII character.
+ * Converts a PS/2 keyboard scancode to an ASCII character.
  *
  * This function maps a given scancode to its corresponding ASCII character using the Set 1 scan code set.
  *
@@ -101,7 +101,7 @@ uint8_t ps2_keyboard_scancode_to_char(uint8_t scancode) {
 }
 
 /**
- * @brief Handles PS/2 keyboard interrupts.
+ * Handles PS/2 keyboard interrupts.
  */
 void ps2_keyboard_handle_interrupt(void) {
     kernel_page();
@@ -128,7 +128,7 @@ void ps2_keyboard_handle_interrupt(void) {
 }
 
 /**
- * @brief Registers the PS/2 keyboard with the keyboard system.
+ * Registers the PS/2 keyboard with the keyboard system.
  * 
  * This function registers the PS/2 keyboard with the keyboard system, allowing it to be used for input.
  * 

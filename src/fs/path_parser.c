@@ -7,7 +7,7 @@
 #include "status.h"
 
 /**
- * @brief Checks if the given filename has a valid path format.
+ * Checks if the given filename has a valid path format.
  *
  * A valid path format starts with a digit representing the drive number,
  * followed by ":/". This function ensures the filename conforms to this pattern.
@@ -21,7 +21,7 @@ static int path_parser_path_valid_format(const char* filename) {
 }
 
 /**
- * @brief Extracts the drive number from the path.
+ * Extracts the drive number from the path.
  *
  * This function assumes that the path has been validated and contains a valid
  * drive number format. It returns the drive number as an integer.
@@ -38,7 +38,7 @@ static int path_parser_get_drive_by_path(const char** path) {
 }
 
 /**
- * @brief Creates a new path_root structure with the specified drive number.
+ * Creates a new path_root structure with the specified drive number.
  *
  * This function allocates memory for a path_root structure and initializes it
  * with the given drive number. The `first` field is set to NULL.
@@ -59,7 +59,7 @@ static struct path_root* path_parser_create_root(int drive_number) {
 }
 
 /**
- * @brief Extracts the next part of the path.
+ * Extracts the next part of the path.
  *
  * This function reads the next segment of the path up to the next '/' or end of the string.
  * It allocates memory for the path segment and returns it as a string.
@@ -94,7 +94,7 @@ static const char* path_parser_get_path_part(const char** path) {
 }
 
 /**
- * @brief Parses a path part and links it to the previous part.
+ * Parses a path part and links it to the previous part.
  *
  * This function extracts the next part of the path and creates a new path_part
  * structure for it. The new part is linked to the previous part, if provided.
@@ -127,7 +127,7 @@ struct path_part* path_parser_parse_path_part(struct path_part* last_part, const
 }
 
 /**
- * @brief Frees the memory allocated for a parsed path.
+ * Frees the memory allocated for a parsed path.
  *
  * This function deallocates the memory used by a path_root structure and its associated
  * path_part structures. It should be called to avoid memory leaks after the parsed path
@@ -149,7 +149,7 @@ void path_parser_free(struct path_root* root) {
 }
 
 /**
- * @brief Parses a file path into its components.
+ * Parses a file path into its components.
  *
  * This function takes a full file path and optionally a current directory path,
  * and parses it into its individual components, separating the drive, directories,

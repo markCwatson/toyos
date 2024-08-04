@@ -2,25 +2,29 @@
 #define _SYS_H_
 
 /**
- * @brief Enumeration of system commands that can be invoked using interrupt 0x80.
+ * Enumeration of system commands that can be invoked using interrupt 0x80.
  */
-enum SYSTEM_COMMANDS {
-    SYSTEM_COMMAND0_TEST,
-    SYSTEM_COMMAND1_PRINT,
-    SYSTEM_COMMAND2_GETKEY,
-    SYSTEM_COMMAND3_PUTCHAR,
-    SYSTEM_COMMAND4_MALLOC,
-    SYSTEM_COMMAND5_FREE,
-    SYSTEM_COMMAND6_PROCESS_LOAD_START,
-    SYSTEM_COMMAND7_EXIT,
-    SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS,
-    SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND,
-    SYSTEM_COMMAND10_CLEAR_TERMINAL,
-    SYSTEM_COMMAND11_GET_PROCESSES,
+enum SYSTEM_CMDS {
+    SYSTEM_CMD0_TEST,
+    SYSTEM_CMD1_PRINT,
+    SYSTEM_CMD2_GETKEY,
+    SYSTEM_CMD3_PUTCHAR,
+    SYSTEM_CMD4_MALLOC,
+    SYSTEM_CMD5_FREE,
+    SYSTEM_CMD6_PROCESS_LOAD_START,
+    SYSTEM_CMD7_EXIT,
+    SYSTEM_CMD8_GET_PROGRAM_ARGUMENTS,
+    SYSTEM_CMD9_INVOKE_SYSTEM_CMD,
+    SYSTEM_CMD10_CLEAR_TERMINAL,
+    SYSTEM_CMD11_GET_PROCESSES,
+    SYSTEM_CMD12_FORK,
+    SYSTEM_CMD13_WAIT,
+    SYSTEM_CMD14_KILL,
+    SYSTEM_CMD15_EXEC
 };
 
 /**
- * @brief Registers the system commands that can be invoked using interrupt 0x80.
+ * Registers the system commands that can be invoked using interrupt 0x80.
  */
 void sys_register_commands(void);
 

@@ -17,7 +17,7 @@ struct task* task_tail = NULL;
 struct task* task_head = NULL;
 
 /**
- * @brief Initializes a task structure
+ * Initializes a task structure
  * 
  * @param task The task structure to initialize
  * @param process The process associated with the task
@@ -26,7 +26,7 @@ struct task* task_head = NULL;
 static int task_init(struct task* task, struct process *process);
 
 /**
- * @brief Retrieves the current running task
+ * Retrieves the current running task
  * 
  * @return struct task* Pointer to the current task
  */
@@ -35,7 +35,7 @@ struct task* task_current(void) {
 }
 
 /**
- * @brief Creates a new task for a given process
+ * Creates a new task for a given process
  * 
  * @param process The process to associate with the new task
  * @return struct task* Pointer to the newly created task, or an error code cast to a pointer on failure
@@ -79,7 +79,7 @@ out:
 }
 
 /**
- * @brief Retrieves the next task in the linked list
+ * Retrieves the next task in the linked list
  * 
  * @return struct task* Pointer to the next task structure, or task_head if at the end of the list
  */
@@ -92,7 +92,7 @@ struct task* task_get_next(void) {
 }
 
 /**
- * @brief Removes a task from the task linked list
+ * Removes a task from the task linked list
  * 
  * @param task The task to remove
  */
@@ -119,9 +119,9 @@ static void task_list_remove(struct task* task) {
 }
 
 /**
- * @brief Copies a string from a task's memory to the kernel space
+ * Copies a string from a task's memory to the kernel space
  * 
- * @details This function copies a string from a task's memory to the kernel space. It allocates
+ * This function copies a string from a task's memory to the kernel space. It allocates
  * memory in the kernel space to store the string, copies the string from the task's memory to the
  * kernel space, and then copies the string to the physical address provided.
  * 
@@ -131,7 +131,7 @@ static void task_list_remove(struct task* task) {
  * @param max The maximum number of bytes to copy
  * @return int Returns 0 on success, negative value on failure
  */
-int copy_string_from_task(struct task* task, void* virtual, void* phys, int max) {
+int task_copy_string_from_task(struct task* task, void* virtual, void* phys, int max) {
     if (max >= PAGING_PAGE_SIZE || !task || !virtual || !phys) {
         return -EINVARG;
     }
@@ -172,7 +172,7 @@ out:
 }
 
 /**
- * @brief Frees the resources associated with a task
+ * Frees the resources associated with a task
  * 
  * @param task The task to free
  * @return int Returns 0 on success or a negative error code on failure
@@ -191,7 +191,7 @@ int task_free(struct task* task) {
 }
 
 /**
- * @brief Saves the state of the current task
+ * Saves the state of the current task
  * 
  * @param task The task whose state is being saved
  * @param frame The interrupt frame containing the CPU state
@@ -217,7 +217,7 @@ void task_save_state(struct task* task, struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Saves the state of the current task
+ * Saves the state of the current task
  * 
  * @param frame The interrupt frame containing the CPU state
  * @return void
@@ -232,9 +232,9 @@ void task_current_save_state(struct interrupt_frame* frame) {
 }
 
 /**
- * @brief Switches to a new task
+ * Switches to a new task
  * 
- * @details This function switches to a new task by setting the current task to the given task and
+ * This function switches to a new task by setting the current task to the given task and
  * switching to the task's page directory.
  * 
  * @param task The task to switch to
@@ -247,23 +247,23 @@ int task_switch(struct task *task) {
 }
 
 /**
- * @brief Switches to the next task in the linked list
+ * Switches to the next task in the linked list
  * 
- * @details This function is called by the timer interrupt handler to switch to 
+ * This function is called by the timer interrupt handler to switch to 
  * the next task in the linked list of tasks.
  * 
  * @return int Returns 0 on success, negative value on failure
  */
 int task_page(void) {
-    user_registers();
+    task_user_registers();
     task_switch(current_task);
     return OK;
 }
 
 /**
- * @brief Runs the first ever task
+ * Runs the first ever task
  * 
- * @details This function is called to run the first task in the linked list of tasks.
+ * This function is called to run the first task in the linked list of tasks.
  */
 void task_run_first_ever_task(void) {
     if (!current_task) {
@@ -275,21 +275,21 @@ void task_run_first_ever_task(void) {
 }
 
 /**
- * @brief Switches to page directory for a given task
+ * Switches to page directory for a given task
  * 
  * @param task The task to switch to
  * @return int Returns 0 on success, negative value on failure
  */
 static int task_page_task(struct task* task) {
-    user_registers();
+    task_user_registers();
     paging_switch(task->page_directory);
     return OK;
 }
 
 /**
- * @brief Retrieves the value of a stack item for a given task
+ * Retrieves the value of a stack item for a given task
  * 
- * @details This function retrieves the value of a stack item for a given task. It switches to the
+ * This function retrieves the value of a stack item for a given task. It switches to the
  * task's page directory, retrieves the value of the stack item, and then switches back to the kernel
  * page directory.
  * 
@@ -325,9 +325,9 @@ void* task_get_stack_item(struct task* task, int index) {
 }
 
 /**
- * @brief Switches to the next task in the linked list
+ * Switches to the next task in the linked list
  * 
- * @details This function is called by the timer interrupt handler to switch to
+ * This function is called by the timer interrupt handler to switch to
  * the next task in the linked list of tasks.
  */
 void task_next(void) {
@@ -341,7 +341,7 @@ void task_next(void) {
 }
 
 /**
- * @brief Retrieves the physical address of a virtual address for a given task
+ * Retrieves the physical address of a virtual address for a given task
  * 
  * @param task The task to retrieve the physical address for
  * @param virtual_address The virtual address to retrieve the physical address for
@@ -352,7 +352,7 @@ void* task_virtual_address_to_physical(struct task* task, void* virtual_address)
 }
 
 /**
- * @brief Initializes a task structure with a given process
+ * Initializes a task structure with a given process
  * 
  * @param task The task structure to initialize
  * @param process The process associated with the task
@@ -384,4 +384,19 @@ static int task_init(struct task* task, struct process* process) {
     task->process = process;
 
     return OK;
+}
+
+/**
+ * Yields the current task to the next task in the linked list.
+ * 
+ * This function yields the current task to the next task in the linked list of tasks.
+ */
+void task_yield(void) {
+    struct task* next_task = task_get_next();
+    if (!next_task) {
+        panick("[task_yield] No more tasks!\n");
+    }
+
+    task_switch(next_task);
+    task_return(&next_task->registers);
 }

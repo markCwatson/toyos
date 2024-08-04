@@ -36,7 +36,7 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
 };
 
 /**
- * @brief Prints a string to the terminal using color attributes.
+ * Prints a string to the terminal using color attributes.
  *
  * This function writes each character of the given string to the terminal, using caller defined
  * color attribute. It is typically used for kernel-level logging and debugging.
@@ -56,7 +56,7 @@ void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
 }
 
 /**
- * @brief Prints a string to the terminal.
+ * Prints a string to the terminal.
  *
  * This function writes each character of the given string to the terminal, using a fixed
  * color attribute (white on black).
@@ -71,7 +71,7 @@ void printk(const char* str) {
 }
 
 /**
- * @brief Displays a panic message and halts the system.
+ * Displays a panic message and halts the system.
  *
  * This function prints a panic message to the terminal and then enters an infinite loop,
  * effectively halting the system. It is used in critical error situations where the kernel
@@ -88,7 +88,7 @@ void panick(const char* str, ...) {
 }
 
 /**
- * @brief Prints an alert message to the terminal.
+ * Prints an alert message to the terminal.
  *
  * This function prints an alert message to the terminal using a fixed color attribute.
  *
@@ -102,7 +102,7 @@ void alertk(const char* str, ...) {
 }
 
 /**
- * @brief Switches to the kernel page.
+ * Switches to the kernel page.
  * 
  * This function switches to the kernel page by setting up the kernel registers and
  * switching to the kernel chunk. This is used to switch to the kernel page when
@@ -114,7 +114,7 @@ void kernel_page(void) {
 }
 
 /**
- * @brief Prints the "ToyOS" logo using ASCII art.
+ * Prints the "ToyOS" logo using ASCII art.
  *
  * This function displays the "ToyOS" name in a stylized ASCII art format.
  * The art uses simple characters to create a visually appealing representation of the OS name.
@@ -133,7 +133,7 @@ static void print_toyos_logo(void) {
 }
 
 /**
- * @brief Entry point for the kernel after booting.
+ * Entry point for the kernel after booting.
  *
  * This function initializes various subsystems of the kernel, including the terminal,
  * heap, file system, disk, and interrupt descriptor table (IDT). It sets up paging,

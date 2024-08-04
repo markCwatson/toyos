@@ -43,7 +43,7 @@ out:
     return root_command;
 }
 
-int toyos_getkeyblock(void) {
+int toyos_get_key_block(void) {
     int val = 0;
     do {
         val = toyos_getkey();
@@ -54,7 +54,7 @@ int toyos_getkeyblock(void) {
 void toyos_terminal_readline(char* out, int max, bool output_while_typing) {
     int i = 0;
     for (i = 0; i < max -1; i++) {
-        char key = toyos_getkeyblock();
+        char key = toyos_get_key_block();
 
         // Carriage return means we have read the line
         if (key == 13) {
