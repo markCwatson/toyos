@@ -30,7 +30,13 @@ make clean
 <br />
 
 > [!NOTE]
-> The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
+> This project was developed on Linux. The assembler used here is `nasm`version 2.15.05 . It can be installed using
+
+```shell
+sudo apt install nasm
+```
+
+The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://osdev.org/GCC_Cross-Compiler).
 
 <br />
 
@@ -44,6 +50,12 @@ make clean
 ```
 
 ### Emulation (QEMU) and debugging (GDB)
+
+QEMU is used to emulate the x86 hardware. It can be installed using.
+
+```shell
+sudo apt install qemu-system-x86
+```
 
 To run the kernel in the QEMU emulator without debugging, simply run the 32-bit x86 emulator
 
