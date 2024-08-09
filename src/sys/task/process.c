@@ -109,6 +109,8 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
     task_switch(process->task);
     task_return(&process->task->registers);
 
+    // Should never reach here: should be in user mode for new process by now
+    panick("task_switch failed\n");
     return 0;
 }
 
