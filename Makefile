@@ -230,6 +230,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/sys/task/process.o: ./src/sys/task/process.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/task $(FLAGS) -std=gnu99 -c ./src/sys/task/process.c -o ./build/sys/task/process.o
 
+./build/sys/locks/spinlock.o: ./src/sys/locks/spinlock.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/locks $(FLAGS) -std=gnu99 -c ./src/sys/locks/spinlock.c -o ./build/sys/locks/spinlock.o
+
 user_programs:
 	cd ./programs/stdlib && make all
 	cd ./programs/test && make all
