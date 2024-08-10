@@ -21,6 +21,7 @@
         "toyos.h": "c",
         "process.h": "c",
         "keyboard.h": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "spinlock.h": "c"
     }
 }

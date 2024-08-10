@@ -13,6 +13,8 @@ global toyos_process_get_arguments:function
 global toyos_system:function
 global toyos_clear_terminal:function
 global toyos_get_processes:function
+global toyos_check_done:function
+global toyos_done:function
 
 ; void print(const char* filename)
 print:
@@ -123,6 +125,24 @@ toyos_clear_terminal:
     push ebp
     mov ebp, esp
     mov eax, 10 ; Command 10 clear terminal
+    int 0x80
+    pop ebp
+    ret
+
+; void toyos_check_done(void)
+toyos_check_done:
+    push ebp
+    mov ebp, esp
+    mov eax, 12 ; Command 12 check lock
+    int 0x80
+    pop ebp
+    ret
+
+; void toyos_done(void)
+toyos_done:
+    push ebp
+    mov ebp, esp
+    mov eax, 13 ; Command 13 done
     int 0x80
     pop ebp
     ret

@@ -1,6 +1,8 @@
 #include "toyos.h"
 #include "string.h"
 
+extern int toyos_check_done(void);
+
 struct command_argument* toyos_parse_command(const char* command, int max) {
     struct command_argument* root_command = 0;
     char scommand[1025];
@@ -89,4 +91,19 @@ int toyos_system_run(const char* command) {
     }
 
     return toyos_system(root_command_argument);
+}
+
+void toyos_wait(void) {
+    do {
+        // this "delay" is necessary to stay in user land
+        // so when the child process finishes we can return
+        // to the parent process
+        for (int i = 0; i < 2000000; i++) {
+            asm volatile("nop");
+        }
+
+        if (toyos_check_done() == 0) {
+            break;
+        }
+    } while(1);
 }

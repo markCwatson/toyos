@@ -58,4 +58,24 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) ;
  */
 void* sys_command11_get_processes(struct interrupt_frame* frame);
 
+/**
+ * @brief System command handler for checkint hte status of the process lock.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND12_CHECK_LOCK is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return 0 if the process is not locked, error code if it is.
+ */
+void* sys_command12_check_lock(struct interrupt_frame* frame);
+
+/**
+ * @brief System command handler for notifying that a process has finished.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND13_DONE is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command13_done(struct interrupt_frame* frame);
+
 #endif

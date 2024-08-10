@@ -4,17 +4,12 @@
 #include "string.h"
 
 int main(int argc, char** argv) {
-    char quote = argv[1][0];
-    if (quote != '\'' && quote != '"') {
-        printf("[Err-1] Usage: echo 'message contained in quotes'\n\n");
-        return -1;
-    }
+    int ret = 0;
 
-    int len = strlen(argv[argc - 1]);
-    char last = argv[argc - 1][len - 1];
-    if (last != quote) {
-        printf("[Err-2] Usage: echo 'message contained in quotes'\n\n");
-        return -1;
+    if (argc == 1) {
+        printf("[Err-1] Usage: echo < string >\n\n");
+        ret = -1;
+        goto done;
     }
 
     for (int i = 1; i < argc; i++) {
@@ -23,5 +18,6 @@ int main(int argc, char** argv) {
 
     printf("\n\n");
 
-    return 0;
+done:
+    return ret;
 }

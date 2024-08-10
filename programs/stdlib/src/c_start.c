@@ -9,7 +9,13 @@ extern int main(int argc, char** argv);
  * retrieves the arguments for the process and calls the main function.
  */
 void c_start(void) {
+    // get the process arguments to inject into the main function
     struct process_arguments arguments;
     toyos_process_get_arguments(&arguments);
+
+    // call the main function
     main(arguments.argc, arguments.argv);
+
+    // notify the kernel that the process has finished in case anyone is waiting
+    toyos_done();
 }

@@ -10,9 +10,9 @@
  * 
  * @var locked The lock status.
  */
-typedef struct {
+struct spinlock_t {
     volatile uint32_t locked;
-} spinlock_t;
+};
 
 /**
  * @brief Locks the spinlock
@@ -21,7 +21,7 @@ typedef struct {
  * 
  * @param lock The spinlock to lock.
  */
-void spin_lock(spinlock_t *lock);
+void spin_lock(struct spinlock_t *lock);
 
 /**
  * @brief Unlocks the spinlock
@@ -30,6 +30,6 @@ void spin_lock(spinlock_t *lock);
  * 
  * @param lock The spinlock to unlock.
  */
-void spin_unlock(spinlock_t *lock);
+void spin_unlock(struct spinlock_t *lock);
 
 #endif

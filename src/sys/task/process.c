@@ -6,6 +6,17 @@
 #include "config.h"
 #include "kernel.h"
 #include "stdlib/printf.h"
+#include "locks/spinlock.h"
+#include "idt/idt.h"
+
+/**
+ * @brief Spinlock for active processes.
+ * 
+ * Used for parent processes who wait for child processes to finish (ex. shell).
+ */
+static struct spinlock_t lock = {
+    .locked = 0,
+};
 
 /**
  * @brief System command handler for loading and starting a new process.
@@ -107,6 +118,7 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
     }
 
     task_switch(process->task);
+    spin_lock(&lock);
     task_return(&process->task->registers);
 
     // Should never reach here: should be in user mode for new process by now
@@ -153,4 +165,29 @@ next:
     }
 
     return info;
+}
+
+/**
+ * @brief System command handler for checkint hte status of the process lock.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND12_CHECK_LOCK is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return 0 if the process is not locked, error code if it is.
+ */
+void* sys_command12_check_lock(struct interrupt_frame* frame) {
+    return lock.locked ? ERROR(-EBUSY) : OK;
+}
+
+/**
+ * @brief System command handler for notifying that a process has finished.
+ * 
+ * This function is called when the system command SYSTEM_COMMAND13_DONE is invoked.
+ * 
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void* sys_command13_done(struct interrupt_frame* frame) {
+    spin_unlock(&lock);
+    return 0;
 }

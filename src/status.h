@@ -73,4 +73,11 @@
  */
 #define EINFORMAT   9   /** < Invalid format */
 
+/**
+ * @brief Status code indicating that a resource is busy.
+ *
+ * This error occurs when a resource is already in use and cannot be accessed.
+ */
+#define EBUSY       10  /** < Resource is busy */
+
 #endif

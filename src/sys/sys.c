@@ -30,4 +30,6 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND, sys_command9_invoke_system_command);
     register_sys_command(SYSTEM_COMMAND10_CLEAR_TERMINAL, sys_command10_clear_terminal);
     register_sys_command(SYSTEM_COMMAND11_GET_PROCESSES, sys_command11_get_processes);
+    register_sys_command(SYSTEM_COMMAND12_CHECK_LOCK, sys_command12_check_lock);
+    register_sys_command(SYSTEM_COMMAND13_DONE, sys_command13_done);
 }
