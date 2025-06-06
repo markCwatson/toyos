@@ -11,11 +11,10 @@ Current features include:
 - **Virtual Memory with Paging:** Implements paging to manage memory, providing virtual memory support.
 - **Virtual Filesystem (VFS):** An abstraction layer for file system operations, allowing different filesystem types to be used seamlessly.
 - **FAT16 Filesystem:** Supports reading and writing files using the FAT16 format. Writing in append mode is under development.
-- **Simple Terminal:** A basic terminal interface for user interaction, currently under development.
+- **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
 - **Simple Test Framework:** A basic test framework for functional testing, currently under development.
 - **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
-- **Interactive Shell:** A user-friendly command-line interface to interact with the OS.
 - **Loading ELF files at runtime:** The ability to dynamically load shared libraries and user programs at runtime.
 
 ### Building
@@ -107,6 +106,5 @@ dumpelf programs/shell/shell.elf
 2. [The Little Book About OS Development by Erik Helin and Adam Renberg](https://littleosbook.github.io/)
 3. [OSdev.org](https://wiki.osdev.org/Expanded_Main_Page)
 4. [Modern Operating Systems 4th Edition by Andrew Tanenbaum and Herbert Bos](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf)
-5. Various OS courses on Udemy by the group [Abhishek CSEPracticals](https://www.udemy.com/user/abhishek-sagar-8/), [Ekta Ekta](https://www.udemy.com/user/ekta-272/), and [Shiwani Nigam](https://www.udemy.com/user/shivani-nigam-2/)
 
 [1]: gif/toyos-demo.gif "ToyOS running in QEMU"
