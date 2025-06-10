@@ -24,7 +24,7 @@ static void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
     if (source.limit > 65536) {
         // Adjusts the limit and sets the granularity flag
         source.limit = source.limit >> 12;
-        target[6] = 0xc0;
+        target[6] = 0xc0; // With the granularity flag set, the descriptor’s 20‑bit limit is interpreted in 4 KB blocks
     }
 
     // Encodes the limit
