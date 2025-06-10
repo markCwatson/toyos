@@ -17,6 +17,10 @@ Current features include:
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
 - **Loading ELF files at runtime:** The ability to dynamically load shared libraries and user programs at runtime.
 
+Work in progress:
+
+- **Networking**: see plan [here](./networking.md)
+
 ### Building
 
 From the root of the project, invoke the make build system (will need to make build script executable beforehand: `sudo chmod +x ./build.sh`)
@@ -107,4 +111,4 @@ dumpelf programs/shell/shell.elf
 3. [OSdev.org](https://wiki.osdev.org/Expanded_Main_Page)
 4. [Modern Operating Systems 4th Edition by Andrew Tanenbaum and Herbert Bos](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf)
 
-[1]: gif/toyos-demo.gif "ToyOS running in QEMU"
+[1]: gif/toyos-demo.gif 'ToyOS running in QEMU'
