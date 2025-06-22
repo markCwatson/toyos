@@ -162,6 +162,38 @@ The Peripheral Component Interconnect (PCI) bus is a standard for connecting per
 - Uses two 32-bit I/O ports: 0xCF8 (address) and 0xCFC (data)
 - Address format encodes bus, device, function, and register offset
 - Allows access to 256 bytes of configuration space per function
+- The PCI configuration space layout is fixed by specification:
+
+| Offset  | Size | Register Name                  |
+| ------- | ---- | ------------------------------ |
+| 0x00    | 16   | Vendor ID                      |
+| 0x02    | 16   | Device ID                      |
+| 0x04    | 16   | Command                        |
+| 0x06    | 16   | Status                         |
+| 0x08    | 8    | Revision ID                    |
+| 0x09    | 8    | Programming Interface          |
+| 0x0A    | 8    | Subclass                       |
+| 0x0B    | 8    | Class Code                     |
+| 0x0C    | 8    | Cache Line Size                |
+| 0x0D    | 8    | Latency Timer                  |
+| 0x0E    | 8    | Header Type                    |
+| 0x0F    | 8    | BIST                           |
+| 0x10    | 32   | Base Address Register 0 (BAR0) |
+| 0x14    | 32   | Base Address Register 1 (BAR1) |
+| 0x18    | 32   | Base Address Register 2 (BAR2) |
+| 0x1C    | 32   | Base Address Register 3 (BAR3) |
+| 0x20    | 32   | Base Address Register 4 (BAR4) |
+| 0x24    | 32   | Base Address Register 5 (BAR5) |
+| 0x28    | 32   | Cardbus CIS Pointer            |
+| 0x2C    | 16   | Subsystem Vendor ID            |
+| 0x2E    | 16   | Subsystem Device ID            |
+| 0x30    | 32   | Expansion ROM Base Address     |
+| 0x34    | 8    | Capabilities Pointer           |
+| 0x35-3B | 7    | Reserved                       |
+| 0x3C    | 8    | Interrupt Line                 |
+| 0x3D    | 8    | Interrupt Pin                  |
+| 0x3E    | 8    | Min Grant                      |
+| 0x3F    | 8    | Max Latency                    |
 
 **Bus Mastering**:
 
@@ -318,7 +350,10 @@ The `hostfwd` option forwards UDP port 8080 on the host to port 7 in the guest. 
 
 ## References
 
+- [OSDev PCI](https://wiki.osdev.org/PCI)
+- [PCI-SIG Specification](https://pcisig.com/specifications)
+- [OSDev Wiki RTL8139](https://wiki.osdev.org/RTL8139)
 - [RTL8139 Programming Guide](http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139_ProgrammersGuide.pdf)
 - [RTL8139 Datasheet](http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139D_DataSheet.pdf)
-- [OSDev Wiki RTL8139](https://wiki.osdev.org/RTL8139)
 - [Sanos RTL8139 Driver](http://www.jbox.dk/sanos/source/sys/dev/rtl8139.c.html)
+- [Linux kernel source for RTL8139](https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/realtek/8139cp.c)

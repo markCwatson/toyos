@@ -3,6 +3,92 @@
 #include "kernel.h"
 #include "stdlib/printf.h"
 
+// PCI Configuration Space I/O Ports
+#define PCI_CONFIG_ADDRESS 0xCF8
+#define PCI_CONFIG_DATA 0xCFC
+
+// PCI Configuration Space Offsets
+#define PCI_VENDOR_ID 0x00
+#define PCI_DEVICE_ID 0x02
+#define PCI_COMMAND 0x04
+#define PCI_STATUS 0x06
+#define PCI_REVISION_ID 0x08
+#define PCI_CLASS_CODE 0x0B
+#define PCI_HEADER_TYPE 0x0E
+#define PCI_BAR0 0x10
+#define PCI_BAR1 0x14
+#define PCI_BAR2 0x18
+#define PCI_BAR3 0x1C
+#define PCI_BAR4 0x20
+#define PCI_BAR5 0x24
+#define PCI_INTERRUPT_LINE 0x3C
+#define PCI_INTERRUPT_PIN 0x3D
+
+// Special Values
+#define PCI_INVALID_VENDOR 0xFFFF  // Invalid vendor ID
+#define PCI_MAX_BUS 256            // Maximum number of buses
+#define PCI_MAX_DEVICE 32          // Maximum devices per bus
+#define PCI_MAX_FUNCTION 8         // Maximum functions per device
+
+// Target Device IDs
+#define RTL8139_VENDOR_ID 0x10EC  // RealTek
+#define RTL8139_DEVICE_ID 0x8139  // RTL8139 Fast Ethernet
+
+/**
+ * @brief PCI Configuration Space Header (Type 0)
+ *
+ * This represents the first 64 bytes of PCI configuration space
+ * for a normal device (header type 0x00).
+ */
+struct pci_config_header {
+    uint16_t vendor_id;         // 0x00
+    uint16_t device_id;         // 0x02
+    uint16_t command;           // 0x04
+    uint16_t status;            // 0x06
+    uint8_t revision_id;        // 0x08
+    uint8_t prog_if;            // 0x09
+    uint8_t subclass;           // 0x0A
+    uint8_t class_code;         // 0x0B
+    uint8_t cache_line_size;    // 0x0C
+    uint8_t latency_timer;      // 0x0D
+    uint8_t header_type;        // 0x0E
+    uint8_t bist;               // 0x0F
+    uint32_t bar0;              // 0x10
+    uint32_t bar1;              // 0x14
+    uint32_t bar2;              // 0x18
+    uint32_t bar3;              // 0x1C
+    uint32_t bar4;              // 0x20
+    uint32_t bar5;              // 0x24
+    uint32_t cardbus_cis;       // 0x28
+    uint16_t subsystem_vendor;  // 0x2C
+    uint16_t subsystem_device;  // 0x2E
+    uint32_t expansion_rom;     // 0x30
+    uint8_t capabilities;       // 0x34
+    uint8_t reserved[7];        // 0x35-0x3B
+    uint8_t interrupt_line;     // 0x3C
+    uint8_t interrupt_pin;      // 0x3D
+    uint8_t min_grant;          // 0x3E
+    uint8_t max_latency;        // 0x3F
+} __attribute__((packed));
+
+/**
+ * @brief PCI configuration address format
+ *
+ * This structure represents the address format used for PCI
+ * configuration space access via port 0xCF8.
+ */
+union pci_config_address {
+    uint32_t raw;
+    struct {
+        uint32_t offset : 8;    // Register offset (bits 0-7)
+        uint32_t function : 3;  // Function number (bits 8-10)
+        uint32_t device : 5;    // Device number (bits 11-15)
+        uint32_t bus : 8;       // Bus number (bits 16-23)
+        uint32_t reserved : 7;  // Reserved (bits 24-30)
+        uint32_t enable : 1;    // Enable bit (bit 31)
+    } __attribute__((packed));
+};
+
 /**
  * @brief Read a 32-bit value from PCI configuration space
  *
