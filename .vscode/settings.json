@@ -1,27 +1,38 @@
 {
-    "files.associations": {
-        "io.h": "c",
-        "memory.h": "c",
-        "status.h": "c",
-        "string.h": "c",
-        "kernel.h": "c",
-        "kheap.h": "c",
-        "stddef.h": "c",
-        "streamer.h": "c",
-        "config.h": "c",
-        "idt.h": "c",
-        "terminal.h": "c",
-        "file.h": "c",
-        "tests.h": "c",
-        "task.h": "c",
-        "printf.h": "c",
-        "elfloader.h": "c",
-        "stdlib.h": "c",
-        "stdio.h": "c",
-        "toyos.h": "c",
-        "process.h": "c",
-        "keyboard.h": "c",
-        "heap.h": "c",
-        "spinlock.h": "c"
-    }
+  "files.associations": {
+    "io.h": "c",
+    "memory.h": "c",
+    "status.h": "c",
+    "string.h": "c",
+    "kernel.h": "c",
+    "kheap.h": "c",
+    "stddef.h": "c",
+    "streamer.h": "c",
+    "config.h": "c",
+    "idt.h": "c",
+    "terminal.h": "c",
+    "file.h": "c",
+    "tests.h": "c",
+    "task.h": "c",
+    "printf.h": "c",
+    "elfloader.h": "c",
+    "stdlib.h": "c",
+    "stdio.h": "c",
+    "toyos.h": "c",
+    "process.h": "c",
+    "keyboard.h": "c",
+    "heap.h": "c",
+    "spinlock.h": "c"
+  },
+  "editor.formatOnSave": true,
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.clang_format_fallbackStyle": "LLVM",
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true
+  }
 }
