@@ -1,8 +1,8 @@
 #ifndef _KHEAP_H_
 #define _KHEAP_H_
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief Initializes the kernel heap.
@@ -20,7 +20,7 @@ void kheap_init(void);
  * @param size The size of the memory block to allocate, in bytes.
  * @return A pointer to the allocated memory block, or NULL if the allocation fails.
  */
-void* kmalloc(size_t size);
+void *kmalloc(size_t size);
 
 /**
  * @brief Allocates and zeroes a block of memory from the kernel heap.
@@ -30,7 +30,7 @@ void* kmalloc(size_t size);
  * @param size The size of the memory block to allocate, in bytes.
  * @return A pointer to the allocated and zeroed memory block, or NULL if the allocation fails.
  */
-void* kzalloc(size_t size);
+void *kzalloc(size_t size);
 
 /**
  * @brief Frees a previously allocated block of memory.
@@ -40,6 +40,6 @@ void* kzalloc(size_t size);
  *
  * @param ptr Pointer to the memory block to free.
  */
-void kfree(void* ptr);
+void kfree(void *ptr);
 
 #endif

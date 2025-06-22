@@ -1,8 +1,8 @@
 #include "disk.h"
-#include "io/io.h"
 #include "config.h"
-#include "status.h"
+#include "io/io.h"
 #include "memory/memory.h"
+#include "status.h"
 
 struct disk disk;
 
@@ -14,7 +14,7 @@ struct disk disk;
  * @param buf Buffer containing the data to be written.
  * @return 0 on success, or an error code if failed.
  */
-int disk_write_sector(int lba, int total, void* buf) {
+int disk_write_sector(int lba, int total, void *buf) {
     if (!buf) {
         return -EINVARG;
     }
@@ -26,7 +26,7 @@ int disk_write_sector(int lba, int total, void* buf) {
     outb(0x1f5, (unsigned char)(lba >> 16));
     outb(0x1f7, 0x30);  // 0x30 is the command for write
 
-    unsigned short* ptr = (unsigned short*)buf;
+    unsigned short *ptr = (unsigned short *)buf;
 
     for (int i = 0; i < total; i++) {
         // Wait for the buffer to be ready
@@ -53,7 +53,7 @@ int disk_write_sector(int lba, int total, void* buf) {
  * @param buf Buffer to store the read data.
  * @return 0 on success, or an error code if failed.
  */
-static int disk_read_sector(int lba, int total, void* buf) {
+static int disk_read_sector(int lba, int total, void *buf) {
     if (!buf) {
         return -EINVARG;
     }
@@ -65,12 +65,12 @@ static int disk_read_sector(int lba, int total, void* buf) {
     outb(0x1f5, (unsigned char)(lba >> 16));
     outb(0x1f7, 0x20);
 
-    unsigned short* ptr = (unsigned short*)buf;
+    unsigned short *ptr = (unsigned short *)buf;
 
     for (int i = 0; i < total; i++) {
         // Wait for the buffer to be ready
         char c = insb(0x1f7);
-        while(!(c & 0x08)) {
+        while (!(c & 0x08)) {
             c = insb(0x1f7);
         }
 
@@ -79,7 +79,6 @@ static int disk_read_sector(int lba, int total, void* buf) {
             *ptr = insw(0x1f0);
             ptr++;
         }
-
     }
 
     return OK;
@@ -107,11 +106,11 @@ void disk_search_and_init(void) {
  * @param index Index of the disk to retrieve.
  * @return Pointer to the disk structure, or NULL if the disk is not found.
  */
-struct disk* disk_get(int index) {
+struct disk *disk_get(int index) {
     if (index != 0) {
         return NULL;
     }
-    
+
     return &disk;
 }
 
@@ -124,7 +123,7 @@ struct disk* disk_get(int index) {
  * @param buf Buffer to store the read data.
  * @return 0 on success, or an error code if failed.
  */
-int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf) {
+int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf) {
     if (idisk != &disk) {
         return -EIO;
     }
@@ -141,7 +140,7 @@ int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf) 
  * @param buf Buffer containing the data to write.
  * @return 0 on success, or an error code if failed.
  */
-int disk_write_block(struct disk* idisk, unsigned int lba, int total, void* buf) {
+int disk_write_block(struct disk *idisk, unsigned int lba, int total, void *buf) {
     if (idisk != &disk) {
         return -EIO;
     }

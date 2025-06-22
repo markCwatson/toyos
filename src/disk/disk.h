@@ -14,19 +14,19 @@ typedef unsigned int disk_type;
  * @brief Structure representing a disk.
  */
 struct disk {
-    disk_type type;             /**< Type of the disk. */
-    int sector_size;            /**< Size of a sector in bytes. */
-    int id;                     /**< Identifier for the disk. */
-    
+    disk_type type;  /**< Type of the disk. */
+    int sector_size; /**< Size of a sector in bytes. */
+    int id;          /**< Identifier for the disk. */
+
     /**
      * @brief Filesystem associated with the disk.
      */
-    struct filesystem* fs;
+    struct filesystem *fs;
 
     /**
      * @brief Private data for the filesystem.
      */
-    void* fs_private;
+    void *fs_private;
 };
 
 /**
@@ -38,7 +38,7 @@ struct disk {
  * @param buf Buffer to store the read data.
  * @return 0 on success, error code otherwise.
  */
-int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf);
+int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf);
 
 /**
  * @brief Writes a block of data to the disk.
@@ -49,7 +49,7 @@ int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf);
  * @param buf Buffer containing the data to write.
  * @return 0 on success, error code otherwise.
  */
-int disk_write_block(struct disk* idisk, unsigned int lba, int total, void* buf);
+int disk_write_block(struct disk *idisk, unsigned int lba, int total, void *buf);
 
 /**
  * @brief Searches for available disks and initializes them.
@@ -62,6 +62,6 @@ void disk_search_and_init(void);
  * @param index Index of the disk.
  * @return Pointer to the disk structure, or NULL if not found.
  */
-struct disk* disk_get(int index);
+struct disk *disk_get(int index);
 
 #endif

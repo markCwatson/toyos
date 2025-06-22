@@ -1,18 +1,18 @@
 #include "file.h"
-#include "fat/fat16.h"
 #include "config.h"
-#include "kernel.h"
-#include "memory/memory.h"
-#include "memory/heap/kheap.h"
-#include "status.h"
 #include "disk/disk.h"
+#include "fat/fat16.h"
+#include "kernel.h"
+#include "memory/heap/kheap.h"
+#include "memory/memory.h"
+#include "status.h"
 #include "stdlib/string.h"
 
 // Array of supported file systems
-struct filesystem* filesystems[TOYOS_MAX_FILESYSTEMS] = { NULL };
+struct filesystem *filesystems[TOYOS_MAX_FILESYSTEMS] = {NULL};
 
 // Array of file descriptors
-struct file_descriptor* file_descriptors[TOYOS_MAX_FILE_DESCRIPTORS] = { NULL };
+struct file_descriptor *file_descriptors[TOYOS_MAX_FILE_DESCRIPTORS] = {NULL};
 
 /**
  * @brief Finds a free slot in the filesystems array.
@@ -22,7 +22,7 @@ struct file_descriptor* file_descriptors[TOYOS_MAX_FILE_DESCRIPTORS] = { NULL };
  *
  * @return A pointer to the free slot, or NULL if no free slot is found.
  */
-static struct filesystem** fs_get_free_filesystem(void) {
+static struct filesystem **fs_get_free_filesystem(void) {
     for (int i = 0; i < TOYOS_MAX_FILESYSTEMS; i++) {
         if (filesystems[i] == NULL) {
             return &filesystems[i];
@@ -40,10 +40,10 @@ static struct filesystem** fs_get_free_filesystem(void) {
  *
  * @param filesystem The filesystem to insert.
  */
-void fs_insert_filesystem(struct filesystem* filesystem) {
-    struct filesystem** fs = fs_get_free_filesystem();
+void fs_insert_filesystem(struct filesystem *filesystem) {
+    struct filesystem **fs = fs_get_free_filesystem();
     if (!fs) {
-        panick("Problem inserting filesystem"); 
+        panick("Problem inserting filesystem");
     }
 
     *fs = filesystem;
@@ -89,7 +89,7 @@ void fs_init(void) {
  * @param str The mode string (e.g., "r" for read, "w" for write).
  * @return The corresponding file_mode, or FILE_MODE_INVALID if the string is not recognized.
  */
-static file_mode file_get_mode_by_string(const char* str) {
+static file_mode file_get_mode_by_string(const char *str) {
     if (strncmp(str, "r", 1) == 0) {
         return FILE_MODE_READ;
     } else if (strncmp(str, "w", 1) == 0) {
@@ -110,10 +110,10 @@ static file_mode file_get_mode_by_string(const char* str) {
  * @param file_desc A pointer to the location where the new file descriptor will be stored.
  * @return OK if successful, or an error code if allocation fails.
  */
-static int file_new_descriptor(struct file_descriptor** file_desc) {
+static int file_new_descriptor(struct file_descriptor **file_desc) {
     for (int i = 0; i < TOYOS_MAX_FILE_DESCRIPTORS; i++) {
         if (file_descriptors[i] == NULL) {
-            struct file_descriptor* new_file_desc = kzalloc(sizeof(struct file_descriptor));
+            struct file_descriptor *new_file_desc = kzalloc(sizeof(struct file_descriptor));
             if (!new_file_desc) {
                 return -ENOMEM;
             }
@@ -140,7 +140,7 @@ static int file_new_descriptor(struct file_descriptor** file_desc) {
  * @param file_desc_id The ID of the file descriptor to retrieve.
  * @return A pointer to the file descriptor, or NULL if the ID is invalid or the descriptor is not found.
  */
-static struct file_descriptor* file_get_descriptor(int file_desc_id) {
+static struct file_descriptor *file_get_descriptor(int file_desc_id) {
     if (file_desc_id <= 0 || file_desc_id >= TOYOS_MAX_FILE_DESCRIPTORS) {
         return NULL;
     }
@@ -158,7 +158,7 @@ static struct file_descriptor* file_get_descriptor(int file_desc_id) {
  * @param disk The disk to resolve the filesystem for.
  * @return A pointer to the filesystem that can handle the disk, or NULL if no such filesystem is found.
  */
-struct filesystem* fs_resolve(struct disk* disk) {
+struct filesystem *fs_resolve(struct disk *disk) {
     for (int i = 0; i < TOYOS_MAX_FILESYSTEMS; i++) {
         if (filesystems[i] != NULL && filesystems[i]->resolve(disk) == OK) {
             return filesystems[i];
@@ -178,9 +178,9 @@ struct filesystem* fs_resolve(struct disk* disk) {
  * @param mode_str The mode in which to open the file (e.g., "r" for read).
  * @return A file descriptor if successful, or an error code if not.
  */
-int fopen(const char* filename, const char* mode_str) {
+int fopen(const char *filename, const char *mode_str) {
     int res = 0;
-    struct path_root* root_path = path_parser_parse(filename, NULL);
+    struct path_root *root_path = path_parser_parse(filename, NULL);
     if (!root_path || !root_path->first) {
         // We cannot have just a root path 0:/ 0:/test.txt
         res = -EINVARG;
@@ -188,7 +188,7 @@ int fopen(const char* filename, const char* mode_str) {
     }
 
     // Ensure the disk we are reading from exists
-    struct disk* disk = disk_get(root_path->drive_no);
+    struct disk *disk = disk_get(root_path->drive_no);
     if (!disk || !disk->fs) {
         res = -EIO;
         goto out;
@@ -200,13 +200,13 @@ int fopen(const char* filename, const char* mode_str) {
         goto out;
     }
 
-    void* descriptor_private_data = disk->fs->open(disk, root_path->first, mode);
+    void *descriptor_private_data = disk->fs->open(disk, root_path->first, mode);
     if (ISERROR(descriptor_private_data)) {
         res = ERROR_I(descriptor_private_data);
         goto out;
     }
 
-    struct file_descriptor* desc = NULL;
+    struct file_descriptor *desc = NULL;
     res = file_new_descriptor(&desc);
     if (res < 0) {
         goto out;
@@ -237,17 +237,17 @@ out:
  * @param fd The file descriptor of the file.
  * @return The number of elements successfully read, or an error code if the read fails.
  */
-int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
+int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd) {
     if (size == 0 || nmemb == 0 || fd < 0) {
         return -EINVARG;
     }
 
-    struct file_descriptor* desc = file_get_descriptor(fd);
+    struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         return -EINVARG;
     }
 
-    return desc->fs->read(desc->disk, desc->private_data, size, nmemb, (char*)ptr);
+    return desc->fs->read(desc->disk, desc->private_data, size, nmemb, (char *)ptr);
 }
 
 /**
@@ -261,17 +261,17 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
  * @param fd The file descriptor of the file.
  * @return The number of elements successfully written, or an error code if the write fails.
  */
-int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
+int fwrite(void *ptr, uint32_t size, uint32_t nmemb, int fd) {
     if (size == 0 || nmemb == 0 || fd < 0) {
         return -EINVARG;
     }
 
-    struct file_descriptor* desc = file_get_descriptor(fd);
+    struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         return -EINVARG;
     }
 
-    return desc->fs->write(desc->disk, desc->private_data, size, nmemb, (char*)ptr);
+    return desc->fs->write(desc->disk, desc->private_data, size, nmemb, (char *)ptr);
 }
 
 /**
@@ -289,7 +289,7 @@ int fseek(int fd, int offset, file_seek_mode whence) {
         return -EINVARG;
     }
 
-    struct file_descriptor* desc = file_get_descriptor(fd);
+    struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         return -EINVARG;
     }
@@ -306,12 +306,12 @@ int fseek(int fd, int offset, file_seek_mode whence) {
  * @param stat The structure to fill with file status information.
  * @return 0 if successful, or an error code if the operation fails.
  */
-int fstat(int fd, struct file_stat* stat) {
+int fstat(int fd, struct file_stat *stat) {
     if (fd < 0) {
         return -EINVARG;
     }
 
-    struct file_descriptor* desc = file_get_descriptor(fd);
+    struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         return -EINVARG;
     }
@@ -332,7 +332,7 @@ int fclose(int fd) {
         return -EINVARG;
     }
 
-    struct file_descriptor* desc = file_get_descriptor(fd);
+    struct file_descriptor *desc = file_get_descriptor(fd);
     if (!desc) {
         return -EINVARG;
     }

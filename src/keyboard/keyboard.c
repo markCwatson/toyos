@@ -1,19 +1,19 @@
 #include "keyboard.h"
-#include "status.h"
 #include "kernel.h"
+#include "status.h"
 #include "task/process.h"
 #include "task/task.h"
 
-static struct keyboard* keyboard_list_head = NULL;
-static struct keyboard* keyboard_list_last = NULL;
+static struct keyboard *keyboard_list_head = NULL;
+static struct keyboard *keyboard_list_last = NULL;
 
 /**
  * @brief Initializes the keyboard system.
- * 
+ *
  * This function initializes all keyboard devices in the linked list of keyboard devices.
  */
 void keyboard_init(void) {
-    struct keyboard* keyboard = keyboard_list_head;
+    struct keyboard *keyboard = keyboard_list_head;
     while (keyboard) {
         keyboard->init();
         keyboard = keyboard->next;
@@ -25,7 +25,7 @@ void keyboard_init(void) {
  * @param keyboard The keyboard device to insert.
  * @return 0 on success, error code on failure.
  */
-int keyboard_insert(struct keyboard* keyboard) {
+int keyboard_insert(struct keyboard *keyboard) {
     if (!keyboard) {
         return -EINVARG;
     }
@@ -42,7 +42,7 @@ int keyboard_insert(struct keyboard* keyboard) {
     } else {
         keyboard_list_head = keyboard;
     }
-    
+
     keyboard_list_last = keyboard;
     res = keyboard->init();
 
@@ -55,7 +55,7 @@ out:
  * @param process The process for which to retrieve the tail index.
  * @return The tail index.
  */
-static int keyboard_get_tail_index(struct process* process) {
+static int keyboard_get_tail_index(struct process *process) {
     if (!process) {
         return -EINVARG;
     }
@@ -67,7 +67,7 @@ static int keyboard_get_tail_index(struct process* process) {
  * @brief Handles backspace functionality for the given process.
  * @param process The process for which to handle backspace.
  */
-void keyboard_backspace(struct process* process) {
+void keyboard_backspace(struct process *process) {
     if (!process) {
         return;
     }
@@ -86,7 +86,7 @@ void keyboard_backspace(struct process* process) {
  * @param c The character to push onto the buffer.
  */
 void keyboard_push(char c) {
-    struct process* process = process_current();
+    struct process *process = process_current();
     if (!process) {
         return;
     }
@@ -105,7 +105,7 @@ char keyboard_pop(void) {
         return 0;
     }
 
-    struct process* process = task_current()->process;
+    struct process *process = task_current()->process;
     int real_index = process->keyboard.head % sizeof(process->keyboard.buffer);
     char c = process->keyboard.buffer[real_index];
     if (c == 0x00) {
@@ -120,24 +120,24 @@ char keyboard_pop(void) {
 
 /**
  * @brief Sets the state of the caps lock key for the given keyboard.
- * 
+ *
  * This function sets the state of the caps lock key for the given keyboard.
- * 
+ *
  * @param keyboard The keyboard device.
  * @param state The state of the caps lock key.
  */
-void keyboard_set_capslock(struct keyboard* keyboard, keyboard_capslock_state state) {
+void keyboard_set_capslock(struct keyboard *keyboard, keyboard_capslock_state state) {
     keyboard->capslock_state = state;
 }
 
 /**
  * @brief Retrieves the state of the caps lock key for the given keyboard.
- * 
+ *
  * This function retrieves the state of the caps lock key for the given keyboard.
- * 
+ *
  * @param keyboard The keyboard device.
  * @return The state of the caps lock key.
  */
-keyboard_capslock_state keyboard_get_capslock(struct keyboard* keyboard) {
+keyboard_capslock_state keyboard_get_capslock(struct keyboard *keyboard) {
     return keyboard->capslock_state;
 }

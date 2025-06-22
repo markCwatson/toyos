@@ -1,22 +1,23 @@
 #include "kernel.h"
-#include "terminal/terminal.h"
-#include "idt/idt.h"
-#include "memory/memory.h"
-#include "memory/heap/kheap.h"
-#include "memory/paging/paging.h"
+#include "config.h"
 #include "disk/disk.h"
-#include "stdlib/string.h"
 #include "disk/streamer.h"
+#include "drivers/keyboards/ps2.h"
+#include "drivers/pci/pci.h"
 #include "fs/file.h"
 #include "gdt/gdt.h"
-#include "config.h"
-#include "task/tss.h"
-#include "task/task.h"
-#include "task/process.h"
-#include "sys/sys.h"
+#include "idt/idt.h"
 #include "keyboard/keyboard.h"
-#include "drivers/keyboards/ps2.h"
+#include "memory/heap/kheap.h"
+#include "memory/memory.h"
+#include "memory/paging/paging.h"
 #include "stdlib/printf.h"
+#include "stdlib/string.h"
+#include "sys/sys.h"
+#include "task/process.h"
+#include "task/task.h"
+#include "task/tss.h"
+#include "terminal/terminal.h"
 
 // Pointer to the 4GB paging chunk used by the kernel
 struct paging_4gb_chunk *kernel_chunk = NULL;
@@ -27,12 +28,12 @@ struct tss tss;
 // Global descriptor table (GDT) entries
 struct gdt gdt_real[TOYOS_TOTAL_GDT_SEGMENTS];
 struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
-    {.base = 0, .limit = 0, .type = 0},                             // Null segment
-    {.base = 0, .limit = 0xffffffff, .type = 0x9a},                 // Kernel code segment
-    {.base = 0, .limit = 0xffffffff, .type = 0x92},                 // Kernel data segment
-    {.base = 0, .limit = 0xffffffff, .type = 0xf8},                 // User code segment
-    {.base = 0, .limit = 0xffffffff, .type = 0xf2},                 // User data segment
-    {.base = (uintptr_t)&tss, .limit = sizeof(tss), .type = 0xe9}   // Task state segment
+    {.base = 0, .limit = 0, .type = 0},                            // Null segment
+    {.base = 0, .limit = 0xffffffff, .type = 0x9a},                // Kernel code segment
+    {.base = 0, .limit = 0xffffffff, .type = 0x92},                // Kernel data segment
+    {.base = 0, .limit = 0xffffffff, .type = 0xf8},                // User code segment
+    {.base = 0, .limit = 0xffffffff, .type = 0xf2},                // User data segment
+    {.base = (uintptr_t)&tss, .limit = sizeof(tss), .type = 0xe9}  // Task state segment
 };
 
 /**
@@ -45,7 +46,7 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
  * @param fg The foreground color of the text.
  * @param bg The background color of the text.
  */
-void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
+void printk_colored(const char *str, unsigned char fg, unsigned char bg) {
     size_t len = strlen(str);
 
     for (int i = 0; i < len; i++) {
@@ -60,13 +61,13 @@ void printk_colored(const char* str, unsigned char fg, unsigned char bg) {
  *
  * This function writes each character of the given string to the terminal, using a fixed
  * color attribute (white on black).
- * 
+ *
  * This function is a light-weight alternative to printf, and is used for kernel-level logging
  * and debugging.
  *
  * @param str The null-terminated string to print.
  */
-void printk(const char* str) {
+void printk(const char *str) {
     printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLUE);
 }
 
@@ -80,11 +81,12 @@ void printk(const char* str) {
  * @param str The null-terminated string describing the panic reason.
  * @param ... The optional arguments to format the string.
  */
-void panick(const char* str, ...) {
+void panick(const char *str, ...) {
     va_list args;
     va_start(args, str);
     printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLUE, args);
-    while (1);  // Infinite loop to halt the system
+    while (1)
+        ;  // Infinite loop to halt the system
 }
 
 /**
@@ -95,7 +97,7 @@ void panick(const char* str, ...) {
  * @param str The null-terminated string to print.
  * @param ... The optional arguments to format the string.
  */
-void alertk(const char* str, ...) {
+void alertk(const char *str, ...) {
     va_list args;
     va_start(args, str);
     printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE, args);
@@ -103,7 +105,7 @@ void alertk(const char* str, ...) {
 
 /**
  * @brief Switches to the kernel page.
- * 
+ *
  * This function switches to the kernel page by setting up the kernel registers and
  * switching to the kernel chunk. This is used to switch to the kernel page when
  * the kernel is running, for example, when handling interrupts.
@@ -120,14 +122,13 @@ void kernel_page(void) {
  * The art uses simple characters to create a visually appealing representation of the OS name.
  */
 static void print_toyos_logo(void) {
-    const char* logo =
-        "   _____              _  _     ___      ___   \n"
-        "  |_   _|    ___     | || |   / _ \\    / __|  \n"
-        "    | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
-        "   _|_|_    \\___/    _|__/    \\___/    |___/  \n"
-        " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
-        " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' version 0.0.0\n"
-        "\n";
+    const char *logo = "   _____              _  _     ___      ___   \n"
+                       "  |_   _|    ___     | || |   / _ \\    / __|  \n"
+                       "    | |     / _ \\     \\_, |  | (_) |   \\__ \\  \n"
+                       "   _|_|_    \\___/    _|__/    \\___/    |___/  \n"
+                       " _|\"\"\"\"\"| _|\"\"\"\"\"| _| \"\"\"\"| _|\"\"\"\"\"| _|\"\"\"\"\"| \n"
+                       " \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' \"`-0-0-' version 0.0.0\n"
+                       "\n";
 
     printk(logo);
 }
@@ -164,7 +165,6 @@ void maink(void) {
     tss.esp0 = 0x60000;             // Set the stack pointer for ring 0
     tss.ss0 = TOYOS_DATA_SELECTOR;  // Set the stack segment for ring 0
 
-    // Load the TSS
     tss_load(0x28);
 
     // Set up paging for the kernel
@@ -182,19 +182,17 @@ void maink(void) {
         panick("Failed to register the PS/2 keyboard!\n");
     }
 
-    // Initialize the keyboard
     keyboard_init();
+    pci_enumerate_devices();
 
-    // Print the ToyOS logo
     print_toyos_logo();
-    // pause for one second
     for (int i = 0; i < 100000000; i++) {
         asm volatile("nop");
     }
 
     // Load the first process
     printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
-    struct process* process = NULL;
+    struct process *process = NULL;
     int res = process_load_switch("0:/shell.elf", &process);
     if (ISERROR(res)) {
         panick("Failed to load the shell!\n");

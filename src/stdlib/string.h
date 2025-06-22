@@ -12,7 +12,7 @@
  * @param ptr Pointer to the null-terminated string.
  * @return The length of the string.
  */
-int strlen(const char* ptr);
+int strlen(const char *ptr);
 
 /**
  * @brief Converts a character to an integer.
@@ -27,11 +27,11 @@ int ctoi(char c);
 
 /**
  * @brief Converts an integer to a string.
- * 
+ *
  * @param i The integer to convert.
  * @return char* The string representation of the integer.
  */
-char* itoa(int i);
+char *itoa(int i);
 
 /**
  * @brief Checks if a character is a digit.
@@ -53,7 +53,7 @@ bool is_digit(char c);
  * @param max The maximum number of characters to count.
  * @return The length of the string, or max if the string is longer than max characters.
  */
-int strnlen(const char* ptr, int max);
+int strnlen(const char *ptr, int max);
 
 /**
  * @brief Copies a string.
@@ -65,7 +65,7 @@ int strnlen(const char* ptr, int max);
  * @param src Pointer to the source string.
  * @return A pointer to the destination buffer.
  */
-char* strcpy(char* dest, const char* src);
+char *strcpy(char *dest, const char *src);
 
 /**
  * @brief Copies a string up to a specified length.
@@ -93,7 +93,7 @@ char *strncpy(char *dest, const char *src, int n);
  * @return An integer less than, equal to, or greater than zero if str1 is found,
  *         respectively, to be less than, to match, or to be greater than str3.
  */
-int strncmp(const char* str1, const char* str3, int n);
+int strncmp(const char *str1, const char *str3, int n);
 
 /**
  * @brief Case-insensitive comparison of two strings up to a specified length.
@@ -107,7 +107,7 @@ int strncmp(const char* str1, const char* str3, int n);
  * @return An integer less than, equal to, or greater than zero if s1 is found,
  *         respectively, to be less than, to match, or to be greater than s2.
  */
-int istrncmp(const char* s1, const char* s2, int n);
+int istrncmp(const char *s1, const char *s2, int n);
 
 /**
  * @brief Converts a character to lowercase.
@@ -131,19 +131,19 @@ char tolower(char s1);
  * @param terminator The character that terminates the counting.
  * @return The length of the string up to the terminator or max, whichever is smaller.
  */
-int strnlen_terminator(const char* str, int max, char terminator);
+int strnlen_terminator(const char *str, int max, char terminator);
 
 /**
  * @brief Concatenates two strings.
- * 
+ *
  * This function appends the null-terminated string src to the end of the null-terminated
  * string dest, overwriting the null character at the end of dest, and then adds a terminating
  * null character.
- * 
+ *
  * @param dest Pointer to the destination buffer.
  * @param src Pointer to the source string.
  * @return The length of the concatenated string.
  */
-int strcat(char* dest, const char* src);
+int strcat(char *dest, const char *src);
 
 #endif

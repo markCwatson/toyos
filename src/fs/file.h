@@ -25,10 +25,10 @@ enum {
 typedef unsigned int file_mode;
 
 enum {
-    FILE_MODE_READ,    /**< Open file for reading. */
-    FILE_MODE_WRITE,   /**< Open file for writing. */
-    FILE_MODE_APPEND,  /**< Open file for appending. */
-    FILE_MODE_INVALID  /**< Invalid file mode. */
+    FILE_MODE_READ,   /**< Open file for reading. */
+    FILE_MODE_WRITE,  /**< Open file for writing. */
+    FILE_MODE_APPEND, /**< Open file for appending. */
+    FILE_MODE_INVALID /**< Invalid file mode. */
 };
 
 /**
@@ -56,13 +56,13 @@ struct file_stat {
 };
 
 /* Function pointer types for file system operations */
-typedef void* (*fs_open_fp)(struct disk* disk, struct path_part* path, file_mode mode);
-typedef int (*fs_resolve_fp)(struct disk* disk);
-typedef int (*fs_read_fp)(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* out);
-typedef int (*fs_write_fp)(struct disk* disk, void* private_data, uint32_t size, uint32_t nmemb, char* in);
-typedef int (*fs_close_fp)(void* private_data);
-typedef int (*fs_seek_fp)(void* private_data, uint32_t offset, file_seek_mode seek_mode);
-typedef int (*fs_stat_fp)(struct disk* disk, void* private_data, struct file_stat* stat);
+typedef void *(*fs_open_fp)(struct disk *disk, struct path_part *path, file_mode mode);
+typedef int (*fs_resolve_fp)(struct disk *disk);
+typedef int (*fs_read_fp)(struct disk *disk, void *private_data, uint32_t size, uint32_t nmemb, char *out);
+typedef int (*fs_write_fp)(struct disk *disk, void *private_data, uint32_t size, uint32_t nmemb, char *in);
+typedef int (*fs_close_fp)(void *private_data);
+typedef int (*fs_seek_fp)(void *private_data, uint32_t offset, file_seek_mode seek_mode);
+typedef int (*fs_stat_fp)(struct disk *disk, void *private_data, struct file_stat *stat);
 
 /**
  * @brief File system interface structure.
@@ -71,14 +71,14 @@ typedef int (*fs_stat_fp)(struct disk* disk, void* private_data, struct file_sta
  * for resolving, opening, reading, writing, seeking, getting status, and closing files.
  */
 struct filesystem {
-    char name[20];           /**< Name of the file system. */
-    fs_resolve_fp resolve;   /**< Function to resolve if the provided disk uses this file system. */
-    fs_open_fp open;         /**< Function to open a file. */
-    fs_read_fp read;         /**< Function to read from a file. */
-    fs_write_fp write;       /**< Function to write to a file. */
-    fs_seek_fp seek;         /**< Function to seek within a file. */
-    fs_stat_fp stat;         /**< Function to get file status. */
-    fs_close_fp close;       /**< Function to close a file. */
+    char name[20];         /**< Name of the file system. */
+    fs_resolve_fp resolve; /**< Function to resolve if the provided disk uses this file system. */
+    fs_open_fp open;       /**< Function to open a file. */
+    fs_read_fp read;       /**< Function to read from a file. */
+    fs_write_fp write;     /**< Function to write to a file. */
+    fs_seek_fp seek;       /**< Function to seek within a file. */
+    fs_stat_fp stat;       /**< Function to get file status. */
+    fs_close_fp close;     /**< Function to close a file. */
 };
 
 /**
@@ -88,10 +88,10 @@ struct filesystem {
  * the file system it belongs to, and any private data needed for file operations.
  */
 struct file_descriptor {
-    int index;                  /**< The descriptor index. */
-    struct filesystem* fs;      /**< Pointer to the file system that handles this file. */
-    void* private_data;         /**< Private data for internal file descriptor. */
-    struct disk* disk;          /**< The disk that the file descriptor is associated with. */
+    int index;             /**< The descriptor index. */
+    struct filesystem *fs; /**< Pointer to the file system that handles this file. */
+    void *private_data;    /**< Private data for internal file descriptor. */
+    struct disk *disk;     /**< The disk that the file descriptor is associated with. */
 };
 
 /* File system function declarations */
@@ -113,7 +113,7 @@ void fs_init(void);
  * @param mode_str The mode in which to open the file (e.g., "r" for read, "w" for write).
  * @return A file descriptor if successful, or a negative error code.
  */
-int fopen(const char* filename, const char* mode_str);
+int fopen(const char *filename, const char *mode_str);
 
 /**
  * @brief Seeks to a specific position in an open file.
@@ -138,7 +138,7 @@ int fseek(int fd, int offset, file_seek_mode whence);
  * @param fd The file descriptor of the file.
  * @return The number of elements successfully read, or a negative error code.
  */
-int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
+int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd);
 
 /**
  * @brief Writes data to an open file.
@@ -151,7 +151,7 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
  * @param fd The file descriptor of the file.
  * @return The number of elements successfully written, or a negative error code.
  */
-int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd);
+int fwrite(void *ptr, uint32_t size, uint32_t nmemb, int fd);
 
 /**
  * @brief Retrieves the status of an open file.
@@ -162,7 +162,7 @@ int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd);
  * @param stat The structure to fill with file status information.
  * @return 0 if successful, or a negative error code.
  */
-int fstat(int fd, struct file_stat* stat);
+int fstat(int fd, struct file_stat *stat);
 
 /**
  * @brief Closes an open file.
@@ -181,16 +181,17 @@ int fclose(int fd);
  *
  * @param filesystem The file system to register.
  */
-void fs_insert_filesystem(struct filesystem* filesystem);
+void fs_insert_filesystem(struct filesystem *filesystem);
 
 /**
  * @brief Resolves the file system used by a specific disk.
  *
- * This function determines which file system is used by a disk and returns a pointer to the corresponding filesystem structure.
+ * This function determines which file system is used by a disk and returns a pointer to the corresponding filesystem
+ * structure.
  *
  * @param disk The disk to check.
  * @return A pointer to the filesystem structure, or NULL if no file system is found.
  */
-struct filesystem* fs_resolve(struct disk* disk);
+struct filesystem *fs_resolve(struct disk *disk);
 
 #endif

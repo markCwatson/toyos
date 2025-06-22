@@ -1,17 +1,17 @@
 #include "process.h"
-#include "task/task.h"
-#include "task/process.h"
-#include "stdlib/string.h"
-#include "status.h"
 #include "config.h"
-#include "kernel.h"
-#include "stdlib/printf.h"
-#include "locks/spinlock.h"
 #include "idt/idt.h"
+#include "kernel.h"
+#include "locks/spinlock.h"
+#include "status.h"
+#include "stdlib/printf.h"
+#include "stdlib/string.h"
+#include "task/process.h"
+#include "task/task.h"
 
 /**
  * @brief Spinlock for active processes.
- * 
+ *
  * Used for parent processes who wait for child processes to finish (ex. shell).
  */
 static struct spinlock_t lock = {
@@ -20,14 +20,14 @@ static struct spinlock_t lock = {
 
 /**
  * @brief System command handler for loading and starting a new process.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND6_PROCESS_LOAD_START is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command6_process_load_start(struct interrupt_frame* frame) {
-    void* filename_user_ptr = task_get_stack_item(task_current(), 0);
+void *sys_command6_process_load_start(struct interrupt_frame *frame) {
+    void *filename_user_ptr = task_get_stack_item(task_current(), 0);
     char filename[TOYOS_MAX_PATH];
     int res = copy_string_from_task(task_current(), filename_user_ptr, filename, sizeof(filename));
     if (res < 0) {
@@ -39,7 +39,7 @@ void* sys_command6_process_load_start(struct interrupt_frame* frame) {
     strcat(path, filename);
     strcat(path, ".elf");
 
-    struct process* process = 0;
+    struct process *process = 0;
     res = process_load_switch(path, &process);
     if (res < 0) {
         goto out;
@@ -54,14 +54,14 @@ out:
 
 /**
  * @brief System command handler for exiting the current process.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND7_PROCESS_EXIT is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command7_process_exit(struct interrupt_frame* frame) {
-    struct process* process = task_current()->process;
+void *sys_command7_process_exit(struct interrupt_frame *frame) {
+    struct process *process = task_current()->process;
     process_terminate(process);
     task_next();
     return NULL;
@@ -69,15 +69,16 @@ void* sys_command7_process_exit(struct interrupt_frame* frame) {
 
 /**
  * @brief System command handler for getting the program arguments.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command8_get_program_arguments(struct interrupt_frame* frame) {
-    struct process* process = task_current()->process;
-    struct process_arguments* arguments = task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
+void *sys_command8_get_program_arguments(struct interrupt_frame *frame) {
+    struct process *process = task_current()->process;
+    struct process_arguments *arguments =
+        task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
 
     process_get_arguments(process, &arguments->argc, &arguments->argv);
     return 0;
@@ -85,27 +86,28 @@ void* sys_command8_get_program_arguments(struct interrupt_frame* frame) {
 
 /**
  * @brief System command handler for invoking a system command.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
-    struct command_argument* arguments = task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
+void *sys_command9_invoke_system_command(struct interrupt_frame *frame) {
+    struct command_argument *arguments =
+        task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
     if (!arguments || strlen(arguments[0].argument) == 0) {
         return ERROR(-EINVARG);
     }
 
-    struct command_argument* root_command_argument = &arguments[0];
-    const char* program_name = root_command_argument->argument;
+    struct command_argument *root_command_argument = &arguments[0];
+    const char *program_name = root_command_argument->argument;
 
     char path[TOYOS_MAX_PATH];
     strcat(path, "0:/");
     strcat(path, program_name);
     strcat(path, ".elf");
 
-    struct process* process = 0;
+    struct process *process = 0;
     int res = process_load_switch(path, &process);
     if (res < 0) {
         alertk("Command not recognized.\n\n");
@@ -128,19 +130,19 @@ void* sys_command9_invoke_system_command(struct interrupt_frame* frame) {
 
 /**
  * @brief System command handler for fetching the process list.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND11_GET_PROCESSES is invoked.
  * It returns a list of processes.
- * 
+ *
  * @warning The memory for the list is allocated from the current process's memory space
  * and must be freed by the caller.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command11_get_processes(struct interrupt_frame* frame) {
-    struct process_info* info = (struct process_info*)process_malloc(task_current()->process,
-                                                                     sizeof(struct process_info) * TOYOS_MAX_PROCESSES);
+void *sys_command11_get_processes(struct interrupt_frame *frame) {
+    struct process_info *info = (struct process_info *)process_malloc(
+        task_current()->process, sizeof(struct process_info) * TOYOS_MAX_PROCESSES);
     if (!info) {
         return ERROR(-ENOMEM);
     }
@@ -152,7 +154,7 @@ void* sys_command11_get_processes(struct interrupt_frame* frame) {
         // indicates no process
         info[index].id = -1;
 
-        struct process* process = process_get(pid);
+        struct process *process = process_get(pid);
         if (!process) {
             goto next;
         }
@@ -160,7 +162,7 @@ void* sys_command11_get_processes(struct interrupt_frame* frame) {
         info[index].id = process->id;
         strcpy(info[index].filename, process->filename);
 
-next:
+    next:
         index += 1;
     }
 
@@ -169,25 +171,25 @@ next:
 
 /**
  * @brief System command handler for checkint hte status of the process lock.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND12_CHECK_LOCK is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return 0 if the process is not locked, error code if it is.
  */
-void* sys_command12_check_lock(struct interrupt_frame* frame) {
+void *sys_command12_check_lock(struct interrupt_frame *frame) {
     return lock.locked ? ERROR(-EBUSY) : OK;
 }
 
 /**
  * @brief System command handler for notifying that a process has finished.
- * 
+ *
  * This function is called when the system command SYSTEM_COMMAND13_DONE is invoked.
- * 
+ *
  * @param frame The interrupt frame.
  * @return The return value of the system command.
  */
-void* sys_command13_done(struct interrupt_frame* frame) {
+void *sys_command13_done(struct interrupt_frame *frame) {
     spin_unlock(&lock);
     return 0;
 }

@@ -11,7 +11,7 @@
  * @param target Pointer to the array where the encoded GDT entry will be stored.
  * @param source The structured GDT entry containing base, limit, and type.
  */
-static void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
+static void encode_gdt_entry(uint8_t *target, struct gdt_structured source) {
     if ((source.limit > 65536) && ((source.limit & 0xfff) != 0xfff)) {
         // checks limit for alignment
         panick("[encode_gdt_entry] Invalid argument\n");
@@ -24,7 +24,7 @@ static void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
     if (source.limit > 65536) {
         // Adjusts the limit and sets the granularity flag
         source.limit = source.limit >> 12;
-        target[6] = 0xc0; // With the granularity flag set, the descriptor’s 20‑bit limit is interpreted in 4 KB blocks
+        target[6] = 0xc0;  // With the granularity flag set, the descriptor’s 20‑bit limit is interpreted in 4 KB blocks
     }
 
     // Encodes the limit
@@ -52,8 +52,8 @@ static void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
  * @param structured_gdt Pointer to the source array of structured GDT entries.
  * @param total_entries The total number of GDT entries to convert.
  */
-void gdt_structured_to_gdt(struct gdt* gdt, struct gdt_structured* structured_gdt, int total_entries) {
+void gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entries) {
     for (int i = 0; i < total_entries; i++) {
-        encode_gdt_entry((uint8_t*)&gdt[i], structured_gdt[i]);
+        encode_gdt_entry((uint8_t *)&gdt[i], structured_gdt[i]);
     }
 }

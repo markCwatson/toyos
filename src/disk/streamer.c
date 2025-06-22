@@ -1,6 +1,6 @@
 #include "streamer.h"
-#include "memory/heap/kheap.h"
 #include "config.h"
+#include "memory/heap/kheap.h"
 #include "status.h"
 #include <stdbool.h>
 
@@ -12,13 +12,13 @@
  * @param disk_id The identifier of the disk to stream from.
  * @return A pointer to the newly created disk_stream structure, or NULL if the disk is not found or allocation fails.
  */
-struct disk_stream* streamer_new(int disk_id) {
-    struct disk* disk = disk_get(disk_id);
+struct disk_stream *streamer_new(int disk_id) {
+    struct disk *disk = disk_get(disk_id);
     if (!disk) {
         return NULL;
     }
 
-    struct disk_stream* streamer = kzalloc(sizeof(struct disk_stream));
+    struct disk_stream *streamer = kzalloc(sizeof(struct disk_stream));
     if (!streamer) {
         return NULL;
     }
@@ -32,13 +32,14 @@ struct disk_stream* streamer_new(int disk_id) {
 /**
  * @brief Sets the position in the disk stream.
  *
- * Changes the position in the stream to the specified byte offset, enabling subsequent read/write operations to begin at this position.
+ * Changes the position in the stream to the specified byte offset, enabling subsequent read/write operations to begin
+ * at this position.
  *
  * @param stream The disk stream to modify.
  * @param pos The new byte offset in the disk stream.
  * @return 0 on success, or an error code if the stream is invalid or the position is out of bounds.
  */
-int streamer_seek(struct disk_stream* stream, int pos) {
+int streamer_seek(struct disk_stream *stream, int pos) {
     if (!stream || pos < 0) {
         return -EINVARG;
     }
@@ -58,7 +59,7 @@ int streamer_seek(struct disk_stream* stream, int pos) {
  * @param total The total number of bytes to read.
  * @return 0 on success, or an error code on failure.
  */
-int streamer_read(struct disk_stream* stream, void* out, int total) {
+int streamer_read(struct disk_stream *stream, void *out, int total) {
     if (!stream || !out || total < 0) {
         return -EINVARG;
     }
@@ -80,7 +81,7 @@ int streamer_read(struct disk_stream* stream, void* out, int total) {
 
     // Copy the read data from the buffer to the output
     for (int i = 0; i < total_to_read; i++) {
-        *(char*)out++ = buf[offset + i];
+        *(char *)out++ = buf[offset + i];
     }
 
     // Update the stream position
@@ -104,7 +105,7 @@ out:
  * @param total The total number of bytes to write.
  * @return 0 on success, or an error code on failure.
  */
-int streamer_write(struct disk_stream* stream, const void* in, int total) {
+int streamer_write(struct disk_stream *stream, const void *in, int total) {
     if (!stream || !in || total < 0) {
         return -EINVARG;
     }
@@ -130,7 +131,7 @@ int streamer_write(struct disk_stream* stream, const void* in, int total) {
 
     // Copy data into the buffer
     for (int i = 0; i < total_to_write; i++) {
-        buf[offset + i] = *(const char*)in++;
+        buf[offset + i] = *(const char *)in++;
     }
 
     // Write the buffer back to the disk
@@ -156,6 +157,6 @@ out:
  *
  * @param stream The disk stream to close.
  */
-void streamer_close(struct disk_stream* stream) {
+void streamer_close(struct disk_stream *stream) {
     kfree(stream);
 }

@@ -1,12 +1,12 @@
 #include "elfloader.h"
-#include "fs/file.h"
-#include "status.h"
-#include "memory/memory.h"
-#include "memory/heap/kheap.h"
-#include "stdlib/string.h"
-#include "memory/paging/paging.h"
-#include "kernel.h"
 #include "config.h"
+#include "fs/file.h"
+#include "kernel.h"
+#include "memory/heap/kheap.h"
+#include "memory/memory.h"
+#include "memory/paging/paging.h"
+#include "status.h"
+#include "stdlib/string.h"
 #include <stdbool.h>
 
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
@@ -20,8 +20,8 @@ const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
  * @param buffer The buffer containing the file data.
  * @return true if the signature is valid, false otherwise.
  */
-static bool elf_valid_signature(void* buffer) {
-    return memcmp(buffer, (void*)elf_signature, sizeof(elf_signature)) == 0;
+static bool elf_valid_signature(void *buffer) {
+    return memcmp(buffer, (void *)elf_signature, sizeof(elf_signature)) == 0;
 }
 
 /**
@@ -33,7 +33,7 @@ static bool elf_valid_signature(void* buffer) {
  * @param header The ELF header structure.
  * @return true if the class is supported, false otherwise.
  */
-static bool elf_valid_class(struct elf_header* header) {
+static bool elf_valid_class(struct elf_header *header) {
     // We only support 32-bit binaries.
     return header->e_ident[EI_CLASS] == ELFCLASSNONE || header->e_ident[EI_CLASS] == ELFCLASS32;
 }
@@ -46,7 +46,7 @@ static bool elf_valid_class(struct elf_header* header) {
  * @param header The ELF header structure.
  * @return true if the encoding is supported, false otherwise.
  */
-static bool elf_valid_encoding(struct elf_header* header) {
+static bool elf_valid_encoding(struct elf_header *header) {
     return header->e_ident[EI_DATA] == ELFDATANONE || header->e_ident[EI_DATA] == ELFDATA2LSB;
 }
 
@@ -58,7 +58,7 @@ static bool elf_valid_encoding(struct elf_header* header) {
  * @param header The ELF header structure.
  * @return true if the file is executable, false otherwise.
  */
-static bool elf_is_executable(struct elf_header* header) {
+static bool elf_is_executable(struct elf_header *header) {
     return header->e_type == ET_EXEC && header->e_entry >= TOYOS_PROGRAM_VIRTUAL_ADDRESS;
 }
 
@@ -70,7 +70,7 @@ static bool elf_is_executable(struct elf_header* header) {
  * @param header The ELF header structure.
  * @return true if the file has a program header, false otherwise.
  */
-static bool elf_has_program_header(struct elf_header* header) {
+static bool elf_has_program_header(struct elf_header *header) {
     return header->e_phoff != 0;
 }
 
@@ -80,7 +80,7 @@ static bool elf_has_program_header(struct elf_header* header) {
  * @param file The ELF file structure.
  * @return Pointer to the ELF memory location.
  */
-void* elf_memory(struct elf_file* file) {
+void *elf_memory(struct elf_file *file) {
     return file->elf_memory;
 }
 
@@ -90,7 +90,7 @@ void* elf_memory(struct elf_file* file) {
  * @param file The ELF file structure.
  * @return Pointer to the ELF header.
  */
-struct elf_header* elf_header(struct elf_file* file) {
+struct elf_header *elf_header(struct elf_file *file) {
     return file->elf_memory;
 }
 
@@ -100,8 +100,8 @@ struct elf_header* elf_header(struct elf_file* file) {
  * @param header The ELF header structure.
  * @return Pointer to the section header table.
  */
-struct elf32_shdr* elf_sheader(struct elf_header* header) {
-    return (struct elf32_shdr*)((int)header + header->e_shoff);
+struct elf32_shdr *elf_sheader(struct elf_header *header) {
+    return (struct elf32_shdr *)((int)header + header->e_shoff);
 }
 
 /**
@@ -110,12 +110,12 @@ struct elf32_shdr* elf_sheader(struct elf_header* header) {
  * @param header The ELF header structure.
  * @return Pointer to the program header table, or NULL if not present.
  */
-struct elf32_phdr* elf_pheader(struct elf_header* header) {
-    if(header->e_phoff == 0) {
+struct elf32_phdr *elf_pheader(struct elf_header *header) {
+    if (header->e_phoff == 0) {
         return NULL;
     }
 
-    return (struct elf32_phdr*)((int)header + header->e_phoff);
+    return (struct elf32_phdr *)((int)header + header->e_phoff);
 }
 
 /**
@@ -125,7 +125,7 @@ struct elf32_phdr* elf_pheader(struct elf_header* header) {
  * @param index The index of the program header to retrieve.
  * @return Pointer to the program header at the specified index.
  */
-struct elf32_phdr* elf_program_header(struct elf_header* header, int index) {
+struct elf32_phdr *elf_program_header(struct elf_header *header, int index) {
     return &elf_pheader(header)[index];
 }
 
@@ -136,7 +136,7 @@ struct elf32_phdr* elf_program_header(struct elf_header* header, int index) {
  * @param index The index of the section header to retrieve.
  * @return Pointer to the section header at the specified index.
  */
-struct elf32_shdr* elf_section(struct elf_header* header, int index) {
+struct elf32_shdr *elf_section(struct elf_header *header, int index) {
     return &elf_sheader(header)[index];
 }
 
@@ -146,9 +146,9 @@ struct elf32_shdr* elf_section(struct elf_header* header, int index) {
  * @param header The ELF header structure.
  * @return Pointer to the string table.
  */
-char* elf_str_table(struct elf_header* header) {
-    struct elf32_shdr* shdr = elf_section(header, header->e_shstrndx);
-    return (char*)header + shdr->sh_offset;
+char *elf_str_table(struct elf_header *header) {
+    struct elf32_shdr *shdr = elf_section(header, header->e_shstrndx);
+    return (char *)header + shdr->sh_offset;
 }
 
 /**
@@ -157,7 +157,7 @@ char* elf_str_table(struct elf_header* header) {
  * @param file The ELF file structure.
  * @return Pointer to the virtual base address.
  */
-void* elf_virtual_base(struct elf_file* file) {
+void *elf_virtual_base(struct elf_file *file) {
     return file->virtual_base_address;
 }
 
@@ -167,7 +167,7 @@ void* elf_virtual_base(struct elf_file* file) {
  * @param file The ELF file structure.
  * @return Pointer to the virtual end address.
  */
-void* elf_virtual_end(struct elf_file* file) {
+void *elf_virtual_end(struct elf_file *file) {
     return file->virtual_end_address;
 }
 
@@ -177,7 +177,7 @@ void* elf_virtual_end(struct elf_file* file) {
  * @param file The ELF file structure.
  * @return Pointer to the physical base address.
  */
-void* elf_phys_base(struct elf_file* file) {
+void *elf_phys_base(struct elf_file *file) {
     return file->physical_base_address;
 }
 
@@ -187,18 +187,18 @@ void* elf_phys_base(struct elf_file* file) {
  * @param file The ELF file structure.
  * @return Pointer to the physical end address.
  */
-void* elf_phys_end(struct elf_file* file) {
+void *elf_phys_end(struct elf_file *file) {
     return file->physical_end_address;
 }
 
 /**
  * @brief Retrieves the physical address of a program header.
- * 
+ *
  * @param file The ELF file structure.
  * @param phdr The program header structure.
  * @return Pointer to the physical address of the program header.
  */
-void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr) {
+void *elf_phdr_phys_address(struct elf_file *file, struct elf32_phdr *phdr) {
     return elf_memory(file) + phdr->p_offset;
 }
 
@@ -211,11 +211,11 @@ void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr) {
  * @param header The ELF header structure.
  * @return 0 if valid, otherwise negative.
  */
-static int elf_validate_loaded(struct elf_header* header) {
-    return (elf_valid_signature(header) &&
-            elf_valid_class(header) && 
-            elf_valid_encoding(header) && 
-            elf_has_program_header(header)) ? OK : -EINFORMAT;
+static int elf_validate_loaded(struct elf_header *header) {
+    return (elf_valid_signature(header) && elf_valid_class(header) && elf_valid_encoding(header) &&
+            elf_has_program_header(header))
+               ? OK
+               : -EINFORMAT;
 }
 
 /**
@@ -228,15 +228,15 @@ static int elf_validate_loaded(struct elf_header* header) {
  * @param phdr Pointer to the program header.
  * @return 0 on success, error code otherwise.
  */
-static int elf_process_phdr_pt_load(struct elf_file* elf_file, struct elf32_phdr* phdr) {
-    if (elf_file->virtual_base_address >= (void*) phdr->p_vaddr || elf_file->virtual_base_address == 0x00) {
-        elf_file->virtual_base_address = (void*) phdr->p_vaddr;
+static int elf_process_phdr_pt_load(struct elf_file *elf_file, struct elf32_phdr *phdr) {
+    if (elf_file->virtual_base_address >= (void *)phdr->p_vaddr || elf_file->virtual_base_address == 0x00) {
+        elf_file->virtual_base_address = (void *)phdr->p_vaddr;
         elf_file->physical_base_address = elf_memory(elf_file) + phdr->p_offset;
     }
 
     unsigned int end_virtual_address = phdr->p_vaddr + phdr->p_filesz;
-    if (elf_file->virtual_end_address <= (void*)(end_virtual_address) || elf_file->virtual_end_address == 0x00) {
-        elf_file->virtual_end_address = (void*) end_virtual_address;
+    if (elf_file->virtual_end_address <= (void *)(end_virtual_address) || elf_file->virtual_end_address == 0x00) {
+        elf_file->virtual_end_address = (void *)end_virtual_address;
         elf_file->physical_end_address = elf_memory(elf_file) + phdr->p_offset + phdr->p_filesz;
     }
 
@@ -253,12 +253,12 @@ static int elf_process_phdr_pt_load(struct elf_file* elf_file, struct elf32_phdr
  * @param phdr Pointer to the program header entry.
  * @return 0 on success, error code otherwise.
  */
-static int elf_process_pheader(struct elf_file* elf_file, struct elf32_phdr* phdr) {
+static int elf_process_pheader(struct elf_file *elf_file, struct elf32_phdr *phdr) {
     int res = 0;
-    switch(phdr->p_type) {
-        case PT_LOAD:
-            res = elf_process_phdr_pt_load(elf_file, phdr);
-            break;
+    switch (phdr->p_type) {
+    case PT_LOAD:
+        res = elf_process_phdr_pt_load(elf_file, phdr);
+        break;
     }
     return res;
 }
@@ -271,11 +271,11 @@ static int elf_process_pheader(struct elf_file* elf_file, struct elf32_phdr* phd
  * @param elf_file Pointer to the ELF file structure.
  * @return 0 on success, error code otherwise.
  */
-static int elf_process_pheaders(struct elf_file* elf_file) {
+static int elf_process_pheaders(struct elf_file *elf_file) {
     int res = 0;
-    struct elf_header* header = elf_header(elf_file);
-    for(int i = 0; i < header->e_phnum; i++) {
-        struct elf32_phdr* phdr = elf_program_header(header, i);
+    struct elf_header *header = elf_header(elf_file);
+    for (int i = 0; i < header->e_phnum; i++) {
+        struct elf32_phdr *phdr = elf_program_header(header, i);
         res = elf_process_pheader(elf_file, phdr);
         if (res < 0) {
             break;
@@ -292,9 +292,9 @@ static int elf_process_pheaders(struct elf_file* elf_file) {
  * @param elf_file Pointer to the ELF file structure.
  * @return 0 on success, error code otherwise.
  */
-int elf_process_loaded(struct elf_file* elf_file) {
+int elf_process_loaded(struct elf_file *elf_file) {
     int res = 0;
-    struct elf_header* header = elf_header(elf_file);
+    struct elf_header *header = elf_header(elf_file);
     res = elf_validate_loaded(header);
     if (res < 0) {
         goto out;
@@ -318,8 +318,8 @@ out:
  * @param file_out Pointer to store the loaded ELF file structure.
  * @return 0 on success, error code otherwise.
  */
-int elf_load(const char* filename, struct elf_file** file_out) {
-    struct elf_file* elf_file = kzalloc(sizeof(struct elf_file));
+int elf_load(const char *filename, struct elf_file **file_out) {
+    struct elf_file *elf_file = kzalloc(sizeof(struct elf_file));
     int fd = 0;
     int res = fopen(filename, "r");
     if (res <= 0) {
@@ -341,7 +341,7 @@ int elf_load(const char* filename, struct elf_file** file_out) {
     }
 
     res = elf_process_loaded(elf_file);
-    if(res < 0) {
+    if (res < 0) {
         goto out;
     }
 
@@ -359,7 +359,7 @@ out:
  *
  * @param file Pointer to the ELF file structure to free.
  */
-void elf_close(struct elf_file* file) {
+void elf_close(struct elf_file *file) {
     if (!file) {
         return;
     }

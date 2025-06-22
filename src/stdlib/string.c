@@ -27,8 +27,8 @@ char tolower(char s1) {
  * @param src Pointer to the source string.
  * @return A pointer to the destination buffer.
  */
-char* strcpy(char* dest, const char* src) {
-    char* res = dest;
+char *strcpy(char *dest, const char *src) {
+    char *res = dest;
 
     while (*src != 0) {
         *dest = *src;
@@ -44,16 +44,16 @@ char* strcpy(char* dest, const char* src) {
 
 /**
  * @brief Concatenates two strings.
- * 
+ *
  * This function appends the null-terminated string src to the end of the null-terminated
  * string dest, overwriting the null character at the end of dest, and then adds a terminating
  * null character.
- * 
+ *
  * @param dest Pointer to the destination buffer.
  * @param src Pointer to the source string.
  * @return The length of the concatenated string.
  */
-int strcat(char* dest, const char* src) {
+int strcat(char *dest, const char *src) {
     int i = 0;
     int j = 0;
 
@@ -108,9 +108,9 @@ char *strncpy(char *dest, const char *src, int n) {
  * @param ptr Pointer to the null-terminated string.
  * @return The length of the string.
  */
-int strlen(const char* ptr) {
+int strlen(const char *ptr) {
     int i = 0;
-    
+
     while (*ptr != 0) {
         i++;
         ptr += 1;
@@ -129,7 +129,7 @@ int strlen(const char* ptr) {
  * @param max The maximum number of characters to count.
  * @return The length of the string, or max if the string is longer than max characters.
  */
-int strnlen(const char* ptr, int max) {
+int strnlen(const char *ptr, int max) {
     int i = 0;
     for (i = 0; i < max; i++) {
         if (ptr[i] == 0) {
@@ -151,7 +151,7 @@ int strnlen(const char* ptr, int max) {
  * @param terminator The character that terminates the counting.
  * @return The length of the string up to the terminator or max, whichever is smaller.
  */
-int strnlen_terminator(const char* str, int max, char terminator) {
+int strnlen_terminator(const char *str, int max, char terminator) {
     for (int i = 0; i < max; i++) {
         if (str[i] == '\0' || str[i] == terminator) {
             return i;
@@ -163,11 +163,11 @@ int strnlen_terminator(const char* str, int max, char terminator) {
 
 /**
  * @brief Converts an integer to a string.
- * 
+ *
  * @param i The integer to convert.
  * @return char* The string representation of the integer.
  */
-char* itoa(int i) {
+char *itoa(int i) {
     static char text[12];
     int loc = 11;
     text[11] = 0;
@@ -178,7 +178,7 @@ char* itoa(int i) {
         i = -i;
     }
 
-    while(i) {
+    while (i) {
         text[--loc] = '0' - (i % 10);
         i /= 10;
     }
@@ -231,7 +231,7 @@ bool is_digit(char c) {
  * @return An integer less than, equal to, or greater than zero if s1 is found,
  *         respectively, to be less than, to match, or to be greater than s2.
  */
-int istrncmp(const char* s1, const char* s2, int n) {
+int istrncmp(const char *s1, const char *s2, int n) {
     unsigned char u1, u2;
 
     while (n-- > 0) {
@@ -242,7 +242,7 @@ int istrncmp(const char* s1, const char* s2, int n) {
             return -1;
         }
 
-        if (u1 == '\0') {   
+        if (u1 == '\0') {
             return 0;
         }
     }
@@ -263,7 +263,7 @@ int istrncmp(const char* s1, const char* s2, int n) {
  * @return An integer less than, equal to, or greater than zero if str1 is found,
  *         respectively, to be less than, to match, or to be greater than str2.
  */
-int strncmp(const char* str1, const char* str2, int n) {
+int strncmp(const char *str1, const char *str2, int n) {
     if (!str1 || !str2 || n == 0) {
         return -1;
     }

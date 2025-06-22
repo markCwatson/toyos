@@ -7,41 +7,41 @@
 struct interrupt_frame;
 
 // Function pointer type for interrupt service routines (ISRs)
-typedef void* (*sys_cmd_fp)(struct interrupt_frame* frame);
+typedef void *(*sys_cmd_fp)(struct interrupt_frame *frame);
 
 // Function pointer type for interrupt handlers
 typedef void (*interrupt_cb_fp)();
 
 /**
  * @brief Structure representing an entry in the interrupt descriptor table (IDT)
- * 
+ *
  * The IDT is an array of these structures, each representing a single interrupt or exception
  * that the CPU can raise. Each entry contains the address of the interrupt handler function
  * that should be called when the interrupt occurs, as well as some other information.
  */
 struct idt_desc {
-    uint16_t offset_1;      // Offset bits 0 - 15
-    uint16_t selector;      // Selector thats in our GDT
-    uint8_t zero;           // Does nothing, unused set to zero
-    uint8_t type_attr;      // Descriptor type and attributes
-    uint16_t offset_2;      // Offset bits 16-31
+    uint16_t offset_1;  // Offset bits 0 - 15
+    uint16_t selector;  // Selector thats in our GDT
+    uint8_t zero;       // Does nothing, unused set to zero
+    uint8_t type_attr;  // Descriptor type and attributes
+    uint16_t offset_2;  // Offset bits 16-31
 } __attribute__((packed));
 
 /**
  * @brief Structure representing the interrupt descriptor table register (IDTR)
- * 
+ *
  * The IDTR is a special register that holds the base address and size of the interrupt
  * descriptor table. When an interrupt occurs, the CPU uses this information to find the
  * correct interrupt handler in the IDT.
  */
 struct idtr_desc {
-    uint16_t limit;         // Size of descriptor table -1
-    uint32_t base;          // Base address of the start of the interrupt descriptor table
+    uint16_t limit;  // Size of descriptor table -1
+    uint32_t base;   // Base address of the start of the interrupt descriptor table
 } __attribute__((packed));
 
 /**
  * @brief Structure representing the state of the CPU when an interrupt occurs
- * 
+ *
  * When an interrupt occurs, the CPU pushes the state of the current process onto the stack
  * before calling the interrupt handler. This structure represents the state that is pushed
  * onto the stack, which includes the values of the general-purpose registers, the instruction
@@ -65,11 +65,11 @@ struct interrupt_frame {
 
 /**
  * @brief Registers a system call handler function
- * 
+ *
  * This function registers a system call handler function for the given system call number.
  * When the system call interrupt occurs, the handler function will be called to handle the
  * system call.
- * 
+ *
  * @param cmd The system call number.
  * @param handler The system call handler function.
  * @return void
@@ -78,9 +78,9 @@ void register_sys_command(int cmd, sys_cmd_fp handler);
 
 /**
  * @brief Registers an interrupt callback function
- * 
+ *
  * This function registers an interrupt callback function for the given interrupt number.
- * 
+ *
  * @param interrupt The interrupt number.
  * @param interrupt_cb The interrupt callback function.
  * @return 0 on success, error code on failure.

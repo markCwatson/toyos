@@ -6,18 +6,18 @@ struct interrupt_frame;
 
 /**
  * @brief Allocates memory on the heap.
- * 
+ *
  * @param frame The interrupt frame.
  * @return void* The address of the allocated memory.
  */
-void* sys_command4_malloc(struct interrupt_frame* frame);
+void *sys_command4_malloc(struct interrupt_frame *frame);
 
 /**
  * @brief Frees memory on the heap.
- * 
+ *
  * @param frame The interrupt frame.
  * @return void* The address of the allocated memory.
  */
-void* sys_command5_free(struct interrupt_frame* frame);
+void *sys_command5_free(struct interrupt_frame *frame);
 
 #endif

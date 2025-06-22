@@ -7,19 +7,20 @@
  */
 
 #include "ps2.h"
-#include "keyboard/keyboard.h"
-#include "io/io.h"
-#include "status.h"
-#include "kernel.h"
 #include "idt/idt.h"
+#include "io/io.h"
+#include "kernel.h"
+#include "keyboard/keyboard.h"
+#include "status.h"
 #include "task/task.h"
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief Initializes the PS/2 keyboard.
  *
- * This function sends a command to the PS/2 controller to enable the first PS/2 port, which is typically used for the keyboard.
+ * This function sends a command to the PS/2 controller to enable the first PS/2 port, which is typically used for the
+ * keyboard.
  *
  * @return Returns OK (0) on success.
  */
@@ -36,29 +37,18 @@ void ps2_keyboard_handle_interrupt(void);
  * This array contains the mapping from scan codes to ASCII characters for the PS/2 keyboard's Set 1 scan code set.
  */
 static uint8_t keyboard_scan_set_one[] = {
-    0x00, 0x1b, '1', '2', '3', '4', '5',
-    '6', '7', '8', '9', '0', '-', '=',
-    0x08, '\t', 'Q', 'W', 'E', 'R', 'T',
-    'Y', 'U', 'I', 'O', 'P', '[', ']',
-    0x0d, 0x00, 'A', 'S', 'D', 'F', 'G',
-    'H', 'J', 'K', 'L', ';', '\'', '`', 
-    0x00, '\\', 'Z', 'X', 'C', 'V', 'B',
-    'N', 'M', ',', '.', '/', 0x00, '*',
-    0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, '7', '8', '9', '-', '4', '5',
-    '6', '+', '1', '2', '3', '0', '.'
-};
+    0x00, 0x1b, '1', '2',  '3', '4',  '5',  '6',  '7',  '8',  '9',  '0',  '-',  '=',  0x08, '\t', 'Q',
+    'W',  'E',  'R', 'T',  'Y', 'U',  'I',  'O',  'P',  '[',  ']',  0x0d, 0x00, 'A',  'S',  'D',  'F',
+    'G',  'H',  'J', 'K',  'L', ';',  '\'', '`',  0x00, '\\', 'Z',  'X',  'C',  'V',  'B',  'N',  'M',
+    ',',  '.',  '/', 0x00, '*', 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, '7',  '8', '9',  '-', '4',  '5',  '6',  '+',  '1',  '2',  '3',  '0',  '.'};
 
 /**
  * @brief PS/2 keyboard structure definition.
  *
  * This structure defines the PS/2 keyboard, including its name and initialization function.
  */
-struct keyboard ps2_keyboard = {
-    .name = {"ps2"},
-    .init = ps2_keyboard_init
-};
+struct keyboard ps2_keyboard = {.name = {"ps2"}, .init = ps2_keyboard_init};
 
 /**
  * @brief Initializes the PS/2 keyboard.
@@ -110,13 +100,14 @@ void ps2_keyboard_handle_interrupt(void) {
     scancode = insb(PS2_KEYBOARD_INPUT_PORT);
     insb(PS2_KEYBOARD_INPUT_PORT);
 
-    if(scancode & PS2_KEYBOARD_KEY_RELEASED) {
+    if (scancode & PS2_KEYBOARD_KEY_RELEASED) {
         return;
     }
 
     if (scancode == PS2_KEYBOARD_CAPSLOCK) {
         keyboard_capslock_state old_state = keyboard_get_capslock(&ps2_keyboard);
-        keyboard_set_capslock(&ps2_keyboard, old_state == KEYBOARD_CAPS_LOCK_ON ? KEYBOARD_CAPS_LOCK_OFF : KEYBOARD_CAPS_LOCK_ON);
+        keyboard_set_capslock(&ps2_keyboard,
+                              old_state == KEYBOARD_CAPS_LOCK_ON ? KEYBOARD_CAPS_LOCK_OFF : KEYBOARD_CAPS_LOCK_ON);
     }
 
     uint8_t c = ps2_keyboard_scancode_to_char(scancode);
@@ -129,9 +120,9 @@ void ps2_keyboard_handle_interrupt(void) {
 
 /**
  * @brief Registers the PS/2 keyboard with the keyboard system.
- * 
+ *
  * This function registers the PS/2 keyboard with the keyboard system, allowing it to be used for input.
- * 
+ *
  * @return 0 on success, error code on failure.
  */
 int ps2_register(void) {

@@ -11,6 +11,6 @@
  *
  * @return A pointer to the initialized filesystem structure.
  */
-struct filesystem* fat16_init(void);
+struct filesystem *fat16_init(void);
 
 #endif

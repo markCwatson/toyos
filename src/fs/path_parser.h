@@ -8,8 +8,8 @@
  * For example, in the path "0:/tmp/file.txt", "0:/" would be the first part.
  */
 struct path_root {
-    int drive_no;                 /**< The drive number (e.g., 0 for "0:/"). */
-    struct path_part* first;      /**< Pointer to the first part of the path. */
+    int drive_no;            /**< The drive number (e.g., 0 for "0:/"). */
+    struct path_part *first; /**< Pointer to the first part of the path. */
 };
 
 /**
@@ -19,8 +19,8 @@ struct path_root {
  * For example, in the path "0:/tmp/file.txt", "tmp/" and "file.txt" are parts.
  */
 struct path_part {
-    const char* part;             /**< The current part of the path (e.g., "tmp/"). */
-    struct path_part* next;       /**< Pointer to the next part of the path. */
+    const char *part;       /**< The current part of the path (e.g., "tmp/"). */
+    struct path_part *next; /**< Pointer to the next part of the path. */
 };
 
 /**
@@ -34,7 +34,7 @@ struct path_part {
  * @param current_directory_path The current directory path, used if the provided path is relative.
  * @return A pointer to a `path_root` structure representing the parsed path, or NULL if parsing fails.
  */
-struct path_root* path_parser_parse(const char* path, const char* current_directory_path);
+struct path_root *path_parser_parse(const char *path, const char *current_directory_path);
 
 /**
  * @brief Frees the memory allocated for a parsed path.
@@ -45,6 +45,6 @@ struct path_root* path_parser_parse(const char* path, const char* current_direct
  *
  * @param root The `path_root` structure to free.
  */
-void path_parser_free(struct path_root* root);
+void path_parser_free(struct path_root *root);
 
 #endif

@@ -1,11 +1,11 @@
 #include "terminal.h"
-#include "stdlib/string.h"
 #include "io/io.h"
+#include "stdlib/string.h"
 #include <stddef.h>
 #include <stdint.h>
 
 // Base address of the VGA video memory
-static uint16_t* video_mem = NULL;
+static uint16_t *video_mem = NULL;
 
 // Current position of the cursor in terms of row and column
 static uint16_t terminal_row = 0;
@@ -16,10 +16,10 @@ static uint16_t screen_buffer[VGA_HEIGHT][VGA_WIDTH];
 
 /**
  * @brief Reads the current cursor position from the VGA hardware.
- * 
+ *
  * This function reads the current cursor position from the VGA hardware and returns
  * the position as a 16-bit value.
- * 
+ *
  * @return The current cursor position.
  */
 uint16_t terminal_get_cursor_position(void) {
@@ -35,34 +35,34 @@ uint16_t terminal_get_cursor_position(void) {
  * @brief Disables the VGA hardware cursor.
  */
 static void terminal_disable_cursor(void) {
-	outb(VGA_CMD_PORT, 0x0a);
-	outb(VGA_DATA_PORT, 0x20);
+    outb(VGA_CMD_PORT, 0x0a);
+    outb(VGA_DATA_PORT, 0x20);
 }
 
 /**
  * @brief Enables the VGA hardware cursor.
- * 
+ *
  * This function enables the VGA hardware cursor by setting the cursor start and end
  * scanlines. The cursor start and end values are the scanlines that define the cursor shape.
- * 
+ *
  * @example values of 15 and 15 create an underline cursor.
- * 
+ *
  * @param cursor_start The scanline where the cursor starts.
  * @param cursor_end The scanline where the cursor ends.
  */
 static void terminal_enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
     // Set cursor start scanline register
-	outb(VGA_CMD_PORT, 0x0a);
-	outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xc0) | cursor_start);
+    outb(VGA_CMD_PORT, 0x0a);
+    outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xc0) | cursor_start);
 
     // Set cursor end scanline register
-	outb(VGA_CMD_PORT, 0x0b);
-	outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xe0) | cursor_end);
+    outb(VGA_CMD_PORT, 0x0b);
+    outb(VGA_DATA_PORT, (insb(VGA_DATA_PORT) & 0xe0) | cursor_end);
 }
 
 /**
  * @brief Updates the hardware cursor to the current position.
- * 
+ *
  * This function sets the VGA hardware cursor to the position specified by
  * the global variables terminal_row and terminal_col.
  */
@@ -200,7 +200,7 @@ update:
 
 /**
  * @brief Deletes the last character written to the terminal.
- * 
+ *
  * This function moves the cursor back by one position and writes a space character
  * to erase the last character written to the terminal.
  */
@@ -221,7 +221,7 @@ void terminal_backspace(void) {
 
 /**
  * @brief Clears the terminal screen.
- * 
+ *
  * This function clears the entire terminal screen by writing spaces with the default color
  * to each character cell.
  */
@@ -246,7 +246,7 @@ void terminal_clear_all(void) {
  */
 void terminal_init(void) {
     // VGA text mode memory address starts at 0xb8000
-    video_mem = (uint16_t*)(0xb8000);
+    video_mem = (uint16_t *)(0xb8000);
     terminal_enable_cursor(15, 15);
-    terminal_clear_all(); 
+    terminal_clear_all();
 }

@@ -8,10 +8,10 @@
 #include "./task/process.h"
 
 // For testing purposes
-static void* sys_command0_test(struct interrupt_frame* frame) {
+static void *sys_command0_test(struct interrupt_frame *frame) {
     int a = (int)task_get_stack_item(task_current(), 0);
     int b = (int)task_get_stack_item(task_current(), 1);
-    return (void*)(a + b);
+    return (void *)(a + b);
 }
 
 /**

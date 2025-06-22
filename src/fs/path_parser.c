@@ -1,10 +1,10 @@
 #include "path_parser.h"
-#include "kernel.h"
 #include "config.h"
-#include "stdlib/string.h"
+#include "kernel.h"
 #include "memory/heap/kheap.h"
 #include "memory/memory.h"
 #include "status.h"
+#include "stdlib/string.h"
 
 /**
  * @brief Checks if the given filename has a valid path format.
@@ -15,9 +15,9 @@
  * @param filename The path string to check.
  * @return 1 if the path is valid, 0 otherwise.
  */
-static int path_parser_path_valid_format(const char* filename) {
+static int path_parser_path_valid_format(const char *filename) {
     int len = strnlen(filename, TOYOS_MAX_PATH);
-    return (len >= 3 && is_digit(filename[0]) && memcmp((void*)&filename[1], ":/", 2) == 0);
+    return (len >= 3 && is_digit(filename[0]) && memcmp((void *)&filename[1], ":/", 2) == 0);
 }
 
 /**
@@ -29,7 +29,7 @@ static int path_parser_path_valid_format(const char* filename) {
  * @param path A pointer to the path string.
  * @return The drive number, or -EBADPATH if the format is invalid.
  */
-static int path_parser_get_drive_by_path(const char** path) {
+static int path_parser_get_drive_by_path(const char **path) {
     if (!path_parser_path_valid_format(*path)) {
         return -EBADPATH;
     }
@@ -46,8 +46,8 @@ static int path_parser_get_drive_by_path(const char** path) {
  * @param drive_number The drive number to set in the path_root.
  * @return A pointer to the newly created path_root, or NULL if memory allocation fails.
  */
-static struct path_root* path_parser_create_root(int drive_number) {
-    struct path_root* path_r = kzalloc(sizeof(struct path_root));
+static struct path_root *path_parser_create_root(int drive_number) {
+    struct path_root *path_r = kzalloc(sizeof(struct path_root));
     if (!path_r) {
         return NULL;
     }
@@ -67,9 +67,9 @@ static struct path_root* path_parser_create_root(int drive_number) {
  * @param path A pointer to the path string. This pointer is updated to point to the next segment.
  * @return A string representing the next path part, or NULL if allocation fails or the path part is empty.
  */
-static const char* path_parser_get_path_part(const char** path) {
+static const char *path_parser_get_path_part(const char **path) {
     int i = 0;
-    char* result_path_part = kzalloc(TOYOS_MAX_PATH);
+    char *result_path_part = kzalloc(TOYOS_MAX_PATH);
     if (!result_path_part) {
         return NULL;
     }
@@ -105,13 +105,13 @@ static const char* path_parser_get_path_part(const char** path) {
  * @param path A pointer to the path string. This pointer is updated to point to the next segment.
  * @return A pointer to the newly created path_part, or NULL if parsing or allocation fails.
  */
-struct path_part* path_parser_parse_path_part(struct path_part* last_part, const char** path) {
-    const char* path_part_str = path_parser_get_path_part(path);
+struct path_part *path_parser_parse_path_part(struct path_part *last_part, const char **path) {
+    const char *path_part_str = path_parser_get_path_part(path);
     if (!path_part_str) {
         return NULL;
     }
 
-    struct path_part* part = kzalloc(sizeof(struct path_part));
+    struct path_part *part = kzalloc(sizeof(struct path_part));
     if (!part) {
         return NULL;
     }
@@ -135,12 +135,12 @@ struct path_part* path_parser_parse_path_part(struct path_part* last_part, const
  *
  * @param root The path_root structure to free.
  */
-void path_parser_free(struct path_root* root) {
-    struct path_part* part = root->first;
+void path_parser_free(struct path_root *root) {
+    struct path_part *part = root->first;
 
     while (part) {
-        struct path_part* next_part = part->next;
-        kfree((void*) part->part);
+        struct path_part *next_part = part->next;
+        kfree((void *)part->part);
         kfree(part);
         part = next_part;
     }
@@ -159,9 +159,9 @@ void path_parser_free(struct path_root* root) {
  * @param current_directory_path The current directory path, used if the provided path is relative.
  * @return A pointer to a path_root structure representing the parsed path, or NULL if parsing fails.
  */
-struct path_root* path_parser_parse(const char* path, const char* current_directory_path) {
-    const char* tmp_path = path;
-    struct path_root* path_root = NULL;
+struct path_root *path_parser_parse(const char *path, const char *current_directory_path) {
+    const char *tmp_path = path;
+    struct path_root *path_root = NULL;
 
     if (strlen(path) > TOYOS_MAX_PATH) {
         goto out;
@@ -179,17 +179,17 @@ struct path_root* path_parser_parse(const char* path, const char* current_direct
 
     // Add 3 bytes to skip drive number 0:/ 1:/ 2:/
     tmp_path += 3;
-    struct path_part* first_part = path_parser_parse_path_part(NULL, &tmp_path);
+    struct path_part *first_part = path_parser_parse_path_part(NULL, &tmp_path);
     if (!first_part) {
         goto out;
     }
 
     path_root->first = first_part;
-    struct path_part* part = path_parser_parse_path_part(first_part, &tmp_path);
+    struct path_part *part = path_parser_parse_path_part(first_part, &tmp_path);
     while (part) {
         part = path_parser_parse_path_part(part, &tmp_path);
     }
-    
+
 out:
     return path_root;
 }

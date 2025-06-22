@@ -104,6 +104,10 @@ and dump the contents of an ELF file, for example
 dumpelf programs/shell/shell.elf
 ```
 
+### AI Disclaimer
+
+Most of the code comments in this project were written by AI. I want this project to be well documented, and since most of the implementations of various features were obtained from tutorials and examples (believe it or not: I am not a professional OS developer), I used ChatGPT to add comments and explain what each thing is doing, to help us both (u and I), learn.
+
 ### References
 
 1. [Developing a Multithreaded Kernel From Scratch! by Daniel McCarthy](https://www.udemy.com/course/developing-a-multithreaded-kernel-from-scratch)

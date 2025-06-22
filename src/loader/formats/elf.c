@@ -9,8 +9,8 @@
  * @param elf_header A pointer to the ELF header structure.
  * @return A void pointer to the entry point address.
  */
-void* elf_get_entry_ptr(struct elf_header* elf_header) {
-    return (void*)elf_header->e_entry;
+void *elf_get_entry_ptr(struct elf_header *elf_header) {
+    return (void *)elf_header->e_entry;
 }
 
 /**
@@ -23,6 +23,6 @@ void* elf_get_entry_ptr(struct elf_header* elf_header) {
  * @param elf_header A pointer to the ELF header structure.
  * @return The entry point address as a 32-bit unsigned integer.
  */
-uint32_t elf_get_entry(struct elf_header* elf_header) {
+uint32_t elf_get_entry(struct elf_header *elf_header) {
     return elf_header->e_entry;
 }

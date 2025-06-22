@@ -2,8 +2,8 @@
 #define _KEYBOARD_H_
 
 // Flags for the caps lock key state
-#define KEYBOARD_CAPS_LOCK_ON   1
-#define KEYBOARD_CAPS_LOCK_OFF  0
+#define KEYBOARD_CAPS_LOCK_ON 1
+#define KEYBOARD_CAPS_LOCK_OFF 0
 
 /**
  * @typedef keyboard_capslock_state
@@ -27,7 +27,7 @@ struct keyboard {
     keyboard_init_fp init;                  /**< Function pointer to the keyboard initialization function. */
     char name[20];                          /**< The name of the keyboard device. */
     keyboard_capslock_state capslock_state; /**< The state of the caps lock key. */
-    struct keyboard* next;                  /**< Pointer to the next keyboard in a linked list. */
+    struct keyboard *next;                  /**< Pointer to the next keyboard in a linked list. */
 };
 
 /**
@@ -39,7 +39,7 @@ void keyboard_init(void);
  * @brief Handles backspace functionality for the given process.
  * @param process The process for which to handle backspace.
  */
-void keyboard_backspace(struct process* process);
+void keyboard_backspace(struct process *process);
 
 /**
  * @brief Pushes a character onto the keyboard buffer.
@@ -58,26 +58,27 @@ char keyboard_pop(void);
  * @param keyboard The keyboard to insert.
  * @return 0 on success, error code on failure.
  */
-int keyboard_insert(struct keyboard* keyboard);;
+int keyboard_insert(struct keyboard *keyboard);
+;
 
 /**
  * @brief Sets the state of the caps lock key for the given keyboard.
- * 
+ *
  * This function sets the state of the caps lock key for the given keyboard.
- * 
+ *
  * @param keyboard The keyboard device.
  * @param state The state of the caps lock key.
  */
-void keyboard_set_capslock(struct keyboard* keyboard, keyboard_capslock_state state);
+void keyboard_set_capslock(struct keyboard *keyboard, keyboard_capslock_state state);
 
 /**
  * @brief Retrieves the state of the caps lock key for the given keyboard.
- * 
+ *
  * This function retrieves the state of the caps lock key for the given keyboard.
- * 
+ *
  * @param keyboard The keyboard device.
  * @return The state of the caps lock key.
  */
-keyboard_capslock_state keyboard_get_capslock(struct keyboard* keyboard);
+keyboard_capslock_state keyboard_get_capslock(struct keyboard *keyboard);
 
 #endif
