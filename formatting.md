@@ -6,6 +6,13 @@ On MacOS:
 brew install clang-format
 ```
 
+On Linux
+
+```shell
+sudo apt update
+sudo apt install clang-format
+```
+
 Apply formatting
 
 ```shell
