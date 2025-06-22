@@ -83,16 +83,22 @@ Next, manually load symbol file at the specified address for debugging (because 
 (gdb) add-symbol-file "./build/kernelfull.o" 0x100000
 ```
 
-Connect to the 32-bit QEMU instance with GDB
+Start the QEMU instance with GDB server enabled on TCP port 1234 (in a separate terminal):
 
 ```shell
-(gdb) target remote | qemu-system-i386 \
+qemu-system-i386 \
     -hda ./bin/os.bin \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -monitor stdio \
     -m 32M \
-    -S -gdb stdio
+    -S -gdb tcp::1234
+```
+
+Then, in GDB, connect to the QEMU instance:
+
+```shell
+(gdb) target remote localhost:1234
 ```
 
 To debug user programs, use address `0x400000` for user space.

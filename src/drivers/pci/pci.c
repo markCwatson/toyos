@@ -35,7 +35,7 @@
 #define RTL8139_DEVICE_ID 0x8139  // RTL8139 Fast Ethernet
 
 // Global device registry
-#define PCI_MAX_DEVICES 1  // todo: one for now (RTL8139 only)
+#define PCI_MAX_DEVICES 16
 
 /**
  * @brief PCI class code names {O(1)} lookup table
@@ -252,12 +252,12 @@ int pci_enumerate_devices(void) {
                 pci_devices[pci_device_count] = device;
                 pci_device_count++;
 
-                printf("PCI %02x:%02x.%x - %04x:%04x (%s)\n", device.bus, device.device, device.function,
-                       device.vendor_id, device.device_id, pci_get_class_name(device.class_code));
+                printf("PCI %x:%x.%x - %x:%x (%s)\n", device.bus, device.device, device.function, device.vendor_id,
+                       device.device_id, pci_get_class_name(device.class_code));
 
                 if (device.vendor_id == RTL8139_VENDOR_ID && device.device_id == RTL8139_DEVICE_ID) {
                     printf("*** Found RTL8139 Network Card! ***\n");
-                    printf("    I/O Base: 0x%08x\n", device.bar[0] & 0xFFFFFFFC);
+                    printf("    I/O Base: 0x%x\n", device.bar[0] & 0xFFFFFFFC);
                     printf("    IRQ Line: %i\n", device.interrupt_line);
                 }
 
