@@ -71,4 +71,23 @@ uint32_t pci_config_read_32(uint8_t bus, uint8_t device, uint8_t function, uint8
  */
 void pci_config_write_32(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset, uint32_t value);
 
+/**
+ * @brief Find a PCI device by vendor and device ID
+ *
+ * @param vendor_id Vendor ID to search for
+ * @param device_id Device ID to search for
+ * @return Pointer to device if found, NULL otherwise
+ */
+struct pci_device *pci_find_device(uint16_t vendor_id, uint16_t device_id);
+
+/**
+ * @brief Find devices by class code
+ *
+ * @param class_code PCI class code to search for
+ * @param devices Array to store found devices
+ * @param max_devices Maximum number of devices to return
+ * @return Number of devices found
+ */
+int pci_find_devices_by_class(uint8_t class_code, struct pci_device *devices, int max_devices);
+
 #endif

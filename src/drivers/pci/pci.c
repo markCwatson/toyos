@@ -34,6 +34,9 @@
 #define RTL8139_VENDOR_ID 0x10EC  // RealTek
 #define RTL8139_DEVICE_ID 0x8139  // RTL8139 Fast Ethernet
 
+// Global device registry
+#define PCI_MAX_DEVICES 1  // todo: one for now (RTL8139 only)
+
 /**
  * @brief PCI class code names {O(1)} lookup table
  */
@@ -115,64 +118,25 @@ union pci_config_address {
     } __attribute__((packed));
 };
 
-/**
- * @brief Read a 32-bit value from PCI configuration space
- *
- * This function constructs the proper PCI configuration address and
- * reads the 32-bit value from the specified configuration register.
- *
- * @param bus PCI bus number (0-255)
- * @param device PCI device number (0-31)
- * @param function PCI function number (0-7)
- * @param offset Register offset (must be 4-byte aligned)
- * @return 32-bit value from configuration space
- */
-uint32_t pci_config_read_32(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset) {
-    union pci_config_address addr;
-
-    // Construct the PCI configuration address
-    addr.raw = 0;
-    addr.enable = 1;
-    addr.bus = bus;
-    addr.device = device;
-    addr.function = function;
-    addr.offset = offset & 0xFC;  // Ensure 4-byte alignment
-
-    // Write the address to the PCI configuration address port
-    outl(PCI_CONFIG_ADDRESS, addr.raw);
-
-    // Read the data from the PCI configuration data port
-    return insl(PCI_CONFIG_DATA);
-}
+// Global variables for PCI devices
+struct pci_device pci_devices[PCI_MAX_DEVICES];
+int pci_device_count = 0;
 
 /**
- * @brief Write a 32-bit value to PCI configuration space
+ * @brief Get class name string for display
  *
- * This function constructs the proper PCI configuration address and
- * writes the 32-bit value to the specified configuration register.
+ * This function returns a string describing the device class based on
+ * the provided class code. It uses a static lookup table to map class
+ * codes to human-readable names.
  *
- * @param bus PCI bus number (0-255)
- * @param device PCI device number (0-31)
- * @param function PCI function number (0-7)
- * @param offset Register offset (must be 4-byte aligned)
- * @param value 32-bit value to write
+ * @param class_code PCI class code
+ * @return String describing the device class
  */
-void pci_config_write_32(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset, uint32_t value) {
-    union pci_config_address addr;
-
-    // Construct the PCI configuration address
-    addr.raw = 0;
-    addr.enable = 1;
-    addr.bus = bus;
-    addr.device = device;
-    addr.function = function;
-    addr.offset = offset & 0xFC;  // Ensure 4-byte alignment
-
-    // Write the address to the PCI configuration address port
-    outl(PCI_CONFIG_ADDRESS, addr.raw);
-
-    // Write the data to the PCI configuration data port
-    outl(PCI_CONFIG_DATA, value);
+static const char *pci_get_class_name(uint8_t class_code) {
+    if (class_code < PCI_CLASS_NAMES_COUNT) {
+        return pci_class_names[class_code];
+    }
+    return "Unknown";
 }
 
 /**
@@ -239,31 +203,45 @@ static int pci_read_device_info(uint8_t bus, uint8_t device, uint8_t function, s
     return 0;
 }
 
-/**
- * @brief Get class name string for display
- *
- * @param class_code PCI class code
- * @return String describing the device class
- */
-static const char *pci_get_class_name(uint8_t class_code) {
-    if (class_code < PCI_CLASS_NAMES_COUNT) {
-        return pci_class_names[class_code];
-    }
-    return "Unknown";
+uint32_t pci_config_read_32(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset) {
+    union pci_config_address addr;
+
+    // Construct the PCI configuration address
+    addr.raw = 0;
+    addr.enable = 1;
+    addr.bus = bus;
+    addr.device = device;
+    addr.function = function;
+    addr.offset = offset & 0xFC;  // Ensure 4-byte alignment
+
+    // Write the address to the PCI configuration address port
+    outl(PCI_CONFIG_ADDRESS, addr.raw);
+
+    // Read the data from the PCI configuration data port
+    return insl(PCI_CONFIG_DATA);
 }
 
-/**
- * @brief Enumerate all PCI devices
- *
- * This function scans all possible PCI bus/device/function combinations
- * to discover available PCI devices. It prints information about each
- * device found and specifically highlights the RTL8139 network card.
- *
- * @return Number of devices found
- */
+void pci_config_write_32(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset, uint32_t value) {
+    union pci_config_address addr;
+
+    // Construct the PCI configuration address
+    addr.raw = 0;
+    addr.enable = 1;
+    addr.bus = bus;
+    addr.device = device;
+    addr.function = function;
+    addr.offset = offset & 0xFC;  // Ensure 4-byte alignment
+
+    // Write the address to the PCI configuration address port
+    outl(PCI_CONFIG_ADDRESS, addr.raw);
+
+    // Write the data to the PCI configuration data port
+    outl(PCI_CONFIG_DATA, value);
+}
+
 int pci_enumerate_devices(void) {
     struct pci_device device;
-    int device_count = 0;
+    pci_device_count = 0;
 
     printf("Enumerating PCI devices...\n");
 
@@ -271,7 +249,11 @@ int pci_enumerate_devices(void) {
         for (int dev = 0; dev < PCI_MAX_DEVICE; dev++) {
             // Check function 0 first
             if (pci_read_device_info(bus, dev, 0, &device) == 0) {
-                device_count++;
+                pci_devices[pci_device_count] = device;
+                pci_device_count++;
+
+                printf("PCI %02x:%02x.%x - %04x:%04x (%s)\n", device.bus, device.device, device.function,
+                       device.vendor_id, device.device_id, pci_get_class_name(device.class_code));
 
                 if (device.vendor_id == RTL8139_VENDOR_ID && device.device_id == RTL8139_DEVICE_ID) {
                     printf("*** Found RTL8139 Network Card! ***\n");
@@ -284,6 +266,26 @@ int pci_enumerate_devices(void) {
         }
     }
 
-    printf("PCI enumeration complete. Found %d devices.\n", device_count);
-    return device_count;
+    printf("PCI enumeration complete. Found %d devices.\n", pci_device_count);
+    return pci_device_count;
+}
+
+struct pci_device *pci_find_device(uint16_t vendor_id, uint16_t device_id) {
+    for (int i = 0; i < pci_device_count; i++) {
+        if (pci_devices[i].vendor_id == vendor_id && pci_devices[i].device_id == device_id) {
+            return &pci_devices[i];
+        }
+    }
+    return NULL;  // Not found
+}
+
+int pci_find_devices_by_class(uint8_t class_code, struct pci_device *devices, int max_devices) {
+    int found = 0;
+    for (int i = 0; i < pci_device_count && found < max_devices; i++) {
+        if (pci_devices[i].class_code == class_code) {
+            devices[found] = pci_devices[i];
+            found++;
+        }
+    }
+    return found;
 }
