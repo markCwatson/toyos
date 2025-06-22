@@ -34,6 +34,14 @@ int ctoi(char c);
 char *itoa(int i);
 
 /**
+ * @brief Converts an unsigned integer to a hexadecimal string.
+ *
+ * @param i The unsigned integer to convert.
+ * @return char* The string representation of the integer.
+ */
+char *itoa_hex(unsigned int i);
+
+/**
  * @brief Checks if a character is a digit.
  *
  * This function determines whether the given character is a numeric digit ('0' to '9').
