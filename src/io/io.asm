@@ -12,6 +12,8 @@ global insb               ; Make the insb function accessible from other files.
 global insw               ; Make the insw function accessible from other files.
 global outb               ; Make the outb function accessible from other files.
 global outw               ; Make the outw function accessible from other files.
+global insl               ; Make the insl function accessible from other files.
+global outl               ; Make the outl function accessible from other files.
 
 ; Function: insb
 ; Description: Reads a byte from the specified I/O port.
@@ -43,6 +45,21 @@ insw:
     pop ebp               ; Restore the base pointer.
     ret                   ; Return, with the result in AX.
 
+; Function: insl
+; Description: Reads a double word (4 bytes) from the specified I/O port.
+; Parameters: port - The I/O port address.
+; Returns: The double word read from the port (in the EAX register).
+insl:
+    push ebp              ; Save the base pointer.
+    mov ebp, esp          ; Set the base pointer to the current stack pointer.
+
+    xor eax, eax          ; Clear EAX register (ensuring EAX is zeroed).
+    mov edx, [ebp+8]      ; Load the port number from the stack into EDX.
+    in eax, dx            ; Read a double word from the port into EAX.
+
+    pop ebp               ; Restore the base pointer.
+    ret                   ; Return, with the result in EAX.
+
 ; Function: outb
 ; Description: Writes a byte to the specified I/O port.
 ; Parameters: port - The I/O port address.
@@ -69,6 +86,21 @@ outw:
     mov eax, [ebp+12]     ; Load the value to output from the stack into EAX.
     mov edx, [ebp+8]      ; Load the port number from the stack into EDX.
     out dx, ax            ; Write the word in AX to the port.
+
+    pop ebp               ; Restore the base pointer.
+    ret                   ; Return.
+
+; Function: outl
+; Description: Writes a double word (4 bytes) to the specified I/O port.
+; Parameters: port - The I/O port address.
+;             val  - The double word to write.
+outl:
+    push ebp              ; Save the base pointer.
+    mov ebp, esp          ; Set the base pointer to the current stack pointer.
+
+    mov eax, [ebp+12]     ; Load the value to output from the stack into EAX.
+    mov edx, [ebp+8]      ; Load the port number from the stack into EDX.
+    out dx, eax           ; Write the double word in EAX to the port.
 
     pop ebp               ; Restore the base pointer.
     ret                   ; Return.

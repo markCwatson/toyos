@@ -63,7 +63,12 @@ sudo apt install qemu-system-x86
 To run the kernel in the QEMU emulator without debugging, simply run the 32-bit x86 emulator
 
 ```shell
-qemu-system-i386 -hda ./bin/os.bin
+qemu-system-i386 \
+    -hda ./bin/os.bin \
+    -netdev user,id=net0,hostfwd=udp::8080-:7 \
+    -device rtl8139,netdev=net0 \
+    -monitor stdio \
+    -m 32M
 ```
 
 To debug with GDB, first start GDB
@@ -81,7 +86,13 @@ Next, manually load symbol file at the specified address for debugging (because 
 Connect to the 32-bit QEMU instance with GDB
 
 ```shell
-(gdb) target remote | qemu-system-i386 -hda ./bin/os.bin -S -gdb stdio
+(gdb) target remote | qemu-system-i386 \
+    -hda ./bin/os.bin \
+    -netdev user,id=net0,hostfwd=udp::8080-:7 \
+    -device rtl8139,netdev=net0 \
+    -monitor stdio \
+    -m 32M \
+    -S -gdb stdio
 ```
 
 To debug user programs, use address `0x400000` for user space.

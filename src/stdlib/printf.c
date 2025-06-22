@@ -54,6 +54,11 @@ int printf(const char *fmt, ...) {
             print(sval, COLOR_WHITE, COLOR_BLUE);
             break;
 
+        case 'x':
+            ival = va_arg(ap, int);
+            print(itoa_hex(ival), COLOR_WHITE, COLOR_BLUE);
+            break;
+
         default:
             terminal_writechar(*p, COLOR_WHITE, COLOR_BLUE);
             break;

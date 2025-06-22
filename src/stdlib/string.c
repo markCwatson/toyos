@@ -207,6 +207,30 @@ int ctoi(char c) {
 }
 
 /**
+ * @brief Converts an unsigned integer to a hexadecimal string.
+ *
+ * @param i The unsigned integer to convert.
+ * @return char* The string representation of the integer.
+ */
+char *itoa_hex(unsigned int i) {
+    static char text[12];
+    int loc = 11;
+    text[11] = 0;
+
+    if (i == 0) {
+        text[--loc] = '0';
+        return &text[loc];
+    }
+
+    while (i) {
+        text[--loc] = "0123456789ABCDEF"[i % 16];
+        i /= 16;
+    }
+
+    return &text[loc];
+}
+
+/**
  * @brief Checks if a character is a digit.
  *
  * Determines whether the given character is a numeric digit ('0' to '9').

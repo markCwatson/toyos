@@ -113,16 +113,47 @@ The Peripheral Component Interconnect (PCI) bus is a standard for connecting per
 
 **Why PCI Enumeration?**
 
-- Network cards are PCI devices with configurable addresses
-- Each device has a unique vendor/device ID combination
-- Configuration space contains resource requirements (I/O ports, memory, IRQ)
 - Modern systems can have hundreds of PCI devices
+- Each device has a unique vendor/device ID combination
+- Network cards are PCI devices with configurable addresses
+- Configuration space contains resource requirements (I/O ports, memory, IRQ)
 
 ### Implementation Plan
 
 #### Step 1.1: PCI Configuration Space Access
 
+**Requirements:**
+
+- Extend I/O subsystem with 32-bit operations (`insl` and `outl`)
+- Define PCI configuration space constants (ports 0xCF8/0xCFC, register offsets)
+- Create PCI data structures:
+  - `pci_device` struct holds essential information about each device
+  - `pci_config_header` gives exact layout of the configuration space
+  - `pci_config_address` union makes it easy to construct addresses for configuration space access
+
+**Implementation:**
+
+- `pci_config_read_32()` - constructs address, writes to 0xCF8, reads from 0xCFC
+- `pci_config_write_32()` - constructs address, writes to 0xCF8, writes to 0xCFC
+- Proper bit field handling for PCI address format (enable bit, bus/device/function encoding)
+
 #### Step 1.2: PCI Device Enumeration
+
+**Strategy:**
+
+- Brute force scan all possible bus/device/function combinations
+- Check vendor ID to determine if device exists (0xFFFF = no device)
+- Read essential device information into `pci_device` structure
+- Handle multifunction devices (check header type bit 7)
+- Specifically watch for RTL8139 (vendor 0x10EC, device 0x8139)
+
+**Implementation:**
+
+- `pci_read_device_info()` - populates device structure from config space
+- `pci_enumerate_devices()` - main enumeration loop
+- `pci_get_class_name()` - translates class codes to human-readable names
+- Triple nested loop: buses (0-255) -> devices (0-31) -> functions (0-7)
+- Special handling for RTL8139 detection with I/O base and IRQ reporting
 
 ### Notes
 
@@ -279,7 +310,6 @@ qemu-system-i386 \
     -device rtl8139,netdev=net0 \
     -monitor stdio \
     -m 32M
-
 ```
 
 The `hostfwd` option forwards UDP port 8080 on the host to port 7 in the guest. This allows testing the echo server from the host machine.
