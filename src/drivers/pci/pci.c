@@ -35,6 +35,32 @@
 #define RTL8139_DEVICE_ID 0x8139  // RTL8139 Fast Ethernet
 
 /**
+ * @brief PCI class code names {O(1)} lookup table
+ */
+static const char *pci_class_names[] = {
+    "Unclassified",             // 0x00
+    "Mass Storage",             // 0x01
+    "Network",                  // 0x02
+    "Display",                  // 0x03
+    "Multimedia",               // 0x04
+    "Memory",                   // 0x05
+    "Bridge",                   // 0x06
+    "Communication",            // 0x07
+    "System Peripheral",        // 0x08
+    "Input Device",             // 0x09
+    "Docking Station",          // 0x0A
+    "Processor",                // 0x0B
+    "Serial Bus",               // 0x0C
+    "Wireless",                 // 0x0D
+    "Intelligent I/O",          // 0x0E
+    "Satellite Communication",  // 0x0F
+    "Encryption/Decryption",    // 0x10
+    "Data Acquisition"          // 0x11
+};
+
+#define PCI_CLASS_NAMES_COUNT (sizeof(pci_class_names) / sizeof(pci_class_names[0]))
+
+/**
  * @brief PCI Configuration Space Header (Type 0)
  *
  * This represents the first 64 bytes of PCI configuration space
@@ -220,46 +246,10 @@ static int pci_read_device_info(uint8_t bus, uint8_t device, uint8_t function, s
  * @return String describing the device class
  */
 static const char *pci_get_class_name(uint8_t class_code) {
-    switch (class_code) {
-    case 0x00:
-        return "Unclassified";
-    case 0x01:
-        return "Mass Storage";
-    case 0x02:
-        return "Network";
-    case 0x03:
-        return "Display";
-    case 0x04:
-        return "Multimedia";
-    case 0x05:
-        return "Memory";
-    case 0x06:
-        return "Bridge";
-    case 0x07:
-        return "Communication";
-    case 0x08:
-        return "System Peripheral";
-    case 0x09:
-        return "Input Device";
-    case 0x0A:
-        return "Docking Station";
-    case 0x0B:
-        return "Processor";
-    case 0x0C:
-        return "Serial Bus";
-    case 0x0D:
-        return "Wireless";
-    case 0x0E:
-        return "Intelligent I/O";
-    case 0x0F:
-        return "Satellite Communication";
-    case 0x10:
-        return "Encryption/Decryption";
-    case 0x11:
-        return "Data Acquisition";
-    default:
-        return "Unknown";
+    if (class_code < PCI_CLASS_NAMES_COUNT) {
+        return pci_class_names[class_code];
     }
+    return "Unknown";
 }
 
 /**
