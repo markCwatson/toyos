@@ -86,7 +86,7 @@ gdt_descriptor:
 [BITS 32]
 load32:                      ; Switch to 32-bit code and load the kernel.
     mov eax, 1               ; LBA (Logical Block Addressing) starting sector.
-    mov ecx, 100             ; Number of sectors to load.
+    mov ecx, 200             ; Number of sectors to load.
     mov edi, 0x0100000       ; Memory address to load the kernel to.
     call ata_lba_read        ; Call function to read kernel from disk and load it to memory at 0x0100000.
     jmp CODE_SEG:0x0100000   ; Jump to the loaded kernel's entry point.
