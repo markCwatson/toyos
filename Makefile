@@ -89,13 +89,13 @@ FLAGS = -g \
 all_tests: RUN_TESTS_FLAG = -DRUN_TESTS
 all_tests: all
 
-# The 'all' target creates the final os.bin by combining boot.bin and kernel.bin.
+# The 'all' target creates the final os.bin by combining bootloader.bin and kernel.bin.
 # This target produces the complete operating system binary, 'os.bin', which includes both the bootloader and the kernel.
-all: ./bin/boot.bin ./bin/kernel.bin user_programs
+all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 
 	# Combines the bootloader and kernel into a single OS image.
 	rm -rf ./bin/os.bin
-	dd if=./bin/boot.bin >> ./bin/os.bin
+	dd if=./bin/bootloader.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 
@@ -122,9 +122,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
 	i686-elf-gcc ${FLAGS} -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o -Wl,-Map=./bin/kernel.map
 
-# The 'boot.bin' target assembles the bootloader.
-./bin/boot.bin: ./src/boot/boot.asm
-	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
+# The 'bootloader.bin' target assembles the bootloader.
+./bin/bootloader.bin: ./src/bootloader/bootloader.asm
+	nasm -f bin ./src/bootloader/bootloader.asm -o ./bin/bootloader.bin
 
 # Individual compilation targets for each source file.
 ./build/kernel.asm.o: ./src/kernel.asm
