@@ -42,16 +42,6 @@ static void encode_gdt_entry(uint8_t *target, struct gdt_structured source) {
     target[5] = source.type;
 }
 
-/**
- * @brief Converts an array of structured GDT entries into a raw GDT format array.
- *
- * This function takes an array of structured GDT entries and converts each one into
- * the raw byte format required by the GDT, storing them in the provided `gdt` array.
- *
- * @param gdt Pointer to the destination array of raw GDT entries.
- * @param structured_gdt Pointer to the source array of structured GDT entries.
- * @param total_entries The total number of GDT entries to convert.
- */
 void gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entries) {
     for (int i = 0; i < total_entries; i++) {
         encode_gdt_entry((uint8_t *)&gdt[i], structured_gdt[i]);

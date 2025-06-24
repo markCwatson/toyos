@@ -50,17 +50,6 @@ static void *sys_handle_command(int cmd, struct interrupt_frame *frame) {
     return handler(frame);
 }
 
-/**
- * @brief Registers a system call handler function
- *
- * This function registers a system call handler function for the given system call number.
- * When the system call interrupt occurs, the handler function will be called to handle the
- * system call.
- *
- * @param cmd The system call number.
- * @param handler The system call handler function.
- * @return void
- */
 void register_sys_command(int cmd, sys_cmd_fp handler) {
     if (cmd < 0 || cmd >= TOYOS_MAX_SYSCALLS) {
         panick("Invalid system call number: %i\n", cmd);
@@ -161,15 +150,6 @@ static void idt_set(int interrupt_no, void *address) {
     desc->offset_2 = (uint32_t)address >> 16;
 }
 
-/**
- * @brief Registers an interrupt callback function
- *
- * This function registers an interrupt callback function for the given interrupt number.
- *
- * @param interrupt The interrupt number.
- * @param interrupt_cb The interrupt callback function.
- * @return 0 on success, error code on failure.
- */
 int idt_register_interrupt_callback(int interrupt, interrupt_cb_fp interrupt_callback) {
     if (interrupt < 0 || interrupt >= TOYOS_TOTAL_INTERRUPTS) {
         return -EINVARG;
@@ -195,9 +175,6 @@ void idt_clock(void) {
     task_next();
 }
 
-/**
- * @brief Initializes the interrupt descriptor table (IDT) with default handlers
- */
 void idt_init(void) {
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;

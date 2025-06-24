@@ -294,227 +294,6 @@ static struct process_allocation *process_get_allocation_by_addr(struct process 
 }
 
 /**
- * Frees memory allocated for a process.
- *
- * @param process The process to free memory for.
- * @param ptr The pointer to the memory to free.
- * @return void
- */
-void process_free(struct process *process, void *ptr) {
-    // Unlink the pages from the process for the given address
-    struct process_allocation *allocation = process_get_allocation_by_addr(process, ptr);
-    if (!allocation) {
-        // Not our pointer.
-        return;
-    }
-
-    int res = paging_map_to(process->task->page_directory, allocation->ptr, allocation->ptr,
-                            paging_align_address(allocation->ptr + allocation->size), 0x00);
-    if (res < 0) {
-        return;
-    }
-
-    // Unjoin the allocation
-    process_allocation_unjoin(process, ptr);
-
-    // We can now free the memory.
-    kfree(ptr);
-}
-
-/**
- * Allocates memory for a process.
- *
- * This function allocates memory for a process. The memory is allocated from the process's
- * memory space, and is not shared with other processes.
- *
- * @param process The process to allocate memory for.
- * @param size The size of the memory to allocate.
- * @return void* The address of the allocated memory or NULL if allocation failed.
- */
-void *process_malloc(struct process *process, size_t size) {
-    void *ptr = kzalloc(size);
-    if (!ptr) {
-        goto out_err;
-    }
-
-    int index = process_find_free_allocation_index(process);
-    if (index < 0) {
-        goto out_err;
-    }
-
-    // Map the memory to the process's address space
-    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr + size),
-                            PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-    if (res < 0) {
-        goto out_err;
-    }
-
-    process->allocations[index].ptr = ptr;
-    process->allocations[index].size = size;
-    return ptr;
-
-out_err:
-    if (ptr) {
-        kfree(ptr);
-    }
-
-    return NULL;
-}
-
-/**
- * Loads a process from the given filename.
- * @param filename The name of the file to load.
- * @param process A pointer to the process structure to store the loaded process.
- * @return 0 on success, error code on failure.
- */
-int process_load(const char *filename, struct process **process) {
-    int res = OK;
-
-    int process_slot = process_get_free_slot();
-    if (process_slot < 0) {
-        res = -EISTKN;
-        goto out;
-    }
-
-    res = process_load_for_slot(filename, process, process_slot);
-
-out:
-    return res;
-}
-
-/**
- * Switches to the given process.
- * @param process The process to switch to.
- * @return 0 on success, error code on failure.
- */
-int process_switch(struct process *process) {
-    current_process = process;
-    return OK;
-}
-
-/**
- * Loads a process from the given filename and switches to it.
- * @param filename The name of the file to load.
- * @param process A pointer to the process structure to store the loaded process.
- * @return 0 on success, error code on failure.
- */
-int process_load_switch(const char *filename, struct process **process) {
-    if (!process || !filename) {
-        return -EINVARG;
-    }
-
-    int res = process_load(filename, process);
-    if (res == OK) {
-        process_switch(*process);
-    }
-
-    return res;
-}
-
-/**
- * Retrieves the current running process.
- * @return The current process.
- */
-struct process *process_current(void) {
-    return current_process;
-}
-
-/**
- * Retrieves a process by its process ID.
- * @param process_id The process ID.
- * @return The process with the given ID, or NULL if not found.
- */
-struct process *process_get(int process_id) {
-    if (process_id < 0 || process_id >= TOYOS_MAX_PROCESSES) {
-        return NULL;
-    }
-
-    return processes[process_id];
-}
-
-/**
- * @brief Loads a process into a specific slot.
- *
- * @details This function loads a process into a specific slot in the process array.
- *
- * @param filename The name of the file to load.
- * @param process A pointer to the process structure to store the loaded process.
- * @param process_slot The slot to load the process into.
- * @return 0 on success, error code on failure.
- */
-int process_load_for_slot(const char *filename, struct process **process, int process_slot) {
-    int res = OK;
-    struct task *task = NULL;
-    struct process *_process = NULL;
-    void *program_stack_ptr = NULL;
-
-    if (process_get(process_slot) != OK) {
-        res = -EISTKN;
-        goto out;
-    }
-
-    // Allocate memory for the process
-    _process = kzalloc(sizeof(struct process));
-    if (!_process) {
-        res = -ENOMEM;
-        goto out;
-    }
-
-    // Load the data for the process
-    process_init(_process);
-    res = process_load_data(filename, _process);
-    if (res < 0) {
-        goto out;
-    }
-
-    // Allocate a stack for the process
-    program_stack_ptr = kzalloc(TOYOS_USER_PROGRAM_STACK_SIZE);
-    if (!program_stack_ptr) {
-        res = -ENOMEM;
-        goto out;
-    }
-
-    // Set the process properties
-    strncpy(_process->filename, filename, sizeof(_process->filename));
-    _process->stack = program_stack_ptr;
-    _process->id = process_slot;
-
-    // Create a task
-    task = task_new(_process);
-    if (task == NULL) {
-        res = ERROR_I(task);
-        goto out;
-    }
-
-    // Set as the main task of the process
-    _process->task = task;
-
-    // Map the memory for the process
-    res = process_map_memory(_process);
-    if (res < 0) {
-        goto out;
-    }
-
-    *process = _process;
-
-    // Add the process to the array
-    processes[process_slot] = _process;
-
-out:
-    if (ISERROR(res)) {
-        if (_process && _process->task) {
-            task_free(_process->task);
-        }
-
-        // \todo: see if better way to free the memory
-        kfree(_process);
-        kfree(program_stack_ptr);
-    }
-
-    return res;
-}
-
-/**
  * @brief Terminates the allocations for a process.
  *
  * @details This function terminates the allocations for a process, freeing the memory
@@ -620,38 +399,6 @@ static void process_unlink(struct process *process) {
 }
 
 /**
- * @brief Terminates a process.
- *
- * @details This function terminates a process, freeing the memory associated with the process.
- *
- * @param process The process to terminate.
- * @return 0 on success, error code on failure.
- */
-int process_terminate(struct process *process) {
-    int res = OK;
-
-    res = process_terminate_allocations(process);
-    if (res < 0) {
-        goto out;
-    }
-
-    res = process_free_program_data(process);
-    if (res < 0) {
-        goto out;
-    }
-
-    // Free the process stack memory.
-    kfree(process->stack);
-    // Free the task
-    task_free(process->task);
-    // Unlink the process from the process array.
-    process_unlink(process);
-
-out:
-    return res;
-}
-
-/**
  * @brief Retrieves the arguments for a process.
  *
  * @param process The process to retrieve arguments for.
@@ -718,6 +465,198 @@ int process_inject_arguments(struct process *process, struct command_argument *r
 
     process->arguments.argc = argc;
     process->arguments.argv = argv;
+
+out:
+    return res;
+}
+
+void process_free(struct process *process, void *ptr) {
+    // Unlink the pages from the process for the given address
+    struct process_allocation *allocation = process_get_allocation_by_addr(process, ptr);
+    if (!allocation) {
+        // Not our pointer.
+        return;
+    }
+
+    int res = paging_map_to(process->task->page_directory, allocation->ptr, allocation->ptr,
+                            paging_align_address(allocation->ptr + allocation->size), 0x00);
+    if (res < 0) {
+        return;
+    }
+
+    // Unjoin the allocation
+    process_allocation_unjoin(process, ptr);
+
+    // We can now free the memory.
+    kfree(ptr);
+}
+
+void *process_malloc(struct process *process, size_t size) {
+    void *ptr = kzalloc(size);
+    if (!ptr) {
+        goto out_err;
+    }
+
+    int index = process_find_free_allocation_index(process);
+    if (index < 0) {
+        goto out_err;
+    }
+
+    // Map the memory to the process's address space
+    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr + size),
+                            PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    if (res < 0) {
+        goto out_err;
+    }
+
+    process->allocations[index].ptr = ptr;
+    process->allocations[index].size = size;
+    return ptr;
+
+out_err:
+    if (ptr) {
+        kfree(ptr);
+    }
+
+    return NULL;
+}
+
+int process_load(const char *filename, struct process **process) {
+    int res = OK;
+
+    int process_slot = process_get_free_slot();
+    if (process_slot < 0) {
+        res = -EISTKN;
+        goto out;
+    }
+
+    res = process_load_for_slot(filename, process, process_slot);
+
+out:
+    return res;
+}
+
+int process_switch(struct process *process) {
+    current_process = process;
+    return OK;
+}
+
+int process_load_switch(const char *filename, struct process **process) {
+    if (!process || !filename) {
+        return -EINVARG;
+    }
+
+    int res = process_load(filename, process);
+    if (res == OK) {
+        process_switch(*process);
+    }
+
+    return res;
+}
+
+struct process *process_current(void) {
+    return current_process;
+}
+
+struct process *process_get(int process_id) {
+    if (process_id < 0 || process_id >= TOYOS_MAX_PROCESSES) {
+        return NULL;
+    }
+
+    return processes[process_id];
+}
+
+int process_load_for_slot(const char *filename, struct process **process, int process_slot) {
+    int res = OK;
+    struct task *task = NULL;
+    struct process *_process = NULL;
+    void *program_stack_ptr = NULL;
+
+    if (process_get(process_slot) != OK) {
+        res = -EISTKN;
+        goto out;
+    }
+
+    // Allocate memory for the process
+    _process = kzalloc(sizeof(struct process));
+    if (!_process) {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Load the data for the process
+    process_init(_process);
+    res = process_load_data(filename, _process);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Allocate a stack for the process
+    program_stack_ptr = kzalloc(TOYOS_USER_PROGRAM_STACK_SIZE);
+    if (!program_stack_ptr) {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Set the process properties
+    strncpy(_process->filename, filename, sizeof(_process->filename));
+    _process->stack = program_stack_ptr;
+    _process->id = process_slot;
+
+    // Create a task
+    task = task_new(_process);
+    if (task == NULL) {
+        res = ERROR_I(task);
+        goto out;
+    }
+
+    // Set as the main task of the process
+    _process->task = task;
+
+    // Map the memory for the process
+    res = process_map_memory(_process);
+    if (res < 0) {
+        goto out;
+    }
+
+    *process = _process;
+
+    // Add the process to the array
+    processes[process_slot] = _process;
+
+out:
+    if (ISERROR(res)) {
+        if (_process && _process->task) {
+            task_free(_process->task);
+        }
+
+        // \todo: see if better way to free the memory
+        kfree(_process);
+        kfree(program_stack_ptr);
+    }
+
+    return res;
+}
+
+int process_terminate(struct process *process) {
+    int res = OK;
+
+    res = process_terminate_allocations(process);
+    if (res < 0) {
+        goto out;
+    }
+
+    res = process_free_program_data(process);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Free the process stack memory.
+    kfree(process->stack);
+    // Free the task
+    task_free(process->task);
+    // Unlink the process from the process array.
+    process_unlink(process);
 
 out:
     return res;

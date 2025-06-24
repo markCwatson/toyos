@@ -166,10 +166,6 @@ struct filesystem fat16_fs = {.resolve = fat16_resolve,
                               .stat = fat16_stat,
                               .close = fat16_close};
 
-/**
- * @brief Initializes the FAT16 filesystem and registers it.
- * @return Pointer to the filesystem structure.
- */
 struct filesystem *fat16_init(void) {
     strcpy(fat16_fs.name, "FAT16");
     return &fat16_fs;

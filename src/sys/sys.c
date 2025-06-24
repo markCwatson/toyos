@@ -14,9 +14,6 @@ static void *sys_command0_test(struct interrupt_frame *frame) {
     return (void *)(a + b);
 }
 
-/**
- * @brief Registers the system commands that can be invoked using interrupt 0x80.
- */
 void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND0_TEST, sys_command0_test);
     register_sys_command(SYSTEM_COMMAND1_PRINT, sys_command1_print);

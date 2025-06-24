@@ -24,12 +24,6 @@ static void print(const char *str, unsigned char fg, unsigned char bg) {
     }
 }
 
-/**
- * @brief ToyOS printf implementation.
- *
- * @param fmt A string that specifies the format of the output.
- * @return The number of characters that are written into the array, not counting the terminating null character.
- */
 int printf(const char *fmt, ...) {
     va_list ap;
     const char *p;
@@ -72,16 +66,6 @@ int printf(const char *fmt, ...) {
     return 0;
 }
 
-/**
- * @brief ToyOS printf implementation with color support.
- *
- * This function is similar to `printf` but accepts additional arguments for foreground and background colors.
- *
- * @param fmt A string that specifies the format of the output.
- * @param fg The foreground color of the text.
- * @param bg The background color of the text.
- * @return The number of characters that are written into the array, not counting the terminating null character.
- */
 int printf_colored(const char *fmt, unsigned char fg, unsigned char bg, ...) {
     va_list ap;
     const char *p;

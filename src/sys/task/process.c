@@ -18,14 +18,6 @@ static struct spinlock_t lock = {
     .locked = 0,
 };
 
-/**
- * @brief System command handler for loading and starting a new process.
- *
- * This function is called when the system command SYSTEM_COMMAND6_PROCESS_LOAD_START is invoked.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command6_process_load_start(struct interrupt_frame *frame) {
     void *filename_user_ptr = task_get_stack_item(task_current(), 0);
     char filename[TOYOS_MAX_PATH];
@@ -52,14 +44,6 @@ out:
     return NULL;
 }
 
-/**
- * @brief System command handler for exiting the current process.
- *
- * This function is called when the system command SYSTEM_COMMAND7_PROCESS_EXIT is invoked.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command7_process_exit(struct interrupt_frame *frame) {
     struct process *process = task_current()->process;
     process_terminate(process);
@@ -67,14 +51,6 @@ void *sys_command7_process_exit(struct interrupt_frame *frame) {
     return NULL;
 }
 
-/**
- * @brief System command handler for getting the program arguments.
- *
- * This function is called when the system command SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS is invoked.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command8_get_program_arguments(struct interrupt_frame *frame) {
     struct process *process = task_current()->process;
     struct process_arguments *arguments =
@@ -84,14 +60,6 @@ void *sys_command8_get_program_arguments(struct interrupt_frame *frame) {
     return 0;
 }
 
-/**
- * @brief System command handler for invoking a system command.
- *
- * This function is called when the system command SYSTEM_COMMAND9_INVOKE_SYSTEM_COMMAND is invoked.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command9_invoke_system_command(struct interrupt_frame *frame) {
     struct command_argument *arguments =
         task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
@@ -128,18 +96,6 @@ void *sys_command9_invoke_system_command(struct interrupt_frame *frame) {
     return 0;
 }
 
-/**
- * @brief System command handler for fetching the process list.
- *
- * This function is called when the system command SYSTEM_COMMAND11_GET_PROCESSES is invoked.
- * It returns a list of processes.
- *
- * @warning The memory for the list is allocated from the current process's memory space
- * and must be freed by the caller.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command11_get_processes(struct interrupt_frame *frame) {
     struct process_info *info = (struct process_info *)process_malloc(
         task_current()->process, sizeof(struct process_info) * TOYOS_MAX_PROCESSES);
@@ -169,26 +125,10 @@ void *sys_command11_get_processes(struct interrupt_frame *frame) {
     return info;
 }
 
-/**
- * @brief System command handler for checkint hte status of the process lock.
- *
- * This function is called when the system command SYSTEM_COMMAND12_CHECK_LOCK is invoked.
- *
- * @param frame The interrupt frame.
- * @return 0 if the process is not locked, error code if it is.
- */
 void *sys_command12_check_lock(struct interrupt_frame *frame) {
     return lock.locked ? ERROR(-EBUSY) : OK;
 }
 
-/**
- * @brief System command handler for notifying that a process has finished.
- *
- * This function is called when the system command SYSTEM_COMMAND13_DONE is invoked.
- *
- * @param frame The interrupt frame.
- * @return The return value of the system command.
- */
 void *sys_command13_done(struct interrupt_frame *frame) {
     spin_unlock(&lock);
     return 0;

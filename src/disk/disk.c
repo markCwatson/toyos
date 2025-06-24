@@ -14,7 +14,7 @@ struct disk disk;
  * @param buf Buffer containing the data to be written.
  * @return 0 on success, or an error code if failed.
  */
-int disk_write_sector(int lba, int total, void *buf) {
+static int disk_write_sector(int lba, int total, void *buf) {
     if (!buf) {
         return -EINVARG;
     }
@@ -84,12 +84,6 @@ static int disk_read_sector(int lba, int total, void *buf) {
     return OK;
 }
 
-/**
- * @brief Searches for available disks and initializes them.
- *
- * This function initializes the disk structure and binds a filesystem
- * to the disk if one is found.
- */
 void disk_search_and_init(void) {
     memset(&disk, 0, sizeof(disk));
     disk.id = 0;
@@ -98,14 +92,6 @@ void disk_search_and_init(void) {
     disk.fs = fs_resolve(&disk);
 }
 
-/**
- * @brief Retrieves the disk structure for a given index.
- *
- * Currently, this function only supports retrieving the primary disk (index 0).
- *
- * @param index Index of the disk to retrieve.
- * @return Pointer to the disk structure, or NULL if the disk is not found.
- */
 struct disk *disk_get(int index) {
     if (index != 0) {
         return NULL;
@@ -114,15 +100,6 @@ struct disk *disk_get(int index) {
     return &disk;
 }
 
-/**
- * @brief Reads a block of data from the disk.
- *
- * @param idisk Pointer to the disk structure.
- * @param lba LBA address to read from.
- * @param total Number of sectors to read.
- * @param buf Buffer to store the read data.
- * @return 0 on success, or an error code if failed.
- */
 int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf) {
     if (idisk != &disk) {
         return -EIO;
@@ -131,15 +108,6 @@ int disk_read_block(struct disk *idisk, unsigned int lba, int total, void *buf) 
     return disk_read_sector(lba, total, buf);
 }
 
-/**
- * @brief Writes a block of data to the disk.
- *
- * @param idisk Pointer to the disk structure.
- * @param lba LBA address to write to.
- * @param total Number of sectors to write.
- * @param buf Buffer containing the data to write.
- * @return 0 on success, or an error code if failed.
- */
 int disk_write_block(struct disk *idisk, unsigned int lba, int total, void *buf) {
     if (idisk != &disk) {
         return -EIO;

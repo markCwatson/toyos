@@ -118,13 +118,6 @@ void ps2_keyboard_handle_interrupt(void) {
     task_page();
 }
 
-/**
- * @brief Registers the PS/2 keyboard with the keyboard system.
- *
- * This function registers the PS/2 keyboard with the keyboard system, allowing it to be used for input.
- *
- * @return 0 on success, error code on failure.
- */
 int ps2_register(void) {
     return keyboard_insert(&ps2_keyboard);
 }

@@ -7,11 +7,6 @@
 static struct keyboard *keyboard_list_head = NULL;
 static struct keyboard *keyboard_list_last = NULL;
 
-/**
- * @brief Initializes the keyboard system.
- *
- * This function initializes all keyboard devices in the linked list of keyboard devices.
- */
 void keyboard_init(void) {
     struct keyboard *keyboard = keyboard_list_head;
     while (keyboard) {
@@ -20,11 +15,6 @@ void keyboard_init(void) {
     }
 }
 
-/**
- * @brief Inserts a keyboard device into the linked list of keyboard devices.
- * @param keyboard The keyboard device to insert.
- * @return 0 on success, error code on failure.
- */
 int keyboard_insert(struct keyboard *keyboard) {
     if (!keyboard) {
         return -EINVARG;
@@ -63,10 +53,6 @@ static int keyboard_get_tail_index(struct process *process) {
     return process->keyboard.tail % sizeof(process->keyboard.buffer);
 }
 
-/**
- * @brief Handles backspace functionality for the given process.
- * @param process The process for which to handle backspace.
- */
 void keyboard_backspace(struct process *process) {
     if (!process) {
         return;
@@ -81,10 +67,6 @@ void keyboard_backspace(struct process *process) {
     process->keyboard.buffer[real_index] = 0x00;
 }
 
-/**
- * @brief Pushes a character onto the keyboard buffer.
- * @param c The character to push onto the buffer.
- */
 void keyboard_push(char c) {
     struct process *process = process_current();
     if (!process) {
@@ -96,10 +78,6 @@ void keyboard_push(char c) {
     process->keyboard.tail++;
 }
 
-/**
- * @brief Pops a character from the keyboard buffer.
- * @return The character popped from the buffer.
- */
 char keyboard_pop(void) {
     if (!task_current()) {
         return 0;
@@ -118,26 +96,10 @@ char keyboard_pop(void) {
     return c;
 }
 
-/**
- * @brief Sets the state of the caps lock key for the given keyboard.
- *
- * This function sets the state of the caps lock key for the given keyboard.
- *
- * @param keyboard The keyboard device.
- * @param state The state of the caps lock key.
- */
 void keyboard_set_capslock(struct keyboard *keyboard, keyboard_capslock_state state) {
     keyboard->capslock_state = state;
 }
 
-/**
- * @brief Retrieves the state of the caps lock key for the given keyboard.
- *
- * This function retrieves the state of the caps lock key for the given keyboard.
- *
- * @param keyboard The keyboard device.
- * @return The state of the caps lock key.
- */
 keyboard_capslock_state keyboard_get_capslock(struct keyboard *keyboard) {
     return keyboard->capslock_state;
 }

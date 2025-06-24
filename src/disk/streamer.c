@@ -4,14 +4,6 @@
 #include "status.h"
 #include <stdbool.h>
 
-/**
- * @brief Creates a new disk stream for the specified disk.
- *
- * Allocates and initializes a disk_stream structure for the disk with the given ID.
- *
- * @param disk_id The identifier of the disk to stream from.
- * @return A pointer to the newly created disk_stream structure, or NULL if the disk is not found or allocation fails.
- */
 struct disk_stream *streamer_new(int disk_id) {
     struct disk *disk = disk_get(disk_id);
     if (!disk) {
@@ -29,16 +21,6 @@ struct disk_stream *streamer_new(int disk_id) {
     return streamer;
 }
 
-/**
- * @brief Sets the position in the disk stream.
- *
- * Changes the position in the stream to the specified byte offset, enabling subsequent read/write operations to begin
- * at this position.
- *
- * @param stream The disk stream to modify.
- * @param pos The new byte offset in the disk stream.
- * @return 0 on success, or an error code if the stream is invalid or the position is out of bounds.
- */
 int streamer_seek(struct disk_stream *stream, int pos) {
     if (!stream || pos < 0) {
         return -EINVARG;
@@ -48,17 +30,6 @@ int streamer_seek(struct disk_stream *stream, int pos) {
     return OK;
 }
 
-/**
- * @brief Reads data from the disk into a buffer.
- *
- * Reads `total` bytes from the current position in the disk stream into the provided buffer.
- * If the read operation crosses sector boundaries, it handles the overflow by reading the next sector.
- *
- * @param stream The disk stream to read from.
- * @param out The buffer to store the read data.
- * @param total The total number of bytes to read.
- * @return 0 on success, or an error code on failure.
- */
 int streamer_read(struct disk_stream *stream, void *out, int total) {
     if (!stream || !out || total < 0) {
         return -EINVARG;
@@ -94,17 +65,6 @@ out:
     return res;
 }
 
-/**
- * @brief Writes data from a buffer to the disk.
- *
- * Writes `total` bytes from the provided buffer into the disk stream starting at the current position.
- * Handles writes that span multiple sectors by managing overflow appropriately.
- *
- * @param stream The disk stream to write to.
- * @param in The buffer containing the data to write.
- * @param total The total number of bytes to write.
- * @return 0 on success, or an error code on failure.
- */
 int streamer_write(struct disk_stream *stream, const void *in, int total) {
     if (!stream || !in || total < 0) {
         return -EINVARG;
@@ -150,13 +110,6 @@ out:
     return res;
 }
 
-/**
- * @brief Closes the disk stream and frees its resources.
- *
- * This function frees the memory allocated for the disk stream structure.
- *
- * @param stream The disk stream to close.
- */
 void streamer_close(struct disk_stream *stream) {
     kfree(stream);
 }

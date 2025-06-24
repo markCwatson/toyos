@@ -37,85 +37,6 @@ struct gdt_structured gdt_structured[TOYOS_TOTAL_GDT_SEGMENTS] = {
 };
 
 /**
- * @brief Prints a string to the terminal using color attributes.
- *
- * This function writes each character of the given string to the terminal, using caller defined
- * color attribute. It is typically used for kernel-level logging and debugging.
- *
- * @param str The null-terminated string to print.
- * @param fg The foreground color of the text.
- * @param bg The background color of the text.
- */
-void printk_colored(const char *str, unsigned char fg, unsigned char bg) {
-    size_t len = strlen(str);
-
-    for (int i = 0; i < len; i++) {
-        terminal_writechar(str[i], fg, bg);
-    }
-
-    terminal_update_cursor();
-}
-
-/**
- * @brief Prints a string to the terminal.
- *
- * This function writes each character of the given string to the terminal, using a fixed
- * color attribute (white on black).
- *
- * This function is a light-weight alternative to printf, and is used for kernel-level logging
- * and debugging.
- *
- * @param str The null-terminated string to print.
- */
-void printk(const char *str) {
-    printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLUE);
-}
-
-/**
- * @brief Displays a panic message and halts the system.
- *
- * This function prints a panic message to the terminal and then enters an infinite loop,
- * effectively halting the system. It is used in critical error situations where the kernel
- * cannot safely continue execution.
- *
- * @param str The null-terminated string describing the panic reason.
- * @param ... The optional arguments to format the string.
- */
-void panick(const char *str, ...) {
-    va_list args;
-    va_start(args, str);
-    printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLUE, args);
-    while (1)
-        ;  // Infinite loop to halt the system
-}
-
-/**
- * @brief Prints an alert message to the terminal.
- *
- * This function prints an alert message to the terminal using a fixed color attribute.
- *
- * @param str The null-terminated string to print.
- * @param ... The optional arguments to format the string.
- */
-void alertk(const char *str, ...) {
-    va_list args;
-    va_start(args, str);
-    printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE, args);
-}
-
-/**
- * @brief Switches to the kernel page.
- *
- * This function switches to the kernel page by setting up the kernel registers and
- * switching to the kernel chunk. This is used to switch to the kernel page when
- * the kernel is running, for example, when handling interrupts.
- */
-void kernel_page(void) {
-    kernel_registers();
-    paging_switch(kernel_chunk);
-}
-
-/**
  * @brief Prints the "ToyOS" logo using ASCII art.
  *
  * This function displays the "ToyOS" name in a stylized ASCII art format.
@@ -133,13 +54,39 @@ static void print_toyos_logo(void) {
     printk(logo);
 }
 
-/**
- * @brief Entry point for the kernel after booting.
- *
- * This function initializes various subsystems of the kernel, including the terminal,
- * heap, file system, disk, and interrupt descriptor table (IDT). It sets up paging,
- * enables interrupts, and optionally runs tests if compiled in test mode.
- */
+void printk_colored(const char *str, unsigned char fg, unsigned char bg) {
+    size_t len = strlen(str);
+
+    for (int i = 0; i < len; i++) {
+        terminal_writechar(str[i], fg, bg);
+    }
+
+    terminal_update_cursor();
+}
+
+void printk(const char *str) {
+    printk_colored(str, VGA_COLOR_WHITE, VGA_COLOR_BLUE);
+}
+
+void panick(const char *str, ...) {
+    va_list args;
+    va_start(args, str);
+    printf_colored(str, VGA_COLOR_RED, VGA_COLOR_BLUE, args);
+    while (1)
+        ;  // Infinite loop to halt the system
+}
+
+void alertk(const char *str, ...) {
+    va_list args;
+    va_start(args, str);
+    printf_colored(str, VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE, args);
+}
+
+void kernel_page(void) {
+    kernel_registers();
+    paging_switch(kernel_chunk);
+}
+
 void maink(void) {
     terminal_init();
     printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);

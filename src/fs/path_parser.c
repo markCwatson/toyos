@@ -126,15 +126,6 @@ struct path_part *path_parser_parse_path_part(struct path_part *last_part, const
     return part;
 }
 
-/**
- * @brief Frees the memory allocated for a parsed path.
- *
- * This function deallocates the memory used by a path_root structure and its associated
- * path_part structures. It should be called to avoid memory leaks after the parsed path
- * is no longer needed.
- *
- * @param root The path_root structure to free.
- */
 void path_parser_free(struct path_root *root) {
     struct path_part *part = root->first;
 
@@ -148,17 +139,6 @@ void path_parser_free(struct path_root *root) {
     kfree(root);
 }
 
-/**
- * @brief Parses a file path into its components.
- *
- * This function takes a full file path and optionally a current directory path,
- * and parses it into its individual components, separating the drive, directories,
- * and file name. It returns a path_root structure representing the parsed path.
- *
- * @param path The full file path to parse.
- * @param current_directory_path The current directory path, used if the provided path is relative.
- * @return A pointer to a path_root structure representing the parsed path, or NULL if parsing fails.
- */
 struct path_root *path_parser_parse(const char *path, const char *current_directory_path) {
     const char *tmp_path = path;
     struct path_root *path_root = NULL;

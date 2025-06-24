@@ -40,38 +40,6 @@ static bool heap_validate_alignment(void *ptr) {
 }
 
 /**
- * @brief Creates a heap.
- *
- * Initializes a heap structure with a specified memory range and a block table.
- * This function sets up the heap's block table and prepares the heap for allocations.
- *
- * @param heap Pointer to the heap structure to initialize.
- * @param ptr Start address of the heap memory range.
- * @param end End address of the heap memory range.
- * @param table Pointer to the heap block table.
- * @return 0 on success, or a negative error code on failure.
- */
-int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *table) {
-    if (!heap_validate_alignment(ptr) || !heap_validate_alignment(end)) {
-        return -EINVARG;
-    }
-
-    memset(heap, 0, sizeof(struct heap));
-    heap->saddr = ptr;
-    heap->table = table;
-
-    int res = heap_validate_table(ptr, end, table);
-    if (res < 0) {
-        return res;
-    }
-
-    size_t table_size = sizeof(heap_block_table_entry) * table->total;
-    memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
-
-    return OK;
-}
-
-/**
  * @brief Aligns a value to the next upper block boundary.
  *
  * This function rounds up the given value to the nearest block size boundary,
@@ -245,31 +213,32 @@ int heap_address_to_block(struct heap *heap, void *address) {
     return ((int)(address - heap->saddr)) / TOYOS_HEAP_BLOCK_SIZE;
 }
 
-/**
- * @brief Allocates a block of memory from the heap.
- *
- * This function allocates a block of memory of the specified size from the heap.
- * The size is aligned to the nearest upper block size boundary.
- *
- * @param heap Pointer to the heap structure.
- * @param size The size of the memory block to allocate, in bytes.
- * @return A pointer to the allocated memory block, or NULL if the allocation fails.
- */
+int heap_create(struct heap *heap, void *ptr, void *end, struct heap_table *table) {
+    if (!heap_validate_alignment(ptr) || !heap_validate_alignment(end)) {
+        return -EINVARG;
+    }
+
+    memset(heap, 0, sizeof(struct heap));
+    heap->saddr = ptr;
+    heap->table = table;
+
+    int res = heap_validate_table(ptr, end, table);
+    if (res < 0) {
+        return res;
+    }
+
+    size_t table_size = sizeof(heap_block_table_entry) * table->total;
+    memset(table->entries, HEAP_BLOCK_TABLE_ENTRY_FREE, table_size);
+
+    return OK;
+}
+
 void *malloc(struct heap *heap, size_t size) {
     size_t aligned_size = heap_align_value_to_upper(size);
     uint32_t total_blocks = aligned_size / TOYOS_HEAP_BLOCK_SIZE;
     return heap_malloc_blocks(heap, total_blocks);
 }
 
-/**
- * @brief Frees a previously allocated block of memory.
- *
- * This function releases a block of memory back to the heap, making it available for future allocations.
- * The block must have been previously allocated using malloc.
- *
- * @param heap Pointer to the heap structure.
- * @param ptr Pointer to the memory block to free.
- */
 void free(struct heap *heap, void *ptr) {
     heap_mark_blocks_free(heap, heap_address_to_block(heap, ptr));
 }

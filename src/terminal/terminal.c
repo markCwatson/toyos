@@ -61,24 +61,6 @@ static void terminal_enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
 }
 
 /**
- * @brief Updates the hardware cursor to the current position.
- *
- * This function sets the VGA hardware cursor to the position specified by
- * the global variables terminal_row and terminal_col.
- */
-void terminal_update_cursor(void) {
-    uint16_t position = terminal_row * VGA_WIDTH + terminal_col;
-
-    // Send the low byte of the cursor position
-    outb(VGA_CMD_PORT, VGA_CURSOR_LOW);
-    outb(VGA_DATA_PORT, (uint8_t)(position & 0xff));
-
-    // Send the high byte of the cursor position
-    outb(VGA_CMD_PORT, VGA_CURSOR_HIGH);
-    outb(VGA_DATA_PORT, (uint8_t)((position >> 8) & 0xff));
-}
-
-/**
  * @brief Combines a character and its color attribute into a single value.
  *
  * This function creates a 16-bit value combining a character (in the lower 8 bits)
@@ -152,17 +134,18 @@ static void terminal_scroll(void) {
     terminal_row = VGA_HEIGHT - 1;
 }
 
-/**
- * @brief Writes a character to the terminal at the current cursor position.
- *
- * This function places a character at the current cursor position, updating
- * the cursor position afterwards. It handles newline characters by moving
- * the cursor to the beginning of the next line.
- *
- * @param c The character to write.
- * @param fg The foreground color of the character.
- * @param bg The background color of the character.
- */
+void terminal_update_cursor(void) {
+    uint16_t position = terminal_row * VGA_WIDTH + terminal_col;
+
+    // Send the low byte of the cursor position
+    outb(VGA_CMD_PORT, VGA_CURSOR_LOW);
+    outb(VGA_DATA_PORT, (uint8_t)(position & 0xff));
+
+    // Send the high byte of the cursor position
+    outb(VGA_CMD_PORT, VGA_CURSOR_HIGH);
+    outb(VGA_DATA_PORT, (uint8_t)((position >> 8) & 0xff));
+}
+
 void terminal_writechar(char c, unsigned char fg, unsigned char bg) {
     if (c == '\n') {
         terminal_row += 1;
@@ -198,12 +181,6 @@ update:
     terminal_update_vga_memory();
 }
 
-/**
- * @brief Deletes the last character written to the terminal.
- *
- * This function moves the cursor back by one position and writes a space character
- * to erase the last character written to the terminal.
- */
 void terminal_backspace(void) {
     if (terminal_row == 0 && terminal_col == 0) {
         return;
@@ -219,12 +196,6 @@ void terminal_backspace(void) {
     terminal_col -= 1;
 }
 
-/**
- * @brief Clears the terminal screen.
- *
- * This function clears the entire terminal screen by writing spaces with the default color
- * to each character cell.
- */
 void terminal_clear_all(void) {
     for (int y = 0; y < VGA_HEIGHT; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
@@ -237,13 +208,6 @@ void terminal_clear_all(void) {
     terminal_col = 0;
 }
 
-/**
- * @brief Initializes the terminal.
- *
- * This function sets up the terminal for text output by initializing
- * the video memory pointer and clearing the screen. It sets the cursor
- * to the top-left corner.
- */
 void terminal_init(void) {
     // VGA text mode memory address starts at 0xb8000
     video_mem = (uint16_t *)(0xb8000);
