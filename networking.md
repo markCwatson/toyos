@@ -222,11 +222,83 @@ The RTL8139 is a PCI Fast Ethernet controller that implements:
 
 ### Implementation Plan
 
-### Step 2.1: RTL8139 Hardware Definitions
+#### Step 2.1: ToyOS Network Device Abstraction
 
-### Step 2.2: Core Driver Implementation
+The original RTL8139 driver was designed for a different OS (sanos) with a `struct dev` abstractions. We will create a ToyOS-specific network device abstraction that provides equivalent functionality while integrating with toyos THis shows how specialized subsystems work in real operating systems (Linux has both `struct device` and `struct net_device`).
+
+- `src/sys/net/netdev.h` - Network device abstraction header
+- `src/sys/net/netdev.c` - Network device management implementation
+
+**Integration:**
+- Direct integration with toyos PCI subsystem
+- Uses toyos memory management (`kzalloc`/`kfree`)
+- Compatible with ToyOS I/O system (`insl`/`outl` functions)
+- Designed for future network stack integration
+
+#### Step 2.2: RTL8139 Driver Structure Adaptation
+
+**Mapping Original Driver to ToyOS:**
+
+| Original Driver | ToyOS Equivalent | Purpose |
+|----------------|------------------|----------|
+| `struct dev` | `struct netdev` | Device representation |
+| `struct pbuf` | `struct netbuf` | Packet buffers |
+| `dev->privdata` | `netdev->driver_data` | Private driver data |
+| `dev->name` | `netdev->name` | Device name |
+| `dev_receive()` | `netdev_rx()` | Receive packet handling |
+
+**Required Changes:**
+1. Replace `#include <os/krnl.h>` with ToyOS headers
+2. Update `struct nic` to work with `struct netdev` instead of `struct dev`
+3. Map I/O function names (e.g., `outp()` → `outb()`, `inpw()` → `insw()`)
+4. Replace missing functions with ToyOS equivalents
+
+#### Step 2.3: RTL8139 Hardware Definitions
+
+**Register Definitions:**
+- RTL8139 register offsets and bit masks
+- Ethernet frame format constants
+- DMA configuration parameters
+- Interrupt status and control bits
+
+**Files:**
+- Update `src/drivers/network/rtl8129.h` with ToyOS compatibility
+
+#### Step 2.4: Core Driver Implementation
 
 Based on the reference implementation from the [sanos RTL8139 driver](http://www.jbox.dk/sanos/source/sys/dev/rtl8139.c.html)
+
+**Key Functions to Adapt:**
+- `rtl8139_open()` - Initialize hardware and allocate buffers
+- `rtl8139_close()` - Shutdown hardware and free resources
+- `rtl8139_transmit()` - Send packets via DMA
+- `rtl8139_rx()` - Receive packet processing
+- `rtl8139_interrupt()` - Interrupt service routine
+
+**ToyOS-Specific Adaptations:**
+1. **Memory Management**: Use `kzalloc()` instead of `alloc_pages_linear()`
+2. **Interrupt Handling**: Integrate with ToyOS interrupt system
+3. **Timer Management**: Implement or stub timer functions
+4. **DPC (Deferred Procedure Call)**: Replace with ToyOS equivalent or simplify
+
+#### Step 2.5: Driver Registration and Initialization
+
+**Driver Detection:**
+- Integrate with existing PCI enumeration in `pci_enumerate_devices()`
+- Detect RTL8139 cards (vendor 0x10EC, device 0x8139)
+- Create `struct netdev` for each detected card
+
+**Initialization Sequence:**
+1. PCI enumeration finds RTL8139 device
+2. Driver creates `struct netdev` via `netdev_create()`
+3. Driver allocates private `struct nic` data
+4. Hardware initialization (reset, MAC address reading, buffer allocation)
+5. Device registered and ready for network stack integration
+
+**Integration with Kernel:**
+- Add driver initialization to kernel startup sequence
+- Register interrupt handlers
+- Make device available to network stack (future phases)
 
 ### Notes
 
@@ -252,15 +324,7 @@ Based on the reference implementation from the [sanos RTL8139 driver](http://www
 
 ## Phase 3: Network Stack
 
-**Network Layering Concepts**
 The network stack implements a layered architecture where each layer provides services to the layer above and uses services from the layer below. This separation of concerns makes the system more maintainable and allows protocols to be developed independently.
-
-**Key Principles**:
-
-1. **Encapsulation**: Each layer adds its own header to the data
-2. **Abstraction**: Upper layers don't need to know lower layer details
-3. **Modularity**: Layers can be replaced or modified independently
-4. **Standard Compliance**: Following RFC specifications ensures interoperability
 
 ### Step 3.1: Ethernet Layer Implementation
 
@@ -273,21 +337,6 @@ ARP (Address Resolution Protocol) maps IP addresses to MAC addresses on the loca
 ### Step 3.3: IPv4 Layer Implementation
 
 The IP layer handles internet addressing and packet routing.
-
-### Network Stack Layers
-
-**Layer Benefits**:
-
-1. **Separation of Concerns**: Each layer handles specific responsibilities
-2. **Reusability**: Lower layers can support multiple upper layer protocols
-3. **Maintainability**: Changes to one layer don't affect others
-4. **Testability**: Each layer can be tested independently
-
-**Protocol Processing**:
-
-- **Outbound**: Data flows down the stack, each layer adding headers
-- **Inbound**: Data flows up the stack, each layer removing and processing headers
-- **Encapsulation**: Higher layer data becomes payload for lower layers
 
 ### Step 3.4: UDP Protocol Implementation
 
