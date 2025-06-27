@@ -6,6 +6,7 @@
 // ...actually, it should be the other way around)
 
 #include "rtl8139.h"
+#include "memory/memory.h"
 
 // The user-configurable values
 
@@ -80,7 +81,7 @@ static int rtl8139_read_eeprom(uint16_t iobase, int location, int addr_len) {
     for (i = 16; i > 0; i--) {
         outb(ee_addr, EE_ENB | EE_SHIFT_CLK);
         eeprom_delay();
-        retval = (retval << 1) | ((inb(ee_addr) & EE_DATA_READ) ? 1 : 0);
+        retval = (retval << 1) | ((insb(ee_addr) & EE_DATA_READ) ? 1 : 0);
         outb(ee_addr, EE_ENB);
         eeprom_delay();
     }
@@ -129,7 +130,7 @@ static int rtl8139_mdio_read(struct rtl8139_private *priv, int phy_id, int locat
 
     if (phy_id > 31) {
         // Really a 8139.  Use internal registers
-        return location < 8 && mii_2_8139_map[location] ? inw(priv->iobase + mii_2_8139_map[location]) : 0;
+        return location < 8 && mii_2_8139_map[location] ? insw(priv->iobase + mii_2_8139_map[location]) : 0;
     }
 
     mdio_sync(mdio_addr);
@@ -147,7 +148,7 @@ static int rtl8139_mdio_read(struct rtl8139_private *priv, int phy_id, int locat
     for (i = 19; i > 0; i--) {
         outb(mdio_addr, 0);
         mdio_delay(mdio_addr);
-        retval = (retval << 1) | ((inb(mdio_addr) & MDIO_DATA_IN) ? 1 : 0);
+        retval = (retval << 1) | ((insb(mdio_addr) & MDIO_DATA_IN) ? 1 : 0);
         outb(mdio_addr, MDIO_CLK);
         mdio_delay(mdio_addr);
     }
@@ -196,7 +197,7 @@ static struct netdev_stats *rtl8139_get_stats(struct netdev *dev) {
     struct rtl8139_private *priv = (struct rtl8139_private *)dev->driver_data;
     uint16_t ioaddr = priv->iobase;
 
-    dev->stats.rx_dropped += inl(ioaddr + RxMissed);
+    dev->stats.rx_dropped += insl(ioaddr + RxMissed);
     outl(ioaddr + RxMissed, 0);
 
     return &dev->stats;
@@ -249,7 +250,7 @@ static int rtl8139_hw_start(struct rtl8139_private *priv) {
 
     // Check that the chip has finished the reset
     for (i = 1000; i > 0; i--) {
-        if ((inb(ioaddr + ChipCmd) & CmdReset) == 0)
+        if ((insb(ioaddr + ChipCmd) & CmdReset) == 0)
             break;
         // TODO: Add delay here if needed
     }
@@ -319,14 +320,14 @@ static void rtl8139_get_mac_address(struct rtl8139_private *priv) {
 
 int rtl8139_open(struct netdev *dev) {
     struct rtl8139_private *priv = (struct rtl8139_private *)dev->driver_data;
-    uint16_t ioaddr = priv->iobase;
+    // uint16_t ioaddr = priv->iobase;
     int rx_buf_len_idx;
 
     // TODO: Enable IRQ when interrupt system is ready
     // enable_irq(priv->irq);
 
-    // Initialize transmit spinlock
-    spinlock_init(&priv->tx_lock);
+    // Itodo: nitialize transmit spinslock
+    // spinslock_init(&priv->tx_lock);
 
     // Allocate receive buffer
     rx_buf_len_idx = RX_BUF_LEN_IDX;
@@ -362,7 +363,7 @@ int rtl8139_close(struct netdev *dev) {
     uint16_t ioaddr = priv->iobase;
     int i;
 
-    printf("%s: Shutting down ethercard, status was 0x%04x\n", dev->name, inw(ioaddr + IntrStatus));
+    printf("%s: Shutting down ethercard, status was 0x%04x\n", dev->name, insw(ioaddr + IntrStatus));
 
     // Disable interrupts by clearing the interrupt mask
     outw(ioaddr + IntrMask, 0x0000);
@@ -371,7 +372,7 @@ int rtl8139_close(struct netdev *dev) {
     outb(ioaddr + ChipCmd, 0x00);
 
     // Update the error counts
-    dev->stats.rx_dropped += inl(ioaddr + RxMissed);
+    dev->stats.rx_dropped += insl(ioaddr + RxMissed);
     outl(ioaddr + RxMissed, 0);
 
     // TODO: Delete timer when timer system is ready
@@ -445,7 +446,7 @@ static int rtl8139_rx(struct rtl8139_private *priv) {
     uint8_t *rx_ring = priv->rx_ring;
     uint16_t cur_rx = priv->cur_rx;
 
-    while ((inb(ioaddr + ChipCmd) & RxBufEmpty) == 0) {
+    while ((insb(ioaddr + ChipCmd) & RxBufEmpty) == 0) {
         uint32_t ring_offset = cur_rx % priv->rx_buf_len;
         uint32_t rx_status = *(uint32_t *)(rx_ring + ring_offset);
         uint32_t rx_size = rx_status >> 16;  // Includes the CRC
@@ -506,7 +507,7 @@ static void rtl8139_tx_clear(struct rtl8139_private *priv) {
 
     while (priv->cur_tx - dirty_tx > 0) {
         int entry = dirty_tx % NUM_TX_DESC;
-        int txstatus = inl(ioaddr + TxStatus0 + entry * 4);
+        int txstatus = insl(ioaddr + TxStatus0 + entry * 4);
 
         if (!(txstatus & (TxStatOK | TxUnderrun | TxAborted))) {
             break;  // Not finished yet
@@ -550,11 +551,11 @@ static void rtl8139_tx_clear(struct rtl8139_private *priv) {
 
 static void rtl8139_tx_timeout(struct rtl8139_private *priv) {
     uint16_t ioaddr = priv->iobase;
-    int status = inw(ioaddr + IntrStatus);
+    int status = insw(ioaddr + IntrStatus);
     int i;
 
-    printf("%s: Transmit timeout, status %02x %04x media %02x\n", priv->netdev->name, inb(ioaddr + ChipCmd), status,
-           inb(ioaddr + GPPinData));
+    printf("%s: Transmit timeout, status %02x %04x media %02x\n", priv->netdev->name, insb(ioaddr + ChipCmd), status,
+           insb(ioaddr + GPPinData));
 
     if (status & (TxOK | RxOK)) {
         printf("%s: RTL8139 Interrupt line blocked, status %x\n", priv->netdev->name, status);
@@ -567,7 +568,7 @@ static void rtl8139_tx_timeout(struct rtl8139_private *priv) {
     printf("%s: Tx queue start entry %d  dirty entry %d\n", priv->netdev->name, priv->cur_tx, priv->dirty_tx);
 
     for (i = 0; i < NUM_TX_DESC; i++) {
-        printf("%s:  Tx descriptor %d is %08x.%s\n", priv->netdev->name, i, inl(ioaddr + TxStatus0 + i * 4),
+        printf("%s:  Tx descriptor %d is %08x.%s\n", priv->netdev->name, i, insl(ioaddr + TxStatus0 + i * 4),
                i == priv->dirty_tx % NUM_TX_DESC ? " (queue head)" : "");
     }
 

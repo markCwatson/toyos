@@ -203,8 +203,6 @@ void rtl8139_cleanup(struct rtl8139_private *priv);
 int rtl8139_open(struct netdev *dev);
 int rtl8139_close(struct netdev *dev);
 int rtl8139_transmit(struct netdev *dev, struct netbuf *buf);
-int rtl8139_set_rx_mode(struct netdev *dev);
-struct netdev_stats *rtl8139_get_stats(struct netdev *dev);
 
 // Hardware functions
 static int rtl8139_hw_start(struct rtl8139_private *priv);

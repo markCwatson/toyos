@@ -1,5 +1,6 @@
 #include "netdev.h"
 #include "memory/heap/kheap.h"
+#include "memory/memory.h"
 #include "stdlib/printf.h"
 #include "stdlib/string.h"
 
