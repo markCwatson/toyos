@@ -94,7 +94,7 @@ struct netdev *netdev_create(const char *name, struct netdev_ops *ops, struct pc
     netdevs[netdev_count] = dev;
     netdev_count++;
 
-    printf("netdev: Created network device '%s' (I/O base: 0x%x, IRQ: %d)\n", dev->name, dev->iobase, dev->irq);
+    printf("netdev: Created network device '%s' (I/O base: 0x%x, IRQ: %i)\n", dev->name, dev->iobase, dev->irq);
 
     return dev;
 }
@@ -131,7 +131,7 @@ int netdev_rx(struct netdev *dev, struct netbuf *buf) {
 
     // todo: For now, just print packet info and discard
     // In the future, this will pass packets to the network stack
-    printf("netdev: %s received %d byte packet\n", dev->name, buf->len);
+    printf("netdev: %s received %i byte packet\n", dev->name, buf->len);
 
     // todo: Free the buffer since we have no network stack yet
     netbuf_free(buf);
