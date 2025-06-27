@@ -16,6 +16,9 @@ Current features include:
 - **Multi-threading:** Support for concurrent execution of processes, enabling more complex and efficient program execution.
 - **User-Level Programs:** Support for running user programs, expanding the OS's functionality beyond system-level operations.
 - **Loading ELF files at runtime:** The ability to dynamically load shared libraries and user programs at runtime.
+- **PCI Device driver:** PCI devices can be discovered and enumerated.
+- **Network Device abstraction:** An abstraction layer for networking devices such as the RTL8139.
+- **RTL8139 driver port:** The driver for sanos (originally developed by Donald Becker and Michael Ringgaard) has been ported to toyos.
 
 Work in progress:
 
