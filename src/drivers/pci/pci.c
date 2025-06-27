@@ -270,7 +270,7 @@ int pci_enumerate_devices(void) {
         }
     }
 
-    printf("PCI enumeration complete. Found %d devices.\n", pci_device_count);
+    printf("PCI enumeration complete. Found %i devices.\n", pci_device_count);
     return pci_device_count;
 }
 

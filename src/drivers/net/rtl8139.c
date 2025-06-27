@@ -279,7 +279,7 @@ static int rtl8139_hw_start(struct rtl8139_private *priv) {
             }
         }
 
-        printf("%s: Setting %s%s-duplex based on auto-negotiated partner ability %04x\n", priv->netdev->name,
+        printf("%s: Setting %s%s-duplex based on auto-negotiated partner ability %x\n", priv->netdev->name,
                mii_reg5 == 0         ? ""
                : (mii_reg5 & 0x0180) ? "100mbps "
                                      : "10mbps ",
@@ -363,7 +363,7 @@ int rtl8139_close(struct netdev *dev) {
     uint16_t ioaddr = priv->iobase;
     int i;
 
-    printf("%s: Shutting down ethercard, status was 0x%04x\n", dev->name, insw(ioaddr + IntrStatus));
+    printf("%s: Shutting down ethercard, status was 0x%x\n", dev->name, insw(ioaddr + IntrStatus));
 
     // Disable interrupts by clearing the interrupt mask
     outw(ioaddr + IntrMask, 0x0000);
@@ -554,7 +554,7 @@ static void rtl8139_tx_timeout(struct rtl8139_private *priv) {
     int status = insw(ioaddr + IntrStatus);
     int i;
 
-    printf("%s: Transmit timeout, status %02x %04x media %02x\n", priv->netdev->name, insb(ioaddr + ChipCmd), status,
+    printf("%s: Transmit timeout, status %x %x media %x\n", priv->netdev->name, insb(ioaddr + ChipCmd), status,
            insb(ioaddr + GPPinData));
 
     if (status & (TxOK | RxOK)) {
@@ -565,10 +565,10 @@ static void rtl8139_tx_timeout(struct rtl8139_private *priv) {
     outw(ioaddr + IntrMask, 0x0000);
 
     // Emit info to figure out what went wrong
-    printf("%s: Tx queue start entry %d  dirty entry %d\n", priv->netdev->name, priv->cur_tx, priv->dirty_tx);
+    printf("%s: Tx queue start entry %i  dirty entry %i\n", priv->netdev->name, priv->cur_tx, priv->dirty_tx);
 
     for (i = 0; i < NUM_TX_DESC; i++) {
-        printf("%s:  Tx descriptor %d is %08x.%s\n", priv->netdev->name, i, insl(ioaddr + TxStatus0 + i * 4),
+        printf("%s:  Tx descriptor %i is %08x.%s\n", priv->netdev->name, i, insl(ioaddr + TxStatus0 + i * 4),
                i == priv->dirty_tx % NUM_TX_DESC ? " (queue head)" : "");
     }
 
@@ -607,7 +607,7 @@ int rtl8139_init(struct pci_device *pci_dev) {
     iobase = pci_dev->bar[0] & 0xFFFFFFFC;  // I/O base address
     irq = pci_dev->interrupt_line;
 
-    printf("RTL8139: Found at I/O 0x%x, IRQ %d\n", iobase, irq);
+    printf("RTL8139: Found at I/O 0x%x, IRQ %i\n", iobase, irq);
 
     // Enable PCI device
     uint32_t cmd = pci_config_read_32(pci_dev->bus, pci_dev->device, pci_dev->function, 0x04);
@@ -649,7 +649,7 @@ int rtl8139_init(struct pci_device *pci_dev) {
     // Read MAC address from EEPROM
     rtl8139_get_mac_address(priv);
 
-    printf("RTL8139: MAC address %02x:%02x:%02x:%02x:%02x:%02x\n", netdev->hwaddr.addr[0], netdev->hwaddr.addr[1],
+    printf("RTL8139: MAC address %x:%x:%x:%x:%x:%x\n", netdev->hwaddr.addr[0], netdev->hwaddr.addr[1],
            netdev->hwaddr.addr[2], netdev->hwaddr.addr[3], netdev->hwaddr.addr[4], netdev->hwaddr.addr[5]);
 
     // Set device state
