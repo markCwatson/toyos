@@ -262,7 +262,7 @@ The original RTL8139 driver was designed for a different OS (sanos) with a `stru
 - Interrupt status and control bits
 
 **Files:**
-- Update `src/drivers/network/rtl8129.h` with ToyOS compatibility
+- Update `src/drivers/net/rtl8129.h` with ToyOS compatibility
 
 #### Step 2.4: Core Driver Implementation
 

@@ -1,4 +1,5 @@
 #include "pci.h"
+#include "drivers/net/rtl8139.h"
 #include "io/io.h"
 #include "kernel.h"
 #include "stdlib/printf.h"
@@ -256,9 +257,12 @@ int pci_enumerate_devices(void) {
                        device.device_id, pci_get_class_name(device.class_code));
 
                 if (device.vendor_id == RTL8139_VENDOR_ID && device.device_id == RTL8139_DEVICE_ID) {
-                    printf("*** Found RTL8139 Network Card! ***\n");
-                    printf("    I/O Base: 0x%x\n", device.bar[0] & 0xFFFFFFFC);
-                    printf("    IRQ Line: %i\n", device.interrupt_line);
+                    printf("    Initializing RTL8139 driver...\n");
+                    if (rtl8139_init(&pci_devices[pci_device_count - 1]) == 0) {
+                        printf("    RTL8139 driver initialized successfully\n");
+                    } else {
+                        printf("    RTL8139 driver initialization failed\n");
+                    }
                 }
 
                 // todo: handle multifunction device, check other functions

@@ -32,6 +32,8 @@ FILES = ./build/kernel.asm.o \
 		./build/keyboard/keyboard.o \
 		./build/drivers/keyboards/ps2.o \
 		./build/drivers/pci/pci.o \
+		./build/drivers/net/rtl8139.o \
+		./build/sys/net/netdev.o \
 		./build/loader/formats/elf.o \
 		./build/loader/formats/elfloader.o \
 		./build/sys/task/process.o \
@@ -225,6 +227,12 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 
 ./build/drivers/pci/pci.o: ./src/drivers/pci/pci.c
 	i686-elf-gcc $(INCLUDES) -I./src/drivers/pci $(FLAGS) -std=gnu99 -c ./src/drivers/pci/pci.c -o ./build/drivers/pci/pci.o
+
+./build/drivers/net/rtl8139.o: ./src/drivers/net/rtl8139.c
+	i686-elf-gcc $(INCLUDES) -I./src/drivers/net $(FLAGS) -std=gnu99 -c ./src/drivers/net/rtl8139.c -o ./build/drivers/net/rtl8139.o
+
+./build/sys/net/netdev.o: ./src/sys/net/netdev.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/netdev.c -o ./build/sys/net/netdev.o
 
 ./build/loader/formats/elf.o: ./src/loader/formats/elf.c
 	i686-elf-gcc $(INCLUDES) -I./src/loader/formats $(FLAGS) -std=gnu99 -c ./src/loader/formats/elf.c -o ./build/loader/formats/elf.o
