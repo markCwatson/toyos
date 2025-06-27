@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "*.mdx": "markdown",
     "io.h": "c",
     "memory.h": "c",
     "status.h": "c",
@@ -22,7 +23,8 @@
     "process.h": "c",
     "keyboard.h": "c",
     "heap.h": "c",
-    "spinlock.h": "c"
+    "spinlock.h": "c",
+    "rtl8139.h": "c"
   },
   "editor.formatOnSave": true,
   "C_Cpp.clang_format_style": "file",
