@@ -171,4 +171,30 @@ struct netdev *netdev_get_by_index(int index);
  */
 int netdev_get_count(void);
 
+/**
+ * @brief Bring up all registered network devices
+ *
+ * This function attempts to open all registered network devices.
+ * It's typically called during system initialization.
+ *
+ * @return Number of devices successfully brought up
+ */
+int netdev_bring_all_up(void);
+
+/**
+ * @brief Bring up a specific network device by name
+ *
+ * @param name Device name (e.g., "eth0")
+ * @return 0 on success, negative on error
+ */
+int netdev_bring_up(const char *name);
+
+/**
+ * @brief Bring down a specific network device by name
+ *
+ * @param name Device name (e.g., "eth0")
+ * @return 0 on success, negative on error
+ */
+int netdev_bring_down(const char *name);
+
 #endif

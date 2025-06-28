@@ -160,3 +160,79 @@ struct netdev *netdev_get_by_index(int index) {
 int netdev_get_count(void) {
     return netdev_count;
 }
+
+int netdev_bring_all_up(void) {
+    int successful = 0;
+
+    for (int i = 0; i < netdev_count; i++) {
+        struct netdev *dev = netdevs[i];
+        if (dev && dev->ops && dev->ops->open) {
+            int result = dev->ops->open(dev);
+            if (result == 0) {
+                dev->state = NETDEV_STATE_UP;
+                printf("Network interface %s is UP\n", dev->name);
+                successful++;
+            } else {
+                printf("Failed to bring up network interface %s\n", dev->name);
+            }
+        }
+    }
+
+    return successful;
+}
+
+int netdev_bring_up(const char *name) {
+    struct netdev *dev = netdev_get_by_name(name);
+    if (!dev) {
+        printf("Network device '%s' not found\n", name);
+        return -1;
+    }
+
+    if (!dev->ops || !dev->ops->open) {
+        printf("Network device '%s' has no open function\n", name);
+        return -1;
+    }
+
+    if (dev->state == NETDEV_STATE_UP) {
+        printf("Network device '%s' is already up\n", name);
+        return 0;
+    }
+
+    int result = dev->ops->open(dev);
+    if (result == 0) {
+        dev->state = NETDEV_STATE_UP;
+        printf("Network interface %s is UP\n", dev->name);
+    } else {
+        printf("Failed to bring up network interface %s\n", dev->name);
+    }
+
+    return result;
+}
+
+int netdev_bring_down(const char *name) {
+    struct netdev *dev = netdev_get_by_name(name);
+    if (!dev) {
+        printf("Network device '%s' not found\n", name);
+        return -1;
+    }
+
+    if (!dev->ops || !dev->ops->close) {
+        printf("Network device '%s' has no close function\n", name);
+        return -1;
+    }
+
+    if (dev->state == NETDEV_STATE_DOWN) {
+        printf("Network device '%s' is already down\n", name);
+        return 0;
+    }
+
+    int result = dev->ops->close(dev);
+    if (result == 0) {
+        dev->state = NETDEV_STATE_DOWN;
+        printf("Network interface %s is DOWN\n", dev->name);
+    } else {
+        printf("Failed to bring down network interface %s\n", dev->name);
+    }
+
+    return result;
+}

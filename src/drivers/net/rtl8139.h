@@ -34,59 +34,8 @@
 // Timeout values
 #define TX_TIMEOUT_TICKS 200  // Simplified timeout (no HZ conversion)
 
-/**
- * @brief RTL8139 private data structure
- *
- * This replaces the original struct nic
- */
-struct rtl8139_private {
-    struct netdev *netdev;  // Associated network device
-
-    // Hardware information
-    uint16_t iobase;             // I/O base address
-    uint8_t irq;                 // IRQ number
-    struct pci_device *pci_dev;  // PCI device info
-
-    // Interrupt handling
-    int interrupt_registered;  // Whether interrupt is registered
-
-    // Receive state
-    uint8_t *rx_ring;     // Receive ring buffer
-    uint32_t cur_rx;      // Index into the Rx buffer of next Rx pkt
-    uint32_t rx_buf_len;  // Size (8K 16K 32K or 64KB) of the Rx ring
-
-    // Transmit state
-    struct spinlock_t tx_lock;            // Transmit lock (replaces semaphore)
-    uint32_t cur_tx;                      // Current transmit descriptor
-    uint32_t dirty_tx;                    // Dirty transmit descriptors
-    uint32_t tx_flag;                     // Transmit configuration flags
-    struct netbuf *tx_bufs[NUM_TX_DESC];  // Saved transmit packets
-    uint8_t *tx_buffer[NUM_TX_DESC];      // Tx bounce buffers
-    uint8_t *tx_bufs_mem;                 // Tx bounce buffer region
-    uint32_t trans_start;                 // Last transmission start time
-
-    // Receiver filter state
-    uint32_t rx_config;     // Receive configuration
-    uint32_t mc_filter[2];  // Multicast hash filter
-
-    // Transceiver state
-    uint8_t phys[4];       // MII device addresses
-    uint16_t advertising;  // NWay media advertisement
-    uint8_t full_duplex;   // Full-duplex operation requested
-    uint8_t duplex_lock;   // Duplex locked
-    uint8_t link_speed;    // Link speed
-
-    // Configuration
-    uint8_t config1;                  // Configuration register 1 value
-    uint32_t max_interrupt_work;      // Maximum interrupt work
-    uint32_t multicast_filter_limit;  // Multicast filter limit
-
-    // Flags
-    uint32_t flags;  // Board capability flags
-
-    // Stats (basic - netdev handles the rest)
-    uint32_t tx_timeout_count;  // Transmit timeout counter
-};
+// forward declaration
+struct rtl8139;
 
 // Board capability flags
 enum board_capability_flags { HAS_MII_XCVR = 0x01, HAS_CHIP_XCVR = 0x02, HAS_LNK_CHNG = 0x04, HAS_DESC = 0x08 };
@@ -197,7 +146,7 @@ enum CSCRBits {
 
 // Function declarations
 int rtl8139_init(struct pci_device *pci_dev);
-void rtl8139_cleanup(struct rtl8139_private *priv);
+void rtl8139_cleanup(struct rtl8139 *rtl);
 
 // Network device operations
 int rtl8139_open(struct netdev *dev);
@@ -205,23 +154,23 @@ int rtl8139_close(struct netdev *dev);
 int rtl8139_transmit(struct netdev *dev, struct netbuf *buf);
 
 // Hardware functions
-static int rtl8139_hw_start(struct rtl8139_private *priv);
-static void rtl8139_hw_reset(struct rtl8139_private *priv);
-static void rtl8139_init_ring(struct rtl8139_private *priv);
+static int rtl8139_hw_start(struct rtl8139 *rtl);
+static void rtl8139_hw_reset(struct rtl8139 *rtl);
+static void rtl8139_init_ring(struct rtl8139 *rtl);
 
 // Interrupt handling
 static void rtl8139_interrupt(struct interrupt_frame *frame);
-static int rtl8139_rx(struct rtl8139_private *priv);
-static void rtl8139_tx_clear(struct rtl8139_private *priv);
-static void rtl8139_tx_timeout(struct rtl8139_private *priv);
+static int rtl8139_rx(struct rtl8139 *rtl);
+static void rtl8139_tx_clear(struct rtl8139 *rtl);
+static void rtl8139_tx_timeout(struct rtl8139 *rtl);
 
 // EEPROM and MII functions
 static int rtl8139_read_eeprom(uint16_t iobase, int location, int addr_len);
-static int rtl8139_mdio_read(struct rtl8139_private *priv, int phy_id, int location);
-static void rtl8139_mdio_write(struct rtl8139_private *priv, int phy_id, int location, int value);
+static int rtl8139_mdio_read(struct rtl8139 *rtl, int phy_id, int location);
+static void rtl8139_mdio_write(struct rtl8139 *rtl, int phy_id, int location, int value);
 
 // Utility functions
-static void rtl8139_get_mac_address(struct rtl8139_private *priv);
+static void rtl8139_get_mac_address(struct rtl8139 *rtl);
 static uint32_t rtl8139_ether_crc(int length, uint8_t *data);
 
 #endif  // __RTL8139_H__

@@ -133,16 +133,13 @@ void maink(void) {
     keyboard_init();
     pci_enumerate_devices();
 
-    // todo: remove
-    struct netdev *netdev = netdev_get_by_name("eth0");
-    if (netdev) {
-        printf("Netdev: %s\n", netdev->name);
-        if (netdev->ops && netdev->ops->open) {
-            netdev->ops->open(netdev);
-            printf("Netdev open result: %i\n", netdev->state);
-        }
+    // Initialize network interfaces
+    printk_colored("Bringing up network interfaces...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
+    int active_interfaces = netdev_bring_all_up();
+    if (active_interfaces > 0) {
+        printf("Successfully brought up %d network interface(s)\n", active_interfaces);
     } else {
-        printf("Netdev not found\n");
+        printf("No network interfaces were brought up\n");
     }
 
     print_toyos_logo();
