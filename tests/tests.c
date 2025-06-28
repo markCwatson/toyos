@@ -1,22 +1,23 @@
 #include "tests.h"
-#include "fs/file.h"
-#include "stdlib/string.h"
-#include "stdlib/printf.h"
 #include "disk/streamer.h"
-#include "memory/paging/paging.h"
-#include "memory/heap/kheap.h"
+#include "fs/file.h"
 #include "kernel.h"
-#include "task/process.h"
 #include "keyboard/keyboard.h"
+#include "memory/heap/kheap.h"
+#include "memory/paging/paging.h"
+#include "stdlib/printf.h"
+#include "stdlib/string.h"
+#include "sys/net/netdev.h"
+#include "task/process.h"
 
-extern struct paging_4gb_chunk* kernel_chunk;
+extern struct paging_4gb_chunk *kernel_chunk;
 
 #define MAX_TESTS 100
 
 // Structure to hold the result of each test
 typedef struct {
     int test_num;            /**< The test number. */
-    const char* description; /**< A brief description of the test. */
+    const char *description; /**< A brief description of the test. */
     bool passed;             /**< Whether the test passed or failed. */
 } test_result_t;
 
@@ -34,7 +35,7 @@ static int fail_count = 0;
  * @param description A description of the test.
  * @param condition Whether the test passed (true) or failed (false).
  */
-static inline void register_test(const char* description, bool condition) {
+static inline void register_test(const char *description, bool condition) {
     if (test_count < MAX_TESTS) {
         test_results[test_count].test_num = test_count;
         test_results[test_count].description = description;
@@ -65,7 +66,8 @@ static void print_test_summary(void) {
         printf_colored("\nFailed Tests:\n", COLOR_RED, COLOR_BLACK);
         for (int i = 0; i < test_count; i++) {
             if (!test_results[i].passed) {
-                printf_colored("Test %i: %s\n", COLOR_RED, COLOR_BLACK, test_results[i].test_num, test_results[i].description);
+                printf_colored("Test %i: %s\n", COLOR_RED, COLOR_BLACK, test_results[i].test_num,
+                               test_results[i].description);
             }
         }
     }
@@ -76,7 +78,7 @@ static void print_test_summary(void) {
  */
 static void test_keyboard(void) {
     keyboard_push('A');
-    struct process* proc = process_current();
+    struct process *proc = process_current();
     register_test("Keyboard push A", proc->keyboard.buffer[0] == 'A');
 
     keyboard_push('B');
@@ -90,10 +92,10 @@ static void test_keyboard(void) {
  * @brief Tests loading and switching to a user program.
  */
 static void test_user_program(void) {
-    struct process* cur_process = process_current();
+    struct process *cur_process = process_current();
     register_test("Current process", cur_process != NULL);
 
-    struct process* process = NULL;
+    struct process *process = NULL;
     int res = process_load_switch("0:/test.bin", &process);
     register_test("Load user program", res == 0);
 
@@ -108,7 +110,7 @@ static void test_user_program(void) {
  * This function tests creating a disk stream, reading from it, and closing it.
  */
 static void test_streamer(void) {
-    struct disk_stream* stream = streamer_new(0);
+    struct disk_stream *stream = streamer_new(0);
     register_test("Streamer creation", stream != NULL);
 
     if (stream) {
@@ -210,7 +212,7 @@ static void test_append_content(void) {
 static void test_file_operations(void) {
     test_read_initial_content();
     test_write_new_content();
-    test_append_content(); // failing because FILE_MODE_APPEND is not implemented yet
+    test_append_content();  // failing because FILE_MODE_APPEND is not implemented yet
 }
 
 /**
@@ -219,7 +221,7 @@ static void test_file_operations(void) {
  * This function tests memory allocation and deallocation using the kernel heap.
  */
 static void test_heap(void) {
-    void* ptr = kmalloc(100);
+    void *ptr = kmalloc(100);
     register_test("Heap allocation", ptr != NULL);
 
     kfree(ptr);
@@ -233,13 +235,14 @@ static void test_heap(void) {
  * and verifying read/write operations to a mapped virtual address.
  */
 static void test_paging(void) {
-    char* ptr = kzalloc(4096);
+    char *ptr = kzalloc(4096);
     register_test("Heap block allocation", ptr != NULL);
 
-    int res = paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void*)0x1000, ((uint32_t)ptr | PAGING_ACCESS_FROM_ALL | PAGING_IS_PRESENT | PAGING_IS_WRITEABLE));
+    int res = paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void *)0x1000,
+                         ((uint32_t)ptr | PAGING_ACCESS_FROM_ALL | PAGING_IS_PRESENT | PAGING_IS_WRITEABLE));
     register_test("Paging set", res == 0);
 
-    char* ptr2 = (char*)0x1000;
+    char *ptr2 = (char *)0x1000;
 
     ptr2[0] = 'A';
     ptr2[1] = 'B';
@@ -249,6 +252,25 @@ static void test_paging(void) {
 
     kfree(ptr);
     register_test("Free memory", true);
+}
+
+/**
+ * @brief Tests the network device functionality.
+ */
+static void test_netdev(void) {
+    pci_enumerate_devices();
+
+    int result = -1;
+    struct netdev *netdev = netdev_get_by_name("eth0");
+    if (netdev)
+        if (netdev->ops && netdev->ops->open)
+            result = netdev->ops->open(netdev);
+
+    register_test("Netdev get by name", netdev != NULL);
+    register_test("Netdev ops", netdev->ops != NULL);
+    register_test("Netdev open", netdev->ops->open != NULL);
+    register_test("Netdev open result", result == 0);
+    register_test("Netdev state", netdev->state == NETDEV_STATE_UP);
 }
 
 /**
@@ -264,6 +286,7 @@ void tests_run(void) {
     test_streamer();
     test_keyboard();
     test_user_program();
+    test_netdev();
 
     print_test_summary();
 }

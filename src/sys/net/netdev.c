@@ -3,6 +3,7 @@
 #include "memory/memory.h"
 #include "stdlib/printf.h"
 #include "stdlib/string.h"
+#include "sys/net/ethernet.h"
 
 // Global device registry (simple for now)
 #define MAX_NETDEVS 8
@@ -122,6 +123,7 @@ void netdev_destroy(struct netdev *dev) {
 
 int netdev_rx(struct netdev *dev, struct netbuf *buf) {
     if (!dev || !buf) {
+        printf("netdev: Invalid parameters\n");
         return -1;
     }
 
@@ -129,12 +131,12 @@ int netdev_rx(struct netdev *dev, struct netbuf *buf) {
     dev->stats.rx_packets++;
     dev->stats.rx_bytes += buf->len;
 
-    // todo: For now, just print packet info and discard
-    // In the future, this will pass packets to the network stack
     printf("netdev: %s received %i byte packet\n", dev->name, buf->len);
-
-    // todo: Free the buffer since we have no network stack yet
-    netbuf_free(buf);
+    int res = ethernet_rx(dev, buf);
+    if (res < 0) {
+        printf("netdev: Failed to process packet\n");
+        return -1;
+    }
 
     return 0;
 }

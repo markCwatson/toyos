@@ -320,13 +320,13 @@ static void rtl8139_get_mac_address(struct rtl8139_private *priv) {
 
 int rtl8139_open(struct netdev *dev) {
     struct rtl8139_private *priv = (struct rtl8139_private *)dev->driver_data;
-    // uint16_t ioaddr = priv->iobase;
     int rx_buf_len_idx;
 
-    // TODO: Enable IRQ when interrupt system is ready
-    // enable_irq(priv->irq);
+    // Register interrupt handler (IRQ numbers start at 0x20)
+    idt_register_interrupt_callback(0x20 + priv->irq, rtl8139_interrupt);
+    printf("%s: Registered interrupt handler for IRQ %i (vector 0x%x)\n", dev->name, priv->irq, 0x20 + priv->irq);
 
-    // Itodo: nitialize transmit spinslock
+    // todo: nitialize transmit spinslock
     // spinslock_init(&priv->tx_lock);
 
     // Allocate receive buffer
@@ -435,10 +435,58 @@ int rtl8139_transmit(struct netdev *dev, struct netbuf *buf) {
     return 0;
 }
 
-// TODO: Implement interrupt handling when interrupt system is ready
 static void rtl8139_interrupt(struct interrupt_frame *frame) {
-    // Placeholder for interrupt handling
-    // This will be implemented when ToyOS interrupt system integration is ready
+    // TODO: For now we need a way to get the device from the interrupt
+    // This is a simplified version - normally we'd get the device from interrupt registration
+
+    // For now, find the RTL8139 device (this is a hack until proper interrupt registration)
+    struct pci_device *rtl_dev = pci_find_device(RTL8139_VENDOR_ID, RTL8139_DEVICE_ID);
+    if (!rtl_dev)
+        return;
+
+    // Get the netdev (this assumes only one RTL8139 - also a hack)
+    struct netdev *netdev = netdev_get_by_name("eth0");
+    if (!netdev)
+        return;
+
+    struct rtl8139_private *priv = (struct rtl8139_private *)netdev->driver_data;
+    if (!priv)
+        return;
+
+    uint16_t ioaddr = priv->iobase;
+    int max_work = priv->max_interrupt_work;
+
+    while (max_work-- > 0) {
+        uint16_t status = insw(ioaddr + IntrStatus);
+
+        if (status == 0 || status == 0xFFFF) {
+            break;  // No more interrupts or device removed
+        }
+
+        // Acknowledge interrupts
+        outw(ioaddr + IntrStatus, status);
+
+        // Handle receive interrupts
+        if (status & (RxOK | RxErr)) {
+            rtl8139_rx(priv);
+        }
+
+        // Handle transmit interrupts
+        if (status & (TxOK | TxErr)) {
+            rtl8139_tx_clear(priv);
+        }
+
+        // Handle errors
+        if (status & (RxOverflow | RxFIFOOver | RxUnderrun)) {
+            printf("%s: RX error, status=0x%x\n", netdev->name, status);
+            // TODO: Proper error recovery
+        }
+
+        if (status & PCIErr) {
+            printf("%s: PCI error, status=0x%x\n", netdev->name, status);
+            // TODO: Proper error recovery
+        }
+    }
 }
 
 static int rtl8139_rx(struct rtl8139_private *priv) {

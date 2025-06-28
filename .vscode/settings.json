@@ -24,7 +24,8 @@
     "keyboard.h": "c",
     "heap.h": "c",
     "spinlock.h": "c",
-    "rtl8139.h": "c"
+    "rtl8139.h": "c",
+    "netdev.h": "c"
   },
   "editor.formatOnSave": true,
   "C_Cpp.clang_format_style": "file",

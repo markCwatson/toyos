@@ -34,6 +34,7 @@ FILES = ./build/kernel.asm.o \
 		./build/drivers/pci/pci.o \
 		./build/drivers/net/rtl8139.o \
 		./build/sys/net/netdev.o \
+		./build/sys/net/ethernet.o \
 		./build/loader/formats/elf.o \
 		./build/loader/formats/elfloader.o \
 		./build/sys/task/process.o \
@@ -230,6 +231,9 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 
 ./build/drivers/net/rtl8139.o: ./src/drivers/net/rtl8139.c
 	i686-elf-gcc $(INCLUDES) -I./src/drivers/net $(FLAGS) -std=gnu99 -c ./src/drivers/net/rtl8139.c -o ./build/drivers/net/rtl8139.o
+
+./build/sys/net/ethernet.o: ./src/sys/net/ethernet.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/ethernet.c -o ./build/sys/net/ethernet.o
 
 ./build/sys/net/netdev.o: ./src/sys/net/netdev.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/netdev.c -o ./build/sys/net/netdev.o

@@ -326,21 +326,79 @@ Based on the reference implementation from the [sanos RTL8139 driver](http://www
 
 The network stack implements a layered architecture where each layer provides services to the layer above and uses services from the layer below. This separation of concerns makes the system more maintainable and allows protocols to be developed independently.
 
+Data flow:
+```
+Packet arrives → RTL8139 hardware → Interrupt → rtl8139_interrupt() → rtl8139_rx() → netdev_rx() → ethernet_rx() → [Protocol layers]
+```
+
 ### Step 3.1: Ethernet Layer Implementation
 
-The Ethernet layer handles local network communication and frame formatting.
+- `src/sys/net/ethernet.h` - Ethernet header structure definitions  
+- `src/sys/net/ethernet.c` - Basic frame parsing and protocol demultiplexing
+- Integration with netdev layer (`netdev_rx()` calls `ethernet_rx()`)
+- EtherType recognition (IPv4 0x0800, ARP 0x0806)
+- ethernet frame transmission (`ethernet_tx()`)
+- ethernet frame validation (minimum length, CRC checking)
+- support for VLAN tags (802.1Q)
 
 ### Step 3.2: ARP Protocol Implementation
 
-ARP (Address Resolution Protocol) maps IP addresses to MAC addresses on the local network.
+Address Resolution Protocol (ARP) maps IP addresses to MAC addresses on the local network segment. This is essential for IP communication as Ethernet frames require MAC addresses, but higher layers work with IP addresses.
+
+- **Address Resolution**: When sending to an IP address, ARP determines the corresponding MAC address
+- **ARP Cache**: Maintains a table of recently resolved IP→MAC mappings to avoid repeated requests
+- **ARP Request/Reply**: Uses broadcast requests and unicast replies for address resolution
+- **Gratuitous ARP**: Announces IP address ownership and updates neighbor caches
+
+**Implementation Strategy**:
+Create ARP packet header structure with hardware/protocol types, operation codes, and address fields. Implement ARP table for caching IP→MAC mappings with timeout support. Handle incoming ARP requests by checking if target IP matches our configuration. Send ARP replies when requests target our IP address. Provide lookup function for higher layers to resolve IP addresses.
+
+**Files to Create**: `src/sys/net/arp.h` and `src/sys/net/arp.c`
 
 ### Step 3.3: IPv4 Layer Implementation
 
-The IP layer handles internet addressing and packet routing.
+**Purpose**: Implements the Internet Protocol version 4, handling packet routing, fragmentation, and delivery between networks. This layer provides the foundation for higher-level protocols like UDP, TCP, and ICMP.
 
-### Step 3.4: UDP Protocol Implementation
+**Key Concepts**:
+- **Packet Routing**: Determines if packets are for local delivery or need forwarding
+- **Header Processing**: Validates IP headers, checksums, and packet integrity
+- **Protocol Demultiplexing**: Routes packets to appropriate upper layer protocols
+- **IP Configuration**: Manages local IP address, netmask, and gateway settings
 
-UDP provides a simple, connectionless transport protocol suitable for applications that don't require reliability guarantees.
+**Implementation Strategy**:
+Define IPv4 header structure with version, length, TTL, protocol, and address fields. Implement packet reception handling that validates headers and routes to upper protocols. Create packet transmission functions that build IP headers and integrate with ARP for address resolution. Support basic IP configuration for static addressing.
+
+**Files to Create**: `src/sys/net/ip.h` and `src/sys/net/ip.c`
+
+### Step 3.4: ICMP Implementation
+
+**Purpose**: Internet Control Message Protocol (ICMP) provides error reporting and diagnostic functionality for IP networks. Most importantly, it enables ping responses for network connectivity testing.
+
+**Key Concepts**:
+- **Echo Request/Reply**: Implements ping functionality for network diagnostics
+- **Error Reporting**: Provides feedback for unreachable destinations and other network issues
+- **Checksum Validation**: Ensures message integrity through checksum calculation
+- **Message Types**: Supports different ICMP message types (echo, destination unreachable, etc.)
+
+**Implementation Strategy**:
+Create ICMP header structure with type, code, checksum, and data fields. Implement echo request handling that generates appropriate echo replies. Support checksum calculation and validation for received packets. Integrate with IP layer for packet transmission and reception.
+
+**Files to Create**: `src/sys/net/icmp.h` and `src/sys/net/icmp.c`
+
+### Step 3.5: UDP Protocol Implementation
+
+**Purpose**: User Datagram Protocol (UDP) provides a simple, connectionless transport layer service. It's ideal for applications that prioritize speed over reliability, such as DNS queries, gaming, and real-time communications.
+
+**Key Concepts**:
+- **Connectionless Transport**: No connection establishment required before data transmission
+- **Port-Based Multiplexing**: Uses port numbers to identify different applications and services
+- **Minimal Overhead**: Simple header structure with minimal processing requirements
+- **Best-Effort Delivery**: No guarantees for packet delivery, ordering, or duplicate prevention
+
+**Implementation Strategy**:
+Define UDP header structure with source/destination ports, length, and checksum fields. Implement packet reception that validates headers and delivers data to appropriate services. Create transmission functions that build UDP headers and integrate with IP layer. Support port-based application multiplexing for service identification.
+
+**Files to Create**: `src/sys/net/udp.h` and `src/sys/net/udp.c`
 
 ## Phase 4: System Call Interface
 
