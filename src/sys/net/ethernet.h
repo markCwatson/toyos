@@ -15,6 +15,6 @@ struct ethernet_frame {
 } __attribute__((packed));
 
 int ethernet_rx(struct netdev *dev, struct netbuf *buf);
-int ethernet_tx(struct netdev *dev, struct netbuf *buf);
+int ethernet_tx(struct netdev *dev, uint8_t *dest_mac, uint16_t ethertype, struct netbuf *payload);
 
 #endif
