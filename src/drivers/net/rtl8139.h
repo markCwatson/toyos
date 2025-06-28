@@ -34,9 +34,6 @@
 // Timeout values
 #define TX_TIMEOUT_TICKS 200  // Simplified timeout (no HZ conversion)
 
-// forward declaration
-struct rtl8139;
-
 // Board capability flags
 enum board_capability_flags { HAS_MII_XCVR = 0x01, HAS_CHIP_XCVR = 0x02, HAS_LNK_CHNG = 0x04, HAS_DESC = 0x08 };
 
@@ -144,33 +141,10 @@ enum CSCRBits {
     CSCR_LinkDownCmd = 0x0f3c0,
 };
 
-// Function declarations
 int rtl8139_init(struct pci_device *pci_dev);
 void rtl8139_cleanup(struct rtl8139 *rtl);
-
-// Network device operations
 int rtl8139_open(struct netdev *dev);
 int rtl8139_close(struct netdev *dev);
 int rtl8139_transmit(struct netdev *dev, struct netbuf *buf);
 
-// Hardware functions
-static int rtl8139_hw_start(struct rtl8139 *rtl);
-static void rtl8139_hw_reset(struct rtl8139 *rtl);
-static void rtl8139_init_ring(struct rtl8139 *rtl);
-
-// Interrupt handling
-static void rtl8139_interrupt(struct interrupt_frame *frame);
-static int rtl8139_rx(struct rtl8139 *rtl);
-static void rtl8139_tx_clear(struct rtl8139 *rtl);
-static void rtl8139_tx_timeout(struct rtl8139 *rtl);
-
-// EEPROM and MII functions
-static int rtl8139_read_eeprom(uint16_t iobase, int location, int addr_len);
-static int rtl8139_mdio_read(struct rtl8139 *rtl, int phy_id, int location);
-static void rtl8139_mdio_write(struct rtl8139 *rtl, int phy_id, int location, int value);
-
-// Utility functions
-static void rtl8139_get_mac_address(struct rtl8139 *rtl);
-static uint32_t rtl8139_ether_crc(int length, uint8_t *data);
-
-#endif  // __RTL8139_H__
+#endif
