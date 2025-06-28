@@ -609,19 +609,17 @@ int rtl8139_init(struct pci_device *pci_dev) {
 
     printf("RTL8139: Found at I/O 0x%x, IRQ %i\n", iobase, irq);
 
-    // Enable PCI device
-    uint32_t cmd = pci_config_read_32(pci_dev->bus, pci_dev->device, pci_dev->function, 0x04);
+    // Enable PCI device (read-modify-write)
+    uint32_t cmd = pci_config_read_32(pci_dev->bus, pci_dev->device, pci_dev->function, PCI_COMMAND_OFFSET);
     cmd |= PCI_COMMAND_IO | PCI_COMMAND_MASTER;
-    pci_config_write_32(pci_dev->bus, pci_dev->device, pci_dev->function, 0x04, cmd);
+    pci_config_write_32(pci_dev->bus, pci_dev->device, pci_dev->function, PCI_COMMAND_OFFSET, cmd);
 
-    // Allocate private data structure
     priv = kzalloc(sizeof(struct rtl8139_private));
     if (!priv) {
         printf("RTL8139: Failed to allocate private data\n");
         return -1;
     }
 
-    // Create network device
     netdev = netdev_create("eth", &rtl8139_netdev_ops, pci_dev, priv);
     if (!netdev) {
         printf("RTL8139: Failed to create network device\n");

@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 // PCI Command Register Bits
+#define PCI_COMMAND_OFFSET 0x04          // Command register offset
 #define PCI_COMMAND_IO 0x0001            // Enable I/O space
 #define PCI_COMMAND_MEMORY 0x0002        // Enable memory space
 #define PCI_COMMAND_MASTER 0x0004        // Enable bus mastering
