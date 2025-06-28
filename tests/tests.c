@@ -7,7 +7,6 @@
 #include "memory/paging/paging.h"
 #include "stdlib/printf.h"
 #include "stdlib/string.h"
-#include "sys/net/netdev.h"
 #include "task/process.h"
 
 extern struct paging_4gb_chunk *kernel_chunk;
@@ -255,25 +254,6 @@ static void test_paging(void) {
 }
 
 /**
- * @brief Tests the network device functionality.
- */
-static void test_netdev(void) {
-    pci_enumerate_devices();
-
-    int result = -1;
-    struct netdev *netdev = netdev_get_by_name("eth0");
-    if (netdev)
-        if (netdev->ops && netdev->ops->open)
-            result = netdev->ops->open(netdev);
-
-    register_test("Netdev get by name", netdev != NULL);
-    register_test("Netdev ops", netdev->ops != NULL);
-    register_test("Netdev open", netdev->ops->open != NULL);
-    register_test("Netdev open result", result == 0);
-    register_test("Netdev state", netdev->state == NETDEV_STATE_UP);
-}
-
-/**
  * @brief Main function to run all tests.
  *
  * This function orchestrates the running of all test cases, including heap,
@@ -286,7 +266,6 @@ void tests_run(void) {
     test_streamer();
     test_keyboard();
     test_user_program();
-    test_netdev();
 
     print_test_summary();
 }

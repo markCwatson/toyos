@@ -13,6 +13,7 @@
 #include "memory/paging/paging.h"
 #include "stdlib/printf.h"
 #include "stdlib/string.h"
+#include "sys/net/netdev.h"
 #include "sys/sys.h"
 #include "task/process.h"
 #include "task/task.h"
@@ -131,6 +132,18 @@ void maink(void) {
 
     keyboard_init();
     pci_enumerate_devices();
+
+    // todo: remove
+    struct netdev *netdev = netdev_get_by_name("eth0");
+    if (netdev) {
+        printf("Netdev: %s\n", netdev->name);
+        if (netdev->ops && netdev->ops->open) {
+            netdev->ops->open(netdev);
+            printf("Netdev open result: %i\n", netdev->state);
+        }
+    } else {
+        printf("Netdev not found\n");
+    }
 
     print_toyos_logo();
     for (int i = 0; i < 100000000; i++) {
