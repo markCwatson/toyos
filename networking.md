@@ -460,6 +460,7 @@ The `hostfwd` option forwards UDP port 8080 on the host to port 7 in the guest. 
 - [OSDev PCI](https://wiki.osdev.org/PCI)
 - [PCI-SIG Specification](https://pcisig.com/specifications)
 - [OSDev Wiki RTL8139](https://wiki.osdev.org/RTL8139)
+- [OSDev Wiki networking stack](https://wiki.osdev.org/Network_Stack)
 - [RTL8139 Programming Guide](http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139_ProgrammersGuide.pdf)
 - [RTL8139 Datasheet](http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139D_DataSheet.pdf)
 - [Sanos RTL8139 Driver](http://www.jbox.dk/sanos/source/sys/dev/rtl8139.c.html)
