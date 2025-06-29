@@ -137,7 +137,7 @@ void maink(void) {
     printk_colored("Bringing up network interfaces...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     int active_interfaces = netdev_bring_all_up();
     if (active_interfaces > 0) {
-        printf("Successfully brought up %d network interface(s)\n", active_interfaces);
+        printf("Successfully brought up %i network interface(s)\n", active_interfaces);
     } else {
         printf("No network interfaces were brought up\n");
     }
