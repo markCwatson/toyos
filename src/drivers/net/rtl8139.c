@@ -372,174 +372,6 @@ static void rtl8139_get_mac_address(struct rtl8139 *rtl) {
     }
 }
 
-int rtl8139_open(struct netdev *dev) {
-    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
-    int rx_buf_len_idx;
-
-    // Register interrupt handler (IRQ numbers start at 0x20)
-    idt_register_interrupt_callback(0x20 + rtl->irq, rtl8139_interrupt);
-    printf("%s: Registered interrupt handler for IRQ %i (vector 0x%x)\n", dev->name, rtl->irq, 0x20 + rtl->irq);
-
-    // Allocate receive buffer
-    rx_buf_len_idx = RX_BUF_LEN_IDX;
-    do {
-        rtl->rx_buf_len = 8192 << rx_buf_len_idx;
-        rtl->rx_ring = kzalloc(rtl->rx_buf_len + 16 + (TX_BUF_SIZE * NUM_TX_DESC));
-    } while (rtl->rx_ring == NULL && --rx_buf_len_idx >= 0);
-
-    if (rtl->rx_ring == NULL) {
-        printf("%s: Failed to allocate RX buffer\n", dev->name);
-        return -1;
-    }
-
-    rtl->tx_bufs_mem = (uint8_t *)rtl->rx_ring + rtl->rx_buf_len + 16;
-
-    rtl8139_init_ring(rtl);
-    rtl->full_duplex = rtl->duplex_lock;
-    rtl->tx_flag = (TX_FIFO_THRESH << 11) & 0x003f0000;
-    rtl->rx_config = (RX_FIFO_THRESH << 13) | (rx_buf_len_idx << 11) | (RX_DMA_BURST << 8);
-
-    rtl8139_hw_start(rtl);
-
-    // TODO: Set up timer when timer system is ready
-    // init_timer(&rtl->timer, rtl8139_timer, dev);
-    // mod_timer(&rtl->timer, get_ticks() + 3 * HZ);
-
-    printf("%s: RTL8139 opened successfully\n", dev->name);
-    return 0;
-}
-
-int rtl8139_close(struct netdev *dev) {
-    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
-    uint16_t ioaddr = rtl->iobase;
-    int i;
-
-    printf("%s: Shutting down ethercard, status was 0x%x\n", dev->name, insw(ioaddr + IntrStatus));
-
-    // Disable interrupts by clearing the interrupt mask
-    outw(ioaddr + IntrMask, 0x0000);
-
-    // Stop the chip's Tx and Rx DMA processes
-    outb(ioaddr + ChipCmd, 0x00);
-
-    // Update the error counts
-    dev->stats.rx_dropped += insl(ioaddr + RxMissed);
-    outl(ioaddr + RxMissed, 0);
-
-    // TODO: Delete timer when timer system is ready
-    // del_timer(&rtl->timer);
-
-    // TODO: Disable IRQ when interrupt system is ready
-    // disable_irq(rtl->irq);
-
-    for (i = 0; i < NUM_TX_DESC; i++) {
-        if (rtl->tx_bufs[i]) {
-            netbuf_free(rtl->tx_bufs[i]);
-        }
-        rtl->tx_bufs[i] = NULL;
-    }
-
-    kfree(rtl->rx_ring);
-    rtl->rx_ring = NULL;
-
-    // Green! Put the chip in low-power mode
-    outb(ioaddr + Cfg9346, 0xC0);
-    outb(ioaddr + Config1, rtl->config1 | 0x03);
-    outb(ioaddr + HltClk, 'H');  // 'R' would leave the clock running
-
-    return 0;
-}
-
-int rtl8139_transmit(struct netdev *dev, struct netbuf *buf) {
-    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
-    uint16_t ioaddr = rtl->iobase;
-    int entry;
-    uint32_t len = buf->len;
-
-    // TODO: Implement proper synchronization when needed
-    // For now, just use a simple check
-    if (rtl->cur_tx - rtl->dirty_tx >= NUM_TX_DESC) {
-        printf("%s: Transmit queue full, dropping packet\n", dev->name);
-        dev->stats.tx_dropped++;
-        return -1;
-    }
-
-    // Calculate the next Tx descriptor entry
-    entry = rtl->cur_tx % NUM_TX_DESC;
-
-    rtl->tx_bufs[entry] = buf;
-
-    // Copy data to transmit buffer (RTL8139 needs contiguous buffer)
-    memcpy(rtl->tx_buffer[entry], buf->data, len);
-
-    outl(ioaddr + TxAddr0 + entry * 4, (uint32_t)rtl->tx_buffer[entry]);
-
-    // Note: the chip doesn't have auto-pad!
-    outl(ioaddr + TxStatus0 + entry * 4, rtl->tx_flag | (len >= ETH_ZLEN ? len : ETH_ZLEN));
-
-    rtl->trans_start = 0;  // TODO: get current time when timer system is ready
-    rtl->cur_tx++;
-
-    dev->stats.tx_packets++;
-    dev->stats.tx_bytes += len;
-
-    return 0;
-}
-
-static void rtl8139_interrupt(struct interrupt_frame *frame) {
-    // TODO: For now we need a way to get the device from the interrupt
-    // This is a simplified version - normally we'd get the device from interrupt registration
-
-    // For now, find the RTL8139 device (this is a hack until proper interrupt registration)
-    struct pci_device *rtl_dev = pci_find_device(RTL8139_VENDOR_ID, RTL8139_DEVICE_ID);
-    if (!rtl_dev)
-        return;
-
-    // Get the netdev (this assumes only one RTL8139 - also a hack)
-    struct netdev *netdev = netdev_get_by_name("eth0");
-    if (!netdev)
-        return;
-
-    struct rtl8139 *rtl = (struct rtl8139 *)netdev->driver_data;
-    if (!rtl)
-        return;
-
-    uint16_t ioaddr = rtl->iobase;
-    int max_work = rtl->max_interrupt_work;
-
-    while (max_work-- > 0) {
-        uint16_t status = insw(ioaddr + IntrStatus);
-
-        if (status == 0 || status == 0xFFFF) {
-            break;  // No more interrupts or device removed
-        }
-
-        // Acknowledge interrupts
-        outw(ioaddr + IntrStatus, status);
-
-        // Handle receive interrupts
-        if (status & (RxOK | RxErr)) {
-            rtl8139_rx(rtl);
-        }
-
-        // Handle transmit interrupts
-        if (status & (TxOK | TxErr)) {
-            rtl8139_tx_clear(rtl);
-        }
-
-        // Handle errors
-        if (status & (RxOverflow | RxFIFOOver | RxUnderrun)) {
-            printf("%s: RX error, status=0x%x\n", netdev->name, status);
-            // TODO: Proper error recovery
-        }
-
-        if (status & PCIErr) {
-            printf("%s: PCI error, status=0x%x\n", netdev->name, status);
-            // TODO: Proper error recovery
-        }
-    }
-}
-
 static int rtl8139_rx(struct rtl8139 *rtl) {
     uint16_t ioaddr = rtl->iobase;
     uint8_t *rx_ring = rtl->rx_ring;
@@ -687,6 +519,60 @@ static void rtl8139_tx_timeout(struct rtl8139 *rtl) {
     rtl->tx_timeout_count++;
 }
 
+static void rtl8139_interrupt(struct interrupt_frame *frame) {
+    // TODO: For now we need a way to get the device from the interrupt
+    // This is a simplified version - normally we'd get the device from interrupt registration
+
+    // For now, find the RTL8139 device (this is a hack until proper interrupt registration)
+    struct pci_device *rtl_dev = pci_find_device(RTL8139_VENDOR_ID, RTL8139_DEVICE_ID);
+    if (!rtl_dev)
+        return;
+
+    // Get the netdev (this assumes only one RTL8139 - also a hack)
+    struct netdev *netdev = netdev_get_by_name("eth0");
+    if (!netdev)
+        return;
+
+    struct rtl8139 *rtl = (struct rtl8139 *)netdev->driver_data;
+    if (!rtl)
+        return;
+
+    uint16_t ioaddr = rtl->iobase;
+    int max_work = rtl->max_interrupt_work;
+
+    while (max_work-- > 0) {
+        uint16_t status = insw(ioaddr + IntrStatus);
+
+        if (status == 0 || status == 0xFFFF) {
+            break;  // No more interrupts or device removed
+        }
+
+        // Acknowledge interrupts
+        outw(ioaddr + IntrStatus, status);
+
+        // Handle receive interrupts
+        if (status & (RxOK | RxErr)) {
+            rtl8139_rx(rtl);
+        }
+
+        // Handle transmit interrupts
+        if (status & (TxOK | TxErr)) {
+            rtl8139_tx_clear(rtl);
+        }
+
+        // Handle errors
+        if (status & (RxOverflow | RxFIFOOver | RxUnderrun)) {
+            printf("%s: RX error, status=0x%x\n", netdev->name, status);
+            // TODO: Proper error recovery
+        }
+
+        if (status & PCIErr) {
+            printf("%s: PCI error, status=0x%x\n", netdev->name, status);
+            // TODO: Proper error recovery
+        }
+    }
+}
+
 // Network device operations structure
 static struct netdev_ops rtl8139_netdev_ops = {
     .open = rtl8139_open,
@@ -695,6 +581,120 @@ static struct netdev_ops rtl8139_netdev_ops = {
     .set_rx_mode = rtl8139_set_rx_mode,
     .get_stats = rtl8139_get_stats,
 };
+
+int rtl8139_open(struct netdev *dev) {
+    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
+    int rx_buf_len_idx;
+
+    // Register interrupt handler (IRQ numbers start at 0x20)
+    idt_register_interrupt_callback(0x20 + rtl->irq, rtl8139_interrupt);
+    printf("%s: Registered interrupt handler for IRQ %i (vector 0x%x)\n", dev->name, rtl->irq, 0x20 + rtl->irq);
+
+    // Allocate receive buffer
+    rx_buf_len_idx = RX_BUF_LEN_IDX;
+    do {
+        rtl->rx_buf_len = 8192 << rx_buf_len_idx;
+        rtl->rx_ring = kzalloc(rtl->rx_buf_len + 16 + (TX_BUF_SIZE * NUM_TX_DESC));
+    } while (rtl->rx_ring == NULL && --rx_buf_len_idx >= 0);
+
+    if (rtl->rx_ring == NULL) {
+        printf("%s: Failed to allocate RX buffer\n", dev->name);
+        return -1;
+    }
+
+    rtl->tx_bufs_mem = (uint8_t *)rtl->rx_ring + rtl->rx_buf_len + 16;
+
+    rtl8139_init_ring(rtl);
+    rtl->full_duplex = rtl->duplex_lock;
+    rtl->tx_flag = (TX_FIFO_THRESH << 11) & 0x003f0000;
+    rtl->rx_config = (RX_FIFO_THRESH << 13) | (rx_buf_len_idx << 11) | (RX_DMA_BURST << 8);
+
+    rtl8139_hw_start(rtl);
+
+    // TODO: Set up timer when timer system is ready
+    // init_timer(&rtl->timer, rtl8139_timer, dev);
+    // mod_timer(&rtl->timer, get_ticks() + 3 * HZ);
+
+    printf("%s: RTL8139 opened successfully\n", dev->name);
+    return 0;
+}
+
+int rtl8139_close(struct netdev *dev) {
+    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
+    uint16_t ioaddr = rtl->iobase;
+    int i;
+
+    printf("%s: Shutting down ethercard, status was 0x%x\n", dev->name, insw(ioaddr + IntrStatus));
+
+    // Disable interrupts by clearing the interrupt mask
+    outw(ioaddr + IntrMask, 0x0000);
+
+    // Stop the chip's Tx and Rx DMA processes
+    outb(ioaddr + ChipCmd, 0x00);
+
+    // Update the error counts
+    dev->stats.rx_dropped += insl(ioaddr + RxMissed);
+    outl(ioaddr + RxMissed, 0);
+
+    // TODO: Delete timer when timer system is ready
+    // del_timer(&rtl->timer);
+
+    // TODO: Disable IRQ when interrupt system is ready
+    // disable_irq(rtl->irq);
+
+    for (i = 0; i < NUM_TX_DESC; i++) {
+        if (rtl->tx_bufs[i]) {
+            netbuf_free(rtl->tx_bufs[i]);
+        }
+        rtl->tx_bufs[i] = NULL;
+    }
+
+    kfree(rtl->rx_ring);
+    rtl->rx_ring = NULL;
+
+    // Green! Put the chip in low-power mode
+    outb(ioaddr + Cfg9346, 0xC0);
+    outb(ioaddr + Config1, rtl->config1 | 0x03);
+    outb(ioaddr + HltClk, 'H');  // 'R' would leave the clock running
+
+    return 0;
+}
+
+int rtl8139_transmit(struct netdev *dev, struct netbuf *buf) {
+    struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
+    uint16_t ioaddr = rtl->iobase;
+    int entry;
+    uint32_t len = buf->len;
+
+    // TODO: Implement proper synchronization when needed
+    // For now, just use a simple check
+    if (rtl->cur_tx - rtl->dirty_tx >= NUM_TX_DESC) {
+        printf("%s: Transmit queue full, dropping packet\n", dev->name);
+        dev->stats.tx_dropped++;
+        return -1;
+    }
+
+    // Calculate the next Tx descriptor entry
+    entry = rtl->cur_tx % NUM_TX_DESC;
+
+    rtl->tx_bufs[entry] = buf;
+
+    // Copy data to transmit buffer (RTL8139 needs contiguous buffer)
+    memcpy(rtl->tx_buffer[entry], buf->data, len);
+
+    outl(ioaddr + TxAddr0 + entry * 4, (uint32_t)rtl->tx_buffer[entry]);
+
+    // Note: the chip doesn't have auto-pad!
+    outl(ioaddr + TxStatus0 + entry * 4, rtl->tx_flag | (len >= ETH_ZLEN ? len : ETH_ZLEN));
+
+    rtl->trans_start = 0;  // TODO: get current time when timer system is ready
+    rtl->cur_tx++;
+
+    dev->stats.tx_packets++;
+    dev->stats.tx_bytes += len;
+
+    return 0;
+}
 
 int rtl8139_init(struct pci_device *pci_dev) {
     struct rtl8139 *rtl;

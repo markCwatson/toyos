@@ -141,6 +141,9 @@ enum CSCRBits {
     CSCR_LinkDownCmd = 0x0f3c0,
 };
 
+// forward declaration
+struct rtl8139;
+
 int rtl8139_init(struct pci_device *pci_dev);
 void rtl8139_cleanup(struct rtl8139 *rtl);
 int rtl8139_open(struct netdev *dev);
