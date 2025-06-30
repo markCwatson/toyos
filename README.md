@@ -24,6 +24,50 @@ Work in progress:
 
 - **Networking**: see plan [here](./networking.md)
 
+### Setup
+
+On a Linux box:
+
+```shell
+sudo apt update
+sudo apt upgrade
+```
+
+This project was developed for Linux. The assembler used here is `nasm`. It can be installed using
+
+```shell
+sudo apt install nasm
+```
+
+QEMU is used to emulate the x86 hardware. It can be installed using
+
+```shell
+sudo apt install qemu-system-x86
+```
+
+The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://wiki.osdev.org/GCC_Cross-Compiler). Here is what worked for me.
+
+```shell
+sudo apt install build-essential
+sudo apt install bison
+sudo apt install flex
+sudo apt install libgmp3-dev
+sudo apt install libmpc-dev
+sudo apt install libmpfr-dev
+sudo apt install texinfo
+sudo apt install libisl-dev
+```
+
+Then we need to download the source code for gcc (10.2) and binutils (2.35):
+
+```shell
+cd ~ && \
+curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.35.tar.xz && \
+curl -O https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/gcc-10.2.0.tar.gz && \
+tar -xf binutils-2.35.tar.xz && \
+tar -xzf gcc-10.2.0.tar.gz
+```
+
 ### Building
 
 From the root of the project, invoke the make build system (will need to make build script executable beforehand: `sudo chmod +x ./build.sh`)
@@ -33,35 +77,7 @@ make clean
 ./build.sh
 ```
 
-<br />
-
-> [!NOTE]
-> This project was developed on Linux. The assembler used here is `nasm`version 2.15.05 . It can be installed using
-
-```shell
-sudo apt install nasm
-```
-
-The makefile invokes a gcc cross-compiler with a generic target (i686-elf) custom built to not include any reminants of the host OS (stdlib, etc.). It needs to be built from source. Follow the instructions [here](https://wiki.osdev.org/GCC_Cross-Compiler).
-
-<br />
-
-### Tests
-
-To run the tests (see [tests](https://github.com/markCwatson/toyos/tree/main/tests) folder at root of project), use the `--tests` flag
-
-```shell
-make clean
-./build.sh --tests
-```
-
 ### Emulation (QEMU) and debugging (GDB)
-
-QEMU is used to emulate the x86 hardware. It can be installed using.
-
-```shell
-sudo apt install qemu-system-x86
-```
 
 To run the kernel in the QEMU emulator without debugging, simply run the 32-bit x86 emulator
 
@@ -73,6 +89,20 @@ qemu-system-i386 \
     -monitor stdio \
     -m 32M
 ```
+
+For network testing and debugging, you can enable packet dumping:
+
+```shell
+qemu-system-i386 \
+    -hda ./bin/os.bin \
+    -netdev user,id=net0,hostfwd=udp::8080-:7 \
+    -device rtl8139,netdev=net0 \
+    -object filter-dump,id=dump0,netdev=net0,file=network.pcap \
+    -monitor stdio \
+    -m 32M
+```
+
+This will capture all network traffic to `network.pcap` which you can analyze with Wireshark.
 
 To debug with GDB, first start GDB
 
@@ -108,6 +138,15 @@ To debug user programs, use address `0x400000` for user space.
 
 ```shell
 (gdb) break *0x400000
+```
+
+### Tests
+
+To run the tests (see [tests](https://github.com/markCwatson/toyos/tree/main/tests) folder at root of project), use the `--tests` flag
+
+```shell
+make clean
+./build.sh --tests
 ```
 
 ### Elf Files
