@@ -61,11 +61,21 @@ sudo apt install libisl-dev
 Then we need to download the source code for gcc (10.2) and binutils (2.35):
 
 ```shell
-cd ~ && \
-curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.35.tar.xz && \
-curl -O https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/gcc-10.2.0.tar.gz && \
-tar -xf binutils-2.35.tar.xz && \
-tar -xzf gcc-10.2.0.tar.gz
+cd ~
+mkdir src
+curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.35.tar.xz
+curl -O https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/gcc-10.2.0.tar.gz
+tar -xf binutils-2.35.tar.xz -C ~/src/
+tar -xzf gcc-10.2.0.tar.gz -C ~/src/
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+cd ~/src 
+mkdir build-binutils
+cd build-binutils
+../binutils-x.y.z/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+make
+make install
 ```
 
 ### Building
