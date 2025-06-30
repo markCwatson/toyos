@@ -3,7 +3,7 @@ OUTPUT_FORMAT(binary)
 
 SECTIONS
 {
-    . = 0x400000;              # Set the starting address of the output file in memory to 4 MB for user programs. See TOYOS_PROGRAM_VIRTUAL_ADDRESS in config.h.
+    . = 0x400000;              /* Set the starting address of the output file in memory to 4 MB for user programs. See TOYOS_PROGRAM_VIRTUAL_ADDRESS in config.h. */
 
     .text : ALIGN(4096)
     {
