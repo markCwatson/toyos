@@ -1,5 +1,7 @@
 # ToyOS
 
+[![Build Status](https://github.com/markCwatson/toyos/workflows/Build%20ToyOS/badge.svg)](https://github.com/markCwatson/toyos/actions)
+
 ToyOS is a work-in-progress (WIP) hobby operating system meant for educational purposes. The OS is being developed with a focus on foundational operating system concepts and practical implementations. The following GIF shows ToyOS running in QEMU. In this demonstration, the shell is interacting with the kernel to execute commands (currently, only the `ps`, `echo`, and `clear` commands are supported).
 
 ![alt-text][1]
@@ -22,7 +24,7 @@ Current features include:
 
 Work in progress:
 
-- **Networking**: see plan [here](./networking.md)
+- **Networking**: see plan [here](./networking.md)S
 
 ### Setup
 
@@ -117,6 +119,12 @@ qemu-system-i386 \
     -monitor stdio \
     -m 32M
 ```
+
+**⚠️ Warning: Snap VS Code Interference**
+If you encounter symbol lookup errors when running QEMU inside a VS Code termianl (e.g., `undefined symbol: __libc_pthread_init, version GLIBC_PRIVATE`), this is likely due to having the snap version of VS Code installed. The snap version sets environment variables that interfere with system binaries. To fix this:
+- Remove the snap version: `sudo snap remove code`
+- Install using `apt` which doesn't have these conflicts
+- Alternatively, run QEMU in a regular terminal outside of VS Code.
 
 For network testing and debugging, you can enable packet dumping:
 
