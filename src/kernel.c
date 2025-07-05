@@ -143,7 +143,7 @@ void maink(void) {
     }
 
     print_toyos_logo();
-    for (int i = 0; i < 100000000; i++) {
+    for (int i = 0; i < 200000000; i++) {
         asm volatile("nop");
     }
 

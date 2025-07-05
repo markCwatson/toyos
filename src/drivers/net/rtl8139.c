@@ -67,9 +67,8 @@ struct rtl8139 {
     struct netdev *netdev;  // Associated network device
 
     // Hardware information
-    uint16_t iobase;             // I/O base address
-    uint8_t irq;                 // IRQ number
-    struct pci_device *pci_dev;  // PCI device info
+    uint16_t iobase;  // I/O base address
+    uint8_t irq;      // IRQ number
 
     // Interrupt handling
     int interrupt_registered;  // Whether interrupt is registered
@@ -730,7 +729,6 @@ int rtl8139_init(struct pci_device *pci_dev) {
     rtl->netdev = netdev;
     rtl->iobase = iobase;
     rtl->irq = irq;
-    rtl->pci_dev = pci_dev;
     rtl->flags = RTL8139_CAPS;
     rtl->full_duplex = 0;
     rtl->duplex_lock = 0;
