@@ -131,6 +131,8 @@ void maink(void) {
     }
 
     keyboard_init();
+
+    printk_colored("Enumerating PCI devices...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     pci_enumerate_devices();
 
     // Initialize network interfaces

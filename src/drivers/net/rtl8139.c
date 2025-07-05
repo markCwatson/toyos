@@ -285,6 +285,7 @@ static void rtl8139_init_ring(struct rtl8139 *rtl) {
     int i;
 
     rtl->dirty_tx = rtl->cur_tx = 0;
+    rtl->tx_lock.locked = 0;
 
     for (i = 0; i < NUM_TX_DESC; i++) {
         rtl->tx_bufs[i] = NULL;
@@ -519,6 +520,8 @@ static void rtl8139_tx_timeout(struct rtl8139 *rtl) {
 }
 
 static void rtl8139_interrupt(struct interrupt_frame *frame) {
+    printf("RTL8139: INTERRUPT RECEIVED!\n");
+
     // TODO: For now we need a way to get the device from the interrupt
     // This is a simplified version - normally we'd get the device from interrupt registration
 
