@@ -353,14 +353,10 @@ static int rtl8139_hw_start(struct rtl8139 *rtl) {
     // Start the chip's Tx and Rx process
     outl(ioaddr + RxMissed, 0);
     rtl8139_set_rx_mode(rtl->netdev);
+    outb(ioaddr + ChipCmd, CmdRxEnb | CmdTxEnb);
 
     // Enable all known interrupts by setting the interrupt mask
     outw(ioaddr + IntrMask, PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK);
-    printf("RTL8139: Interrupt mask set to 0x%x\n",
-           PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK);
-    printf("RTL8139: Current interrupt status: 0x%x\n", insw(ioaddr + IntrStatus));
-    printf("RTL8139: Hardware initialization completed\n");
-
     return 0;
 }
 
