@@ -53,6 +53,9 @@ static void print_toyos_logo(void) {
                        "\n";
 
     printk(logo);
+    for (int i = 0; i < 10000000; i++) {
+        asm volatile("nop");
+    }
 }
 
 void printk_colored(const char *str, unsigned char fg, unsigned char bg) {
@@ -145,11 +148,6 @@ void maink(void) {
     }
 
     print_toyos_logo();
-
-    // Brief delay to see output
-    for (int i = 0; i < 10000000; i++) {
-        asm volatile("nop");
-    }
 
     // Load the first process
     printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);

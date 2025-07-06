@@ -356,6 +356,10 @@ static int rtl8139_hw_start(struct rtl8139 *rtl) {
 
     // Enable all known interrupts by setting the interrupt mask
     outw(ioaddr + IntrMask, PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK);
+    printf("RTL8139: Interrupt mask set to 0x%x\n",
+           PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK);
+    printf("RTL8139: Current interrupt status: 0x%x\n", insw(ioaddr + IntrStatus));
+    printf("RTL8139: Hardware initialization completed\n");
 
     return 0;
 }
@@ -618,6 +622,8 @@ int rtl8139_open(struct netdev *dev) {
     // mod_timer(&rtl->timer, get_ticks() + 3 * HZ);
 
     printf("%s: RTL8139 opened successfully\n", dev->name);
+    printf("RTL8139: Device state - Interrupt Status: 0x%x, Chip Command: 0x%x\n", insw(rtl->iobase + IntrStatus),
+           insb(rtl->iobase + ChipCmd));
     return 0;
 }
 
@@ -712,8 +718,16 @@ int rtl8139_init(struct pci_device *pci_dev) {
 
     // Enable PCI device (read-modify-write)
     uint32_t cmd = pci_config_read_32(pci_dev->bus, pci_dev->device, pci_dev->function, PCI_COMMAND_OFFSET);
+    printf("RTL8139: Original PCI command register: 0x%x\n", cmd);
+
+    // Enable I/O space, bus mastering, and make sure INTX is NOT disabled
     cmd |= PCI_COMMAND_IO | PCI_COMMAND_MASTER;
+    cmd &= ~PCI_COMMAND_INTX_DISABLE;  // Clear the INTX disable bit
+
     pci_config_write_32(pci_dev->bus, pci_dev->device, pci_dev->function, PCI_COMMAND_OFFSET, cmd);
+
+    uint32_t new_cmd = pci_config_read_32(pci_dev->bus, pci_dev->device, pci_dev->function, PCI_COMMAND_OFFSET);
+    printf("RTL8139: New PCI command register: 0x%x\n", new_cmd);
 
     rtl = kzalloc(sizeof(struct rtl8139));
     if (!rtl) {
