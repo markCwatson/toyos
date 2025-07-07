@@ -133,7 +133,10 @@ void *task_get_stack_item(struct task *task, int index);
 int copy_string_from_task(struct task *task, void *virtual, void *phys, int max);
 
 /**
- * @brief Handles the task return process, restoring registers.
+ * @brief Handles the task return process, restoring registers, enabling interrupts, and switching to the task's page
+ * directory.
+ *
+ * @details This f'n also enables interrupts (pushes EFLAGS with the IF bit set and then executes iretd. )
  *
  * @param regs Pointer to the registers to restore.
  */
