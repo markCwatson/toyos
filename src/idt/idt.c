@@ -7,6 +7,15 @@
 #include "task/process.h"
 #include "task/task.h"
 
+// PIC ports
+#define PIC_MASTER_CMD 0x20
+#define PIC_MASTER_DATA 0x21
+#define PIC_SLAVE_CMD 0xA0
+#define PIC_SLAVE_DATA 0xA1
+
+// EOI command
+#define PIC_EOI 0x20
+
 // Interrupt descriptor table (IDT) descriptors
 struct idt_desc idt_descriptors[TOYOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
@@ -21,6 +30,15 @@ extern void int80h(void);
 extern void int21h(void);
 extern void no_interrupt(void);
 extern void idt_load(struct idtr_desc *ptr);
+
+void pic_send_eoi(int irq) {
+    if (irq >= 8) {
+        // For slave PIC interrupts (IRQ 8-15), send EOI to both slave and master
+        outb(PIC_SLAVE_CMD, PIC_EOI);
+    }
+    // Always send EOI to master PIC
+    outb(PIC_MASTER_CMD, PIC_EOI);
+}
 
 // System call handler function pointer
 static sys_cmd_fp sys_commands[TOYOS_MAX_SYSCALLS];
@@ -111,8 +129,7 @@ void interrupt_handler(int interrupt, struct interrupt_frame *frame) {
     // Switch back to the task page to return to the task
     task_page();
 
-    // ack interrupt
-    outb(0x20, 0x20);
+    pic_send_eoi(interrupt - PIC_EOI);
 }
 
 /**
@@ -126,8 +143,7 @@ static void int0h(void) {
  * @brief Handles no interrupt
  */
 void no_interrupt_handler(void) {
-    // ack interrupt
-    outb(0x20, 0x20);
+    pic_send_eoi(0);
 }
 
 /**
@@ -171,7 +187,7 @@ void idt_handle_exception(void) {
  * @brief Handles the clock interrupt for task switching
  */
 void idt_clock(void) {
-    outb(0x20, 0x20);
+    pic_send_eoi(0);
     task_next();
 }
 

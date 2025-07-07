@@ -102,4 +102,18 @@ void enable_interrupt(void);
  */
 void disable_interrupt(void);
 
+/**
+ * @brief Send an end-of-interrupt (EOI) signal to the PIC
+ *
+ * Writes to the appropriate PIC command ports acknowledging completion
+ * of the interrupt. If the IRQ number is on the slave PIC (>= 8), the
+ * slave must be acknowledged before the master.
+ *
+ * For IRQ 0-7: Send EOI to master PIC only
+ * For IRQ 8-15: Send EOI to both slave and master PIC
+ *
+ * @param irq The IRQ number to acknowledge.
+ */
+void pic_send_eoi(int irq);
+
 #endif
