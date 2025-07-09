@@ -135,8 +135,8 @@ qemu-system-i386 \
     -device rtl8139,netdev=net0 \
     -object filter-dump,id=dump0,netdev=net0,file=network.pcap \
     -m 32M \
-    -S -gdb tcp::1234 \
-    -monitor stdio 
+    -monitor stdio \
+    -S -gdb tcp::1234
 ```
 
 This will capture all network traffic to `network.pcap` which you can analyze with Wireshark. Try these commands one by one:
@@ -167,6 +167,7 @@ qemu-system-i386 \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -m 32M \
+    -monitor stdio \
     -S -gdb tcp::1234
 ```
 

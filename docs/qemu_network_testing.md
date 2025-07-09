@@ -24,7 +24,7 @@ qemu-system-i386 \
 | Parameter | Purpose | Details |
 |-----------|---------|---------|
 | `qemu-system-i386` | QEMU emulator for i386 architecture | Emulates a 32-bit x86 system |
-| `-hda ./bin/os.bin` | Hard drive A | Uses your ToyOS binary as the boot disk |
+| `-hda ./bin/os.bin` | Hard drive A | Uses the ToyOS binary as the boot disk |
 | `-netdev user,id=net0,hostfwd=udp::8080-:7` | Network backend | Creates user-mode networking with port forwarding |
 | `-device rtl8139,netdev=net0` | Network device | Adds RTL8139 NIC connected to the network backend |
 | `-monitor stdio` | QEMU monitor | Enables QEMU monitor on standard input/output |
