@@ -133,3 +133,13 @@ void *sys_command13_done(struct interrupt_frame *frame) {
     spin_unlock(&lock);
     return 0;
 }
+
+void *sys_command14_fork(struct interrupt_frame *frame) {
+    struct process *child = NULL;
+    int res = process_fork(&child);
+    if (res < 0) {
+        return ERROR(res);
+    }
+
+    return (void *)(uintptr_t)child->id;
+}

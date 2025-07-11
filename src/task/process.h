@@ -166,4 +166,15 @@ void process_get_arguments(struct process *process, int *argc, char ***argv);
  */
 int process_inject_arguments(struct process *process, struct command_argument *root_argument);
 
+/**
+ * @brief Forks the current process.
+ *
+ * Creates a new process that is a copy of the calling process. On success the
+ * parent's return value is the child's process id and the child receives 0.
+ *
+ * @param out_process A pointer to store the new process.
+ * @return The process ID of the new process on success, or an error code on failure
+ */
+uint16_t process_fork(struct process **out_process);
+
 #endif

@@ -1,5 +1,5 @@
 ENTRY(_start)
-OUTPUT_FORMAT(binary)
+OUTPUT_FORMAT(elf32-i386)      /* Specify the output format as a 32-bit ELF executable for x86 architecture. */
 
 SECTIONS
 {

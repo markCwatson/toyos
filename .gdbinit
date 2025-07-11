@@ -10,8 +10,10 @@ target remote localhost:1234
 
 # Set useful breakpoints for networking debugging
 # Uncomment these as needed:
-break pci_enumerate_devices
+# break pci_enumerate_devices
 # break rtl8139_hw_start
 # break rtl8139_interrupt
 # break rtl8139_open
 # break task_run_first_ever_task
+break process_fork
+# break process_map_elf

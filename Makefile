@@ -106,17 +106,11 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 	# Mounts the generated OS image, adds a test user program and test file, the shell program, and then unmounts.
 	sudo mkdir /mnt/d
 	sudo mount -t vfat ./bin/os.bin /mnt/d
-	sudo cp ./programs/test/test.bin /mnt/d
 	sudo cp ./programs/shell/shell.elf /mnt/d
 	sudo cp ./programs/echo/echo.elf /mnt/d
 	sudo cp ./programs/clear/clear.elf /mnt/d
 	sudo cp ./programs/ps/ps.elf /mnt/d
-
-	# Create a test file on the mounted OS image.
-	touch test.txt
-	echo "01234" > test.txt
-	sudo cp test.txt /mnt/d
-	rm -f test.txt
+	sudo cp ./programs/forkdemo/forkdemo.elf /mnt/d
 
 	sudo umount /mnt/d
 	sudo rm -rf /mnt/d
@@ -256,19 +250,19 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 
 user_programs:
 	cd ./programs/stdlib && make all
-	cd ./programs/test && make all
 	cd ./programs/shell && make all
 	cd ./programs/echo && make all
 	cd ./programs/clear && make all
 	cd ./programs/ps && make all
+	cd ./programs/forkdemo && make all
 
 user_programs_clean:
 	cd ./programs/stdlib && make clean
-	cd ./programs/test && make clean
 	cd ./programs/shell && make clean
 	cd ./programs/echo && make clean
 	cd ./programs/clear && make clean
 	cd ./programs/ps && make clean
+	cd ./programs/forkdemo && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

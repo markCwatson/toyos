@@ -661,3 +661,39 @@ int process_terminate(struct process *process) {
 out:
     return res;
 }
+
+uint16_t process_fork(struct process **out_process) {
+    int res = OK;
+    struct process *parent = process_current();
+    if (!parent || !out_process) {
+        return -EINVARG;
+    }
+
+    int slot = process_get_free_slot();
+    if (slot < 0) {
+        return slot;
+    }
+
+    struct process *child = 0;
+    res = process_load_for_slot(parent->filename, &child, slot);
+    if (res < 0) {
+        return res;
+    }
+
+    memcpy(child->stack, parent->stack, TOYOS_USER_PROGRAM_STACK_SIZE);
+
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (parent->allocations[i].ptr) {
+            void *newptr = process_malloc(child, parent->allocations[i].size);
+            if (newptr) {
+                memcpy(newptr, parent->allocations[i].ptr, parent->allocations[i].size);
+            }
+        }
+    }
+
+    memcpy(&child->task->registers, &task_current()->registers, sizeof(struct registers));
+    child->task->registers.eax = 0;  // Set return value to 0 for child process
+
+    *out_process = child;
+    return child->id;
+}
