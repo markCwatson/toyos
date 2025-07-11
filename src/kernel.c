@@ -4,6 +4,7 @@
 #include "disk/streamer.h"
 #include "drivers/keyboards/ps2.h"
 #include "drivers/pci/pci.h"
+#include "drivers/pic/pic8259.h"
 #include "fs/file.h"
 #include "gdt/gdt.h"
 #include "idt/idt.h"
@@ -94,6 +95,10 @@ void kernel_page(void) {
 void maink(void) {
     terminal_init();
     printk_colored("ToyOS kernel starting...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
+
+    // Initialize the Programmable Interrupt Controller (PIC)
+    printk_colored("Initializing the PIC...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
+    pic_init();
 
     // Initialize the global descriptor table (GDT)
     printk_colored("Initializing the GDT...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);

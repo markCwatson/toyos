@@ -1,5 +1,6 @@
 #include "idt.h"
 #include "config.h"
+#include "drivers/pic/pic8259.h"
 #include "io/io.h"
 #include "kernel.h"
 #include "memory/memory.h"
@@ -111,8 +112,7 @@ void interrupt_handler(int interrupt, struct interrupt_frame *frame) {
     // Switch back to the task page to return to the task
     task_page();
 
-    // ack interrupt
-    outb(0x20, 0x20);
+    pic_send_eoi(interrupt - 0x20);
 }
 
 /**
@@ -126,8 +126,7 @@ static void int0h(void) {
  * @brief Handles no interrupt
  */
 void no_interrupt_handler(void) {
-    // ack interrupt
-    outb(0x20, 0x20);
+    pic_send_eoi(0);
 }
 
 /**
@@ -171,7 +170,7 @@ void idt_handle_exception(void) {
  * @brief Handles the clock interrupt for task switching
  */
 void idt_clock(void) {
-    outb(0x20, 0x20);
+    pic_send_eoi(0);
     task_next();
 }
 

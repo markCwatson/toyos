@@ -244,8 +244,6 @@ int pci_enumerate_devices(void) {
     struct pci_device device;
     pci_device_count = 0;
 
-    printf("Enumerating PCI devices...\n");
-
     for (int bus = 0; bus < PCI_MAX_BUS; bus++) {
         for (int dev = 0; dev < PCI_MAX_DEVICE; dev++) {
             // Check function 0 first

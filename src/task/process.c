@@ -380,7 +380,7 @@ void process_switch_to_any(void) {
         }
     }
 
-    panick("No processes to switch too\n");
+    panick("No processes to switch to\n");
 }
 
 /**

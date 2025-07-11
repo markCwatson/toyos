@@ -23,14 +23,6 @@ _start:
     or al, 2            ; Set the second bit to enable the A20 line.
     out 0x92, al        ; Write back to port 0x92 to enable the A20 line.
 
-    ; Remap the Programmable Interrupt Controller (PIC) to avoid conflicts with CPU exceptions.
-    mov al, 00010001b   ; Start the initialization sequence for the master PIC.
-    out 0x20, al        ; Send initialization command to master PIC command port (0x20).
-    mov al, 0x20        ; Set the master PIC vector offset to 0x20 (ISR start vector).
-    out 0x21, al        ; Send the vector offset to the master PIC data port (0x21).
-    mov al, 00000001b   ; Finalize the initialization with 8086/88 mode.
-    out 0x21, al        ; Send the command to the master PIC data port (0x21).
-
     ; Call the main function of the kernel, which is the entry point of the kernel's C code.
     call maink          ; Transfer control to the C kernel code.
     jmp $               ; Infinite loop to prevent returning from the kernel main function.

@@ -24,7 +24,7 @@ Current features include:
 
 Work in progress:
 
-- **Networking**: see plan [here](./networking.md)S
+- **Networking**: see plan [here](./docs/networking.md)
 
 ### Setup
 
@@ -116,6 +116,7 @@ qemu-system-i386 \
     -hda ./bin/os.bin \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
+    -monitor stdio \
     -m 32M
 ```
 
@@ -134,16 +135,16 @@ qemu-system-i386 \
     -device rtl8139,netdev=net0 \
     -object filter-dump,id=dump0,netdev=net0,file=network.pcap \
     -m 32M \
-    -S -gdb tcp::1234 \
-    -monitor stdio 
+    -monitor stdio \
+    -S -gdb tcp::1234
 ```
 
 This will capture all network traffic to `network.pcap` which you can analyze with Wireshark. Try these commands one by one:
 
 ```shell
-ping 10.0.2.100
-echo "test" | nc -u 10.0.2.100 7
-echo "test" | nc -u 10.0.2.100 8080
+ping 10.0.2.15
+echo "test" | nc -u 10.0.2.15 7
+echo "test" | nc -u 10.0.2.15 8080
 ```
 
 To debug with GDB, first start GDB
@@ -166,6 +167,7 @@ qemu-system-i386 \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -m 32M \
+    -monitor stdio \
     -S -gdb tcp::1234
 ```
 

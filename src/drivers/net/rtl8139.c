@@ -356,7 +356,14 @@ static int rtl8139_hw_start(struct rtl8139 *rtl) {
     outb(ioaddr + ChipCmd, CmdRxEnb | CmdTxEnb);
 
     // Enable all known interrupts by setting the interrupt mask
-    outw(ioaddr + IntrMask, PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK);
+    uint16_t intr_mask = PCIErr | PCSTimeout | RxUnderrun | RxOverflow | RxFIFOOver | TxErr | TxOK | RxErr | RxOK;
+    printf("RTL8139: Attempting to write interrupt mask: 0x%x\n", intr_mask);
+    outw(ioaddr + IntrMask, intr_mask);
+
+    // verify
+    uint16_t actual_mask = insw(ioaddr + IntrMask);
+    printf("RTL8139: Actual interrupt mask after write: 0x%x\n", actual_mask);
+
     return 0;
 }
 
