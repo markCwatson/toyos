@@ -95,7 +95,7 @@ static int task_init(struct task *task, struct process *process) {
     // Map the entire 4GB address space to its self
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory) {
-        return -EIO;
+        return -ENOMEM;
     }
 
     // Set the ip to the program's entry point

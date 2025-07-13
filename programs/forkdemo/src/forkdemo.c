@@ -47,12 +47,15 @@ int ps(void) {
 int main(int argc, char **argv) {
     int pid = toyos_fork();
     if (pid == 0) {
-        printf("fork: i'm child\n\n");
+        printf("fork: i'm the child process\n\n");
         for (;;)
             ;
     } else {
-        printf("fork: i'm parent with child=%i\n\n", pid);
-        printf("Running ps:\n");
+        for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10000000; i++)
+                ;
+        printf("fork: i'm the parent with child pid=%i\n\n", pid);
+        printf("Running processes:\n");
         ps();
     }
     return 0;

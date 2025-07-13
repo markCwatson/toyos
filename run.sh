@@ -5,4 +5,4 @@ qemu-system-i386 \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -monitor stdio \
-    -m 32M
+    -m 128M
