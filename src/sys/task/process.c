@@ -32,7 +32,7 @@ void *sys_command6_process_load_start(struct interrupt_frame *frame) {
     strcat(path, ".elf");
 
     struct process *process = 0;
-    res = process_load_switch(path, &process);
+    res = process_load_and_switch(path, &process);
     if (res < 0) {
         goto out;
     }
@@ -76,7 +76,7 @@ void *sys_command9_invoke_system_command(struct interrupt_frame *frame) {
     strcat(path, ".elf");
 
     struct process *process = 0;
-    int res = process_load_switch(path, &process);
+    int res = process_load_and_switch(path, &process);
     if (res < 0) {
         alertk("Command not recognized.\n\n");
         return ERROR(res);

@@ -115,7 +115,7 @@ int process_switch(struct process *process);
  * @param process A pointer to the process structure to store the loaded process.
  * @return 0 on success, error code on failure.
  */
-int process_load_switch(const char *filename, struct process **process);
+int process_load_and_switch(const char *filename, struct process **process);
 
 /**
  * Allocates memory for a process.

@@ -95,11 +95,11 @@ static void test_user_program(void) {
     register_test("Current process", cur_process != NULL);
 
     struct process *process = NULL;
-    int res = process_load_switch("0:/test.bin", &process);
+    int res = process_load_and_switch("0:/shell.elf", &process);
     register_test("Load user program", res == 0);
 
     // switch back
-    res = process_load_switch(cur_process->filename, &cur_process);
+    res = process_load_and_switch(cur_process->filename, &cur_process);
     register_test("Switch back to kernel", res == 0);
 }
 

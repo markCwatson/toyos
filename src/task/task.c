@@ -148,6 +148,7 @@ struct task *task_new(struct process *process) {
     }
 
     if (task_head == NULL) {
+        // this is the first task
         task_head = task;
         task_tail = task;
         current_task = task;
@@ -247,15 +248,6 @@ int task_page(void) {
     user_registers();
     task_switch(current_task);
     return OK;
-}
-
-void task_run_first_ever_task(void) {
-    if (!current_task) {
-        panick("[task_run_first_ever_task] No current task exists!\n");
-    }
-
-    task_switch(task_head);
-    task_return(&task_head->registers);
 }
 
 void *task_get_stack_item(struct task *task, int index) {
