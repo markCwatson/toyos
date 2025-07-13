@@ -117,7 +117,7 @@ qemu-system-i386 \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -monitor stdio \
-    -m 32M
+    -m 128M
 ```
 
 **⚠️ Warning: Snap VS Code Interference**
@@ -134,7 +134,7 @@ qemu-system-i386 \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
     -object filter-dump,id=dump0,netdev=net0,file=network.pcap \
-    -m 32M \
+    -m 128M \
     -monitor stdio \
     -S -gdb tcp::1234
 ```
@@ -166,7 +166,7 @@ qemu-system-i386 \
     -hda ./bin/os.bin \
     -netdev user,id=net0,hostfwd=udp::8080-:7 \
     -device rtl8139,netdev=net0 \
-    -m 32M \
+    -m 128M \
     -monitor stdio \
     -S -gdb tcp::1234
 ```

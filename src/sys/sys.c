@@ -29,4 +29,5 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND11_GET_PROCESSES, sys_command11_get_processes);
     register_sys_command(SYSTEM_COMMAND12_CHECK_LOCK, sys_command12_check_lock);
     register_sys_command(SYSTEM_COMMAND13_DONE, sys_command13_done);
+    register_sys_command(SYSTEM_COMMAND14_FORK, sys_command14_fork);
 }

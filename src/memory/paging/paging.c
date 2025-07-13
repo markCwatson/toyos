@@ -14,7 +14,7 @@ struct paging_4gb_chunk *paging_new_4gb(uint8_t flags) {
         uint32_t *entry = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
 
         for (int j = 0; j < PAGING_TOTAL_ENTRIES_PER_TABLE; j++) {
-            // The upper 20 bits are the address, and the lower bits are flags.
+            // note: the upper 20 bits are the address, and the lower bits are flags.
             entry[j] = (offset + (j * PAGING_PAGE_SIZE)) | flags;
         }
 

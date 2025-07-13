@@ -36,6 +36,7 @@ void toyos_process_get_arguments(struct process_arguments* arguments);;
 int toyos_system(struct command_argument* arguments);
 int toyos_system_run(const char* command);
 void toyos_clear_terminal(void);
+int toyos_fork(void);
 void* toyos_get_processes(void);
 void toyos_wait(void);
 void toyos_done(void);

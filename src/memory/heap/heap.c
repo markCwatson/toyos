@@ -83,12 +83,13 @@ static int heap_get_entry_type(heap_block_table_entry entry) {
  */
 int heap_get_start_block(struct heap *heap, uint32_t total_blocks) {
     struct heap_table *table = heap->table;
-    int curr_block = 0;
+    int free_blocks = 0;
     int start_block = -1;
 
     for (size_t i = 0; i < table->total; i++) {
         if (heap_get_entry_type(table->entries[i]) != HEAP_BLOCK_TABLE_ENTRY_FREE) {
-            curr_block = 0;
+            // reset and begin searching again
+            free_blocks = 0;
             start_block = -1;
             continue;
         }
@@ -97,9 +98,14 @@ int heap_get_start_block(struct heap *heap, uint32_t total_blocks) {
             start_block = i;
         }
 
-        if (++curr_block == total_blocks) {
+        if (++free_blocks == total_blocks) {
             break;
         }
+    }
+
+    // todo: i think there is an edge case here where the last block is free but not enough blocks are available
+    if (free_blocks < total_blocks) {
+        start_block = -1;  // not enough blocks found
     }
 
     return start_block == -1 ? -ENOMEM : start_block;
@@ -171,7 +177,6 @@ void *heap_malloc_blocks(struct heap *heap, uint32_t total_blocks) {
         goto out;
     }
 
-    // Mark the blocks as taken
     heap_mark_blocks_taken(heap, start_block, total_blocks);
 
 out:

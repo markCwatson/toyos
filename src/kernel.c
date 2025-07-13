@@ -157,14 +157,17 @@ void maink(void) {
     // Load the first process
     printk_colored("Loading the shell...\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     struct process *process = NULL;
-    int res = process_load_switch("0:/shell.elf", &process);
+    int res = process_load_and_switch("0:/shell.elf", &process);
     if (ISERROR(res)) {
         panick("Failed to load the shell!\n");
     }
 
     terminal_clear_all();
-    task_run_first_ever_task();
 
-    // Halt the system if the first task returns
+    // run first task (will not return)
+    task_switch(process->task);
+    task_return(&process->task->registers);
+
+    // panic if the first task returns
     panick("First task returned!\n");
 }

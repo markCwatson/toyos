@@ -115,7 +115,7 @@ int process_switch(struct process *process);
  * @param process A pointer to the process structure to store the loaded process.
  * @return 0 on success, error code on failure.
  */
-int process_load_switch(const char *filename, struct process **process);
+int process_load_and_switch(const char *filename, struct process **process);
 
 /**
  * Allocates memory for a process.
@@ -165,5 +165,16 @@ void process_get_arguments(struct process *process, int *argc, char ***argv);
  * @return 0 on success, error code on failure.
  */
 int process_inject_arguments(struct process *process, struct command_argument *root_argument);
+
+/**
+ * @brief Forks the current process.
+ *
+ * Creates a new process that is a copy of the calling process. On success the
+ * parent's return value is the child's process id and the child receives 0.
+ *
+ * @param out_process A pointer to store the new process.
+ * @return The process ID of the new process on success, or an error code on failure
+ */
+uint16_t process_fork(struct process **out_process);
 
 #endif

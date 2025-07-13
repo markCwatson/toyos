@@ -92,11 +92,6 @@ void task_current_save_state(struct interrupt_frame *frame);
 int task_page(void);
 
 /**
- * @brief Runs the first ever task
- */
-void task_run_first_ever_task(void);
-
-/**
  * @brief Frees the resources associated with a task.
  *
  * @param task The task to free.

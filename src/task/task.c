@@ -95,7 +95,7 @@ static int task_init(struct task *task, struct process *process) {
     // Map the entire 4GB address space to its self
     task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (!task->page_directory) {
-        return -EIO;
+        return -ENOMEM;
     }
 
     // Set the ip to the program's entry point
@@ -148,6 +148,7 @@ struct task *task_new(struct process *process) {
     }
 
     if (task_head == NULL) {
+        // this is the first task
         task_head = task;
         task_tail = task;
         current_task = task;
@@ -247,15 +248,6 @@ int task_page(void) {
     user_registers();
     task_switch(current_task);
     return OK;
-}
-
-void task_run_first_ever_task(void) {
-    if (!current_task) {
-        panick("[task_run_first_ever_task] No current task exists!\n");
-    }
-
-    task_switch(task_head);
-    task_return(&task_head->registers);
 }
 
 void *task_get_stack_item(struct task *task, int index) {

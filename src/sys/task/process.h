@@ -79,4 +79,13 @@ void *sys_command12_check_lock(struct interrupt_frame *frame);
  */
 void *sys_command13_done(struct interrupt_frame *frame);
 
+/**
+ * @brief System command handler for forking the current process.
+ *
+ * This function is called when the system command SYSTEM_COMMAND14_FORK is invoked.
+ * It creates a copy of the current process and returns the child process id to
+ * the caller. The child process receives 0 as the return value.
+ */
+void *sys_command14_fork(struct interrupt_frame *frame);
+
 #endif

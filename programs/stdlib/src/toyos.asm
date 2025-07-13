@@ -15,6 +15,7 @@ global toyos_clear_terminal:function
 global toyos_get_processes:function
 global toyos_check_done:function
 global toyos_done:function
+global toyos_fork:function
 
 ; void print(const char* filename)
 print:
@@ -143,6 +144,15 @@ toyos_done:
     push ebp
     mov ebp, esp
     mov eax, 13 ; Command 13 done
+    int 0x80
+    pop ebp
+    ret
+
+; int toyos_fork(void)
+toyos_fork:
+    push ebp
+    mov ebp, esp
+    mov eax, 14 ; Command 14 fork
     int 0x80
     pop ebp
     ret

@@ -541,7 +541,7 @@ int process_switch(struct process *process) {
     return OK;
 }
 
-int process_load_switch(const char *filename, struct process **process) {
+int process_load_and_switch(const char *filename, struct process **process) {
     if (!process || !filename) {
         return -EINVARG;
     }
@@ -577,43 +577,35 @@ int process_load_for_slot(const char *filename, struct process **process, int pr
         goto out;
     }
 
-    // Allocate memory for the process
-    _process = kzalloc(sizeof(struct process));
+    _process = kzalloc(sizeof(struct process));  // zeores memory
     if (!_process) {
         res = -ENOMEM;
         goto out;
     }
 
-    // Load the data for the process
-    process_init(_process);
     res = process_load_data(filename, _process);
     if (res < 0) {
         goto out;
     }
 
-    // Allocate a stack for the process
     program_stack_ptr = kzalloc(TOYOS_USER_PROGRAM_STACK_SIZE);
     if (!program_stack_ptr) {
         res = -ENOMEM;
         goto out;
     }
 
-    // Set the process properties
     strncpy(_process->filename, filename, sizeof(_process->filename));
     _process->stack = program_stack_ptr;
     _process->id = process_slot;
 
-    // Create a task
     task = task_new(_process);
     if (task == NULL) {
         res = ERROR_I(task);
         goto out;
     }
 
-    // Set as the main task of the process
     _process->task = task;
 
-    // Map the memory for the process
     res = process_map_memory(_process);
     if (res < 0) {
         goto out;
@@ -621,7 +613,6 @@ int process_load_for_slot(const char *filename, struct process **process, int pr
 
     *process = _process;
 
-    // Add the process to the array
     processes[process_slot] = _process;
 
 out:
@@ -660,4 +651,40 @@ int process_terminate(struct process *process) {
 
 out:
     return res;
+}
+
+uint16_t process_fork(struct process **out_process) {
+    int res = OK;
+    struct process *parent = process_current();
+    if (!parent || !out_process) {
+        return -EINVARG;
+    }
+
+    int slot = process_get_free_slot();
+    if (slot < 0) {
+        return slot;
+    }
+
+    struct process *child = 0;
+    res = process_load_for_slot(parent->filename, &child, slot);
+    if (res < 0) {
+        return res;
+    }
+
+    memcpy(child->stack, parent->stack, TOYOS_USER_PROGRAM_STACK_SIZE);
+
+    for (int i = 0; i < TOYOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+        if (parent->allocations[i].ptr) {
+            void *newptr = process_malloc(child, parent->allocations[i].size);
+            if (newptr) {
+                memcpy(newptr, parent->allocations[i].ptr, parent->allocations[i].size);
+            }
+        }
+    }
+
+    memcpy(&child->task->registers, &task_current()->registers, sizeof(struct registers));
+    child->task->registers.eax = 0;  // Set return value to 0 for child process
+
+    *out_process = child;
+    return child->id;
 }
