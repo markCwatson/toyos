@@ -16,6 +16,7 @@ global toyos_get_processes:function
 global toyos_check_done:function
 global toyos_done:function
 global toyos_fork:function
+global toyos_kill:function
 
 ; void print(const char* filename)
 print:
@@ -154,5 +155,17 @@ toyos_fork:
     mov ebp, esp
     mov eax, 14 ; Command 14 fork
     int 0x80
+    pop ebp
+    ret
+
+; int toyos_kill(int pid)
+; Kills the process with the given pid.
+toyos_kill:
+    push ebp
+    mov ebp, esp
+    mov eax, 15 ; Command 15 kill
+    push dword[ebp+8] ; Variable "pid"
+    int 0x80
+    add esp, 4
     pop ebp
     ret

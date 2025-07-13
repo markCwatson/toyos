@@ -35,8 +35,24 @@ static void task_list_remove(struct task *task) {
         return;
     }
 
+    // If we're removing the current task, we need to find the next task
+    // BEFORE we modify the links
+    struct task *next_task = NULL;
+    if (task == current_task) {
+        // Get the next task before we modify the current task
+        if (task->next) {
+            next_task = task->next;
+        } else {
+            next_task = task_head;
+        }
+    }
+
     if (task->prev) {
         task->prev->next = task->next;
+    }
+
+    if (task->next) {
+        task->next->prev = task->prev;
     }
 
     if (task == task_head) {
@@ -48,7 +64,7 @@ static void task_list_remove(struct task *task) {
     }
 
     if (task == current_task) {
-        current_task = task_get_next();
+        current_task = next_task;
     }
 }
 
@@ -263,7 +279,6 @@ void *task_get_stack_item(struct task *task, int index) {
 
     void *result = 0;
 
-    // Get the stack pointer from the task
     uint32_t *sp_ptr = (uint32_t *)task->registers.esp;
 
     // Switch to the given tasks page

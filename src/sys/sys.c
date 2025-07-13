@@ -30,4 +30,5 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND12_CHECK_LOCK, sys_command12_check_lock);
     register_sys_command(SYSTEM_COMMAND13_DONE, sys_command13_done);
     register_sys_command(SYSTEM_COMMAND14_FORK, sys_command14_fork);
+    register_sys_command(SYSTEM_COMMAND15_KILL, sys_command15_kill);
 }

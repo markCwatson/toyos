@@ -143,3 +143,27 @@ void *sys_command14_fork(struct interrupt_frame *frame) {
 
     return (void *)(uintptr_t)child->id;
 }
+
+void *sys_command15_kill(struct interrupt_frame *frame) {
+    struct task *current_task = task_current();
+    if (!current_task) {
+        return ERROR(-EINVARG);
+    }
+
+    int pid = (int)(uintptr_t)task_get_stack_item(current_task, 0);
+    if (pid == 0) {
+        return ERROR(-EINVARG);  // the shell is always running, cannot kill it
+    }
+
+    struct process *process = process_get(pid);
+    if (!process) {
+        return ERROR(-EINVARG);
+    }
+
+    int res = process_terminate(process);
+    if (res < 0) {
+        return ERROR(res);
+    }
+
+    return OK;
+}

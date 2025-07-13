@@ -111,6 +111,7 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 	sudo cp ./programs/clear/clear.elf /mnt/d
 	sudo cp ./programs/ps/ps.elf /mnt/d
 	sudo cp ./programs/forkdemo/forkdemo.elf /mnt/d
+	sudo cp ./programs/kill/kill.elf /mnt/d
 
 	sudo umount /mnt/d
 	sudo rm -rf /mnt/d
@@ -255,6 +256,7 @@ user_programs:
 	cd ./programs/clear && make all
 	cd ./programs/ps && make all
 	cd ./programs/forkdemo && make all
+	cd ./programs/kill && make all
 
 user_programs_clean:
 	cd ./programs/stdlib && make clean
@@ -263,6 +265,7 @@ user_programs_clean:
 	cd ./programs/clear && make clean
 	cd ./programs/ps && make clean
 	cd ./programs/forkdemo && make clean
+	cd ./programs/kill && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

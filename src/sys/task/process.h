@@ -88,4 +88,15 @@ void *sys_command13_done(struct interrupt_frame *frame);
  */
 void *sys_command14_fork(struct interrupt_frame *frame);
 
+/**
+ * @brief System command handler for killing a process.
+ *
+ * This function is called when the system command SYSTEM_COMMAND15_KILL is invoked.
+ * It terminates the specified process.
+ *
+ * @param frame The interrupt frame.
+ * @return The return value of the system command.
+ */
+void *sys_command15_kill(struct interrupt_frame *frame);
+
 #endif
