@@ -17,6 +17,10 @@ global toyos_check_done:function
 global toyos_done:function
 global toyos_fork:function
 global toyos_kill:function
+global toyos_socket:function
+global toyos_bind:function
+global toyos_sendto:function
+global toyos_recvfrom:function
 
 ; void print(const char* filename)
 print:
@@ -165,6 +169,59 @@ toyos_kill:
     mov ebp, esp
     mov eax, 15 ; Command 15 kill
     push dword[ebp+8] ; Variable "pid"
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; int toyos_socket(int type)
+; Creates a new socket. type=2 for UDP (SOCK_DGRAM).
+; Returns socket descriptor (>= 0) or -1 on error.
+toyos_socket:
+    push ebp
+    mov ebp, esp
+    mov eax, 16 ; Command 16 socket
+    push dword[ebp+8] ; Variable "type"
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; int toyos_bind(int sockfd, int port)
+; Binds a socket to a UDP port.
+; Returns 0 on success, -1 on error.
+toyos_bind:
+    push ebp
+    mov ebp, esp
+    mov eax, 17 ; Command 17 bind
+    push dword[ebp+12] ; Variable "port" (pushed first = stack item 1)
+    push dword[ebp+8]  ; Variable "sockfd" (pushed second = stack item 0)
+    int 0x80
+    add esp, 8
+    pop ebp
+    ret
+
+; int toyos_sendto(struct sendto_args *args)
+; Sends a UDP packet. args is a pointer to a sendto_args struct.
+; Returns bytes sent or -1 on error.
+toyos_sendto:
+    push ebp
+    mov ebp, esp
+    mov eax, 18 ; Command 18 sendto
+    push dword[ebp+8] ; Variable "args" (pointer to struct)
+    int 0x80
+    add esp, 4
+    pop ebp
+    ret
+
+; int toyos_recvfrom(struct recvfrom_args *args)
+; Receives a UDP packet. args is a pointer to a recvfrom_args struct.
+; Returns bytes received, 0 if nothing available, -1 on error.
+toyos_recvfrom:
+    push ebp
+    mov ebp, esp
+    mov eax, 19 ; Command 19 recvfrom
+    push dword[ebp+8] ; Variable "args" (pointer to struct)
     int 0x80
     add esp, 4
     pop ebp

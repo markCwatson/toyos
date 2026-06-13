@@ -7,6 +7,30 @@
 
 #define TOYOS_MAX_PROCESSES 12
 
+/* Socket type constant */
+#define SOCK_DGRAM 2
+
+/*
+ * Argument structs for sendto/recvfrom syscalls.
+ * These match the kernel-side definitions in sys_net.h.
+ * Packed to ensure the same layout on both sides.
+ */
+struct sendto_args {
+    int sockfd;
+    void *buf;
+    int len;
+    uint8_t dst_ip[4];
+    uint16_t dst_port;
+} __attribute__((packed));
+
+struct recvfrom_args {
+    int sockfd;
+    void *buf;
+    int max_len;
+    uint8_t src_ip[4];
+    uint16_t src_port;
+} __attribute__((packed));
+
 struct process_info {
     int id;
     char filename[64];
@@ -41,5 +65,11 @@ void *toyos_get_processes(void);
 void toyos_wait(void);
 void toyos_done(void);
 void toyos_kill(int pid);
+
+/* Network socket functions */
+int toyos_socket(int type);
+int toyos_bind(int sockfd, int port);
+int toyos_sendto(struct sendto_args *args);
+int toyos_recvfrom(struct recvfrom_args *args);
 
 #endif

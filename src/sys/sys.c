@@ -5,6 +5,7 @@
 // System command handlers
 #include "./io/io.h"
 #include "./memory/heap.h"
+#include "./net/sys_net.h"
 #include "./task/process.h"
 
 // For testing purposes
@@ -31,4 +32,8 @@ void sys_register_commands(void) {
     register_sys_command(SYSTEM_COMMAND13_DONE, sys_command13_done);
     register_sys_command(SYSTEM_COMMAND14_FORK, sys_command14_fork);
     register_sys_command(SYSTEM_COMMAND15_KILL, sys_command15_kill);
+    register_sys_command(SYSTEM_COMMAND16_SOCKET, sys_command16_socket);
+    register_sys_command(SYSTEM_COMMAND17_BIND, sys_command17_bind);
+    register_sys_command(SYSTEM_COMMAND18_SENDTO, sys_command18_sendto);
+    register_sys_command(SYSTEM_COMMAND19_RECVFROM, sys_command19_recvfrom);
 }

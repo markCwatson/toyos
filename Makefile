@@ -40,6 +40,8 @@ FILES = ./build/kernel.asm.o \
 		./build/sys/net/ip.o \
 		./build/sys/net/icmp.o \
 		./build/sys/net/udp.o \
+		./build/sys/net/socket.o \
+		./build/sys/net/sys_net.o \
 		./build/loader/formats/elf.o \
 		./build/loader/formats/elfloader.o \
 		./build/sys/task/process.o \
@@ -116,6 +118,7 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 	sudo cp ./programs/ps/ps.elf /mnt/d
 	sudo cp ./programs/forkdemo/forkdemo.elf /mnt/d
 	sudo cp ./programs/kill/kill.elf /mnt/d
+	sudo cp ./programs/udpecho/udpecho.elf /mnt/d
 
 	sudo umount /mnt/d
 	sudo rm -rf /mnt/d
@@ -250,6 +253,12 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 ./build/sys/net/udp.o: ./src/sys/net/udp.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/udp.c -o ./build/sys/net/udp.o
 
+./build/sys/net/socket.o: ./src/sys/net/socket.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/socket.c -o ./build/sys/net/socket.o
+
+./build/sys/net/sys_net.o: ./src/sys/net/sys_net.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/sys_net.c -o ./build/sys/net/sys_net.o
+
 ./build/sys/net/netdev.o: ./src/sys/net/netdev.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/netdev.c -o ./build/sys/net/netdev.o
 
@@ -273,6 +282,7 @@ user_programs:
 	cd ./programs/ps && make all
 	cd ./programs/forkdemo && make all
 	cd ./programs/kill && make all
+	cd ./programs/udpecho && make all
 
 user_programs_clean:
 	cd ./programs/stdlib && make clean
@@ -282,6 +292,7 @@ user_programs_clean:
 	cd ./programs/ps && make clean
 	cd ./programs/forkdemo && make clean
 	cd ./programs/kill && make clean
+	cd ./programs/udpecho && make clean
 
 # The 'clean' target removes all the compiled files and binaries.
 clean: user_programs_clean

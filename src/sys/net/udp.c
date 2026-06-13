@@ -1,18 +1,14 @@
 /*
  * UDP implementation for ToyOS
  *
- * Currently implements:
+ * Implements:
  *   - UDP packet reception and validation
  *   - UDP packet transmission via ip_tx()
- *   - Echo server on port 7 (RFC 862)
+ *   - Delivery to user-space sockets via socket_deliver_udp()
  *
- * The echo protocol is the simplest possible network service:
- *   1. Receive data on port 7
- *   2. Send the exact same data back to the sender
- *   That's it. No state, no connection, no protocol negotiation.
- *
- * This is useful for testing because `nc -u` (netcat) can send/receive
- * UDP packets interactively from the host.
+ * The echo server used to live here (udp_echo), but has been moved
+ * to user space as programs/udpecho. Now udp_rx() delivers packets
+ * to whatever socket is bound to the destination port.
  */
 
 #include "sys/net/udp.h"
@@ -21,50 +17,7 @@
 #include "sys/net/arp.h"
 #include "sys/net/byteorder.h"
 #include "sys/net/ip.h"
-
-/**
- * @brief Handle the echo protocol (RFC 862)
- *
- * Echo is dead simple: send back whatever we received.
- * The reply goes back to the sender's IP and port.
- *
- * @param dev       Network device
- * @param ip_hdr    IP header of received packet (for sender's IP)
- * @param udp       UDP header of received packet (for sender's port)
- * @param data      Pointer to the UDP payload data
- * @param data_len  Length of the payload data
- */
-static int udp_echo(struct netdev *dev, struct ip_header *ip_hdr, struct udp_header *udp, void *data, int data_len) {
-    printf("UDP: Echo %i bytes back to %i.%i.%i.%i:%i\n", data_len, ip_hdr->src_ip[0], ip_hdr->src_ip[1],
-           ip_hdr->src_ip[2], ip_hdr->src_ip[3], ntohs(udp->src_port));
-
-    /*
-     * Build a netbuf containing just the data to echo back.
-     */
-    struct netbuf *reply = netbuf_alloc(data_len);
-    if (!reply) {
-        printf("UDP: Failed to allocate echo reply buffer\n");
-        return -1;
-    }
-
-    memcpy(reply->data, data, data_len);
-    reply->len = data_len;
-
-    /*
-     * Send the reply. Note the port swap:
-     *   - Our source port = the port they sent TO (port 7)
-     *   - Their dest port = the port they sent FROM (their ephemeral port)
-     *
-     * This is how the sender's `nc` knows which conversation the reply
-     * belongs to — it matches the source port it used.
-     */
-    int res = udp_tx(dev, ip_hdr->src_ip, ntohs(udp->dst_port), /* our port (7) */
-                     ntohs(udp->src_port),                      /* their port */
-                     reply);
-
-    netbuf_free(reply);
-    return res;
-}
+#include "sys/net/socket.h"
 
 int udp_rx(struct netdev *dev, struct ip_header *ip_hdr, struct netbuf *buf) {
     if (buf->len < sizeof(struct udp_header)) {
@@ -105,19 +58,19 @@ int udp_rx(struct netdev *dev, struct ip_header *ip_hdr, struct netbuf *buf) {
            ip_hdr->src_ip[3], src_port, dst_port, data_len);
 
     /*
-     * Dispatch by destination port.
-     * In a real OS, there would be a table of "bound sockets" and we'd
-     * look up which process is listening on this port. For now, we
-     * just hardcode the echo service.
+     * Try to deliver to a user-space socket bound to this port.
+     * socket_deliver_udp() searches the socket table for a socket
+     * bound to dst_port and queues the packet in its receive buffer.
+     *
+     * If no socket is bound, the packet is silently dropped —
+     * this is normal UDP behavior (unlike TCP, which would send
+     * an RST/ICMP port unreachable).
      */
-    switch (dst_port) {
-    case UDP_PORT_ECHO:
-        return udp_echo(dev, ip_hdr, udp, data, data_len);
-
-    default:
-        printf("UDP: No service on port %i, dropping\n", dst_port);
-        return 0;
+    if (socket_deliver_udp(dst_port, data, data_len, ip_hdr->src_ip, src_port) < 0) {
+        printf("UDP: No socket bound to port %i, dropping\n", dst_port);
     }
+
+    return 0;
 }
 
 int udp_tx(struct netdev *dev, uint8_t *dst_ip, uint16_t src_port, uint16_t dst_port, struct netbuf *payload) {
