@@ -21,10 +21,11 @@ Current features include:
 - **PCI Device driver:** PCI devices can be discovered and enumerated.
 - **Network Device abstraction:** An abstraction layer for networking devices such as the RTL8139.
 - **RTL8139 driver port:** The driver for sanos (originally developed by Donald Becker and Michael Ringgaard) has been ported to toyos.
+- **Network Stack (partial):** Ethernet frame parsing, ARP (address resolution with cache), IPv4 (packet parsing and transmission), ICMP (ping echo reply), and UDP with echo server on port 7. ToyOS responds to `ping` and echoes UDP packets.
 
 Work in progress:
 
-- **Networking**: see plan [here](./docs/networking.md)
+- **Networking**: Socket API, system call interface, and user-space integration. See plan [here](./docs/networking.md).
 
 ### Setup
 
@@ -119,7 +120,7 @@ ToyOS uses TAP networking, which creates a real virtual network interface (`tap0
 
 This creates a TAP interface with the following topology:
 - **Host** (`tap0`): `10.0.2.1/24`
-- **Guest** (ToyOS): `10.0.2.15/24` (once IP stack assigns it)
+- **Guest** (ToyOS): `10.0.2.15/24`
 
 **Run ToyOS:**
 
@@ -127,11 +128,11 @@ This creates a TAP interface with the following topology:
 ./run.sh
 ```
 
-Once the network stack is implemented, you can test from the host:
+Test networking from the host:
 
 ```shell
 ping 10.0.2.15                         # ICMP ping
-echo "test" | nc -u 10.0.2.15 7       # UDP echo
+echo "test" | nc -u -w1 10.0.2.15 7    # UDP echo (port 7)
 sudo tcpdump -i tap0 -n               # capture traffic for debugging
 ```
 

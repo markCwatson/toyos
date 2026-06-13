@@ -36,6 +36,10 @@ FILES = ./build/kernel.asm.o \
 		./build/drivers/net/rtl8139.o \
 		./build/sys/net/netdev.o \
 		./build/sys/net/ethernet.o \
+		./build/sys/net/arp.o \
+		./build/sys/net/ip.o \
+		./build/sys/net/icmp.o \
+		./build/sys/net/udp.o \
 		./build/loader/formats/elf.o \
 		./build/loader/formats/elfloader.o \
 		./build/sys/task/process.o \
@@ -233,6 +237,18 @@ all: ./bin/bootloader.bin ./bin/kernel.bin user_programs
 
 ./build/sys/net/ethernet.o: ./src/sys/net/ethernet.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/ethernet.c -o ./build/sys/net/ethernet.o
+
+./build/sys/net/arp.o: ./src/sys/net/arp.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/arp.c -o ./build/sys/net/arp.o
+
+./build/sys/net/ip.o: ./src/sys/net/ip.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/ip.c -o ./build/sys/net/ip.o
+
+./build/sys/net/icmp.o: ./src/sys/net/icmp.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/icmp.c -o ./build/sys/net/icmp.o
+
+./build/sys/net/udp.o: ./src/sys/net/udp.c
+	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/udp.c -o ./build/sys/net/udp.o
 
 ./build/sys/net/netdev.o: ./src/sys/net/netdev.c
 	i686-elf-gcc $(INCLUDES) -I./src/sys/net $(FLAGS) -std=gnu99 -c ./src/sys/net/netdev.c -o ./build/sys/net/netdev.o

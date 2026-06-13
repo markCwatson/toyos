@@ -2,7 +2,9 @@
 #include "memory/memory.h"
 #include "stdlib/printf.h"
 #include "stdlib/string.h"
+#include "sys/net/arp.h"
 #include "sys/net/byteorder.h"
+#include "sys/net/ip.h"
 #include "sys/net/netdev.h"
 
 // todo: incomplete
@@ -19,15 +21,10 @@ int ethernet_rx(struct netdev *dev, struct netbuf *buf) {
 
     switch (ntohs(eth->ethertype)) {
     case 0x0800:  // IPv4
-        printf("ETH: IPv4 packet\n");
-        // todo: implement ip_rx
-        // return ip_rx(dev, buf);
-        return 0;
+        return ip_rx(dev, buf);
     case 0x0806:  // ARP
         printf("ETH: ARP packet\n");
-        // todo: implement arp_rx
-        // return arp_rx(dev, buf);
-        return 0;
+        return arp_rx(dev, buf);
     default:
         printf("ETH: Unknown ethertype 0x%04x\n", ntohs(eth->ethertype));
         return -1;
@@ -47,6 +44,8 @@ int ethernet_tx(struct netdev *dev, uint8_t *dest_mac, uint16_t ethertype, struc
 
     // Copy payload
     memcpy(frame->payload, payload->data, payload->len);
+
+    frame_buf->len = sizeof(struct ethernet_header) + payload->len;
 
     // Send via driver
     return dev->ops->transmit(dev, frame_buf);

@@ -4,9 +4,9 @@
 
 1. [Overview](#overview)
 2. [Architecture](#architecture)
-3. [Phase 1: PCI Enumeration](#phase-1-pci-enumeration)
-4. [Phase 2: RTL8139 Driver](#phase-2-rtl8139-driver)
-5. [Phase 3: Network Stack](#phase-3-network-stack)
+3. [Phase 1: PCI Enumeration](#phase-1-pci-enumeration) ✅
+4. [Phase 2: RTL8139 Driver](#phase-2-rtl8139-driver) ✅
+5. [Phase 3: Network Stack](#phase-3-network-stack) ✅
 6. [Phase 4: System Call Interface](#phase-4-system-call-interface)
 7. [Phase 5: User Space Integration](#phase-5-user-space-integration)
 8. [Phase 6: Testing and Validation](#phase-6-testing-and-validation)
@@ -106,9 +106,9 @@ This document provides a rough (and WIP) plan (which is subject to change) for i
 
 ---
 
-## Phase 1: PCI Enumeration
+## Phase 1: PCI Enumeration ✅
 
-**What is PCI?**
+> **Status**: Complete. PCI configuration space access and device enumeration are implemented in `src/drivers/pci/pci.c`. RTL8139 devices are detected and their I/O base and IRQ are read from BARs.
 The Peripheral Component Interconnect (PCI) bus is a standard for connecting peripheral devices to a computer's motherboard. Unlike older buses that used fixed addresses, PCI devices are detected and configured dynamically.
 
 **Why PCI Enumeration?**
@@ -203,9 +203,9 @@ The Peripheral Component Interconnect (PCI) bus is a standard for connecting per
 
 ---
 
-## Phase 2: RTL8139 Driver
+## Phase 2: RTL8139 Driver ✅
 
-**RTL8139 Hardware Overview**
+> **Status**: Complete. The sanos RTL8139 driver has been ported to ToyOS. The driver handles hardware init, DMA-based packet TX/RX, and interrupt handling. Integrated with the `netdev` abstraction layer.
 The RTL8139 is a PCI Fast Ethernet controller that implements:
 
 - **DMA Engine**: Direct memory access for packet transfers
@@ -322,83 +322,64 @@ Based on the reference implementation from the [sanos RTL8139 driver](http://www
 
 ---
 
-## Phase 3: Network Stack
+## Phase 3: Network Stack ✅
 
-The network stack implements a layered architecture where each layer provides services to the layer above and uses services from the layer below. This separation of concerns makes the system more maintainable and allows protocols to be developed independently.
+> **Status**: Complete. Ethernet, ARP, IPv4, ICMP, and UDP are implemented. ToyOS responds to `ping` and echoes UDP packets on port 7.
 
 Data flow:
 ```
 Packet arrives → RTL8139 hardware → Interrupt → rtl8139_interrupt() → rtl8139_rx() → netdev_rx() → ethernet_rx() → [Protocol layers]
 ```
 
-### Step 3.1: Ethernet Layer Implementation
+### Step 3.1: Ethernet Layer ✅
 
-- `src/sys/net/ethernet.h` - Ethernet header structure definitions  
-- `src/sys/net/ethernet.c` - Basic frame parsing and protocol demultiplexing
-- Integration with netdev layer (`netdev_rx()` calls `ethernet_rx()`)
-- EtherType recognition (IPv4 0x0800, ARP 0x0806)
-- ethernet frame transmission (`ethernet_tx()`)
-- ethernet frame validation (minimum length, CRC checking)
-- support for VLAN tags (802.1Q)
+> **Status**: Complete. Implemented in `src/sys/net/ethernet.h` and `src/sys/net/ethernet.c`.
 
-### Step 3.2: ARP Protocol Implementation
+- Ethernet header structure and frame parsing
+- Protocol demultiplexing by EtherType (IPv4 0x0800, ARP 0x0806)
+- `ethernet_rx()` strips header and dispatches to protocol handlers
+- `ethernet_tx()` builds Ethernet frames and sends via driver
 
-Address Resolution Protocol (ARP) maps IP addresses to MAC addresses on the local network segment. This is essential for IP communication as Ethernet frames require MAC addresses, but higher layers work with IP addresses.
+### Step 3.2: ARP Protocol ✅
 
-- **Address Resolution**: When sending to an IP address, ARP determines the corresponding MAC address
-- **ARP Cache**: Maintains a table of recently resolved IP→MAC mappings to avoid repeated requests
-- **ARP Request/Reply**: Uses broadcast requests and unicast replies for address resolution
-- **Gratuitous ARP**: Announces IP address ownership and updates neighbor caches
+> **Status**: Complete. Implemented in `src/sys/net/arp.h` and `src/sys/net/arp.c`.
 
-**Implementation Strategy**:
-Create ARP packet header structure with hardware/protocol types, operation codes, and address fields. Implement ARP table for caching IP→MAC mappings with timeout support. Handle incoming ARP requests by checking if target IP matches our configuration. Send ARP replies when requests target our IP address. Provide lookup function for higher layers to resolve IP addresses.
+- ARP request/reply handling for Ethernet + IPv4
+- ARP cache (16 entries, circular overwrite) for IP→MAC lookups
+- Replies to ARP requests targeting our static IP (10.0.2.15)
+- Cache is populated from all received ARP packets
+- `arp_cache_lookup()` used by `ip_tx()` for destination MAC resolution
 
-**Files to Create**: `src/sys/net/arp.h` and `src/sys/net/arp.c`
+### Step 3.3: IPv4 Layer ✅
 
-### Step 3.3: IPv4 Layer Implementation
+> **Status**: Complete. Implemented in `src/sys/net/ip.h` and `src/sys/net/ip.c`.
 
-**Purpose**: Implements the Internet Protocol version 4, handling packet routing, fragmentation, and delivery between networks. This layer provides the foundation for higher-level protocols like UDP, TCP, and ICMP.
+- IPv4 header parsing with version, IHL, TTL, protocol, and checksum validation
+- `ip_rx()` validates headers and demultiplexes by protocol (ICMP=1, UDP=17, TCP=6)
+- `ip_tx()` builds IP headers (TTL=64, Don't Fragment) and sends via ARP cache + `ethernet_tx()`
+- `ip_checksum()` implements RFC 1071 internet checksum (shared with ICMP)
+- Static IP configuration (10.0.2.15)
 
-**Key Concepts**:
-- **Packet Routing**: Determines if packets are for local delivery or need forwarding
-- **Header Processing**: Validates IP headers, checksums, and packet integrity
-- **Protocol Demultiplexing**: Routes packets to appropriate upper layer protocols
-- **IP Configuration**: Manages local IP address, netmask, and gateway settings
+### Step 3.4: ICMP (Ping) ✅
 
-**Implementation Strategy**:
-Define IPv4 header structure with version, length, TTL, protocol, and address fields. Implement packet reception handling that validates headers and routes to upper protocols. Create packet transmission functions that build IP headers and integrate with ARP for address resolution. Support basic IP configuration for static addressing.
+> **Status**: Complete. Implemented in `src/sys/net/icmp.h` and `src/sys/net/icmp.c`. ToyOS responds to `ping` from the host.
 
-**Files to Create**: `src/sys/net/ip.h` and `src/sys/net/ip.c`
+- ICMP Echo Request (type 8) → Echo Reply (type 0)
+- Copies ID, sequence number, and data payload verbatim
+- Checksum calculation and validation
+- Full round trip: host `ping 10.0.2.15` → ARP → ICMP request → ICMP reply → host sees response
 
-### Step 3.4: ICMP Implementation
+### Step 3.5: UDP Protocol ✅
 
-**Purpose**: Internet Control Message Protocol (ICMP) provides error reporting and diagnostic functionality for IP networks. Most importantly, it enables ping responses for network connectivity testing.
+> **Status**: Complete. Implemented in `src/sys/net/udp.h` and `src/sys/net/udp.c`. Echo server on port 7 works with `echo "test" | nc -u -w1 10.0.2.15 7`.
 
-**Key Concepts**:
-- **Echo Request/Reply**: Implements ping functionality for network diagnostics
-- **Error Reporting**: Provides feedback for unreachable destinations and other network issues
-- **Checksum Validation**: Ensures message integrity through checksum calculation
-- **Message Types**: Supports different ICMP message types (echo, destination unreachable, etc.)
+- UDP header parsing with port and length validation
+- `udp_rx()` dispatches by destination port
+- `udp_tx()` builds UDP header and sends via `ip_tx()`
+- Echo server (RFC 862) on port 7: echoes received data back to sender
+- Checksum set to 0 (optional in IPv4); pseudo-header verification is a TODO
 
-**Implementation Strategy**:
-Create ICMP header structure with type, code, checksum, and data fields. Implement echo request handling that generates appropriate echo replies. Support checksum calculation and validation for received packets. Integrate with IP layer for packet transmission and reception.
-
-**Files to Create**: `src/sys/net/icmp.h` and `src/sys/net/icmp.c`
-
-### Step 3.5: UDP Protocol Implementation
-
-**Purpose**: User Datagram Protocol (UDP) provides a simple, connectionless transport layer service. It's ideal for applications that prioritize speed over reliability, such as DNS queries, gaming, and real-time communications.
-
-**Key Concepts**:
-- **Connectionless Transport**: No connection establishment required before data transmission
-- **Port-Based Multiplexing**: Uses port numbers to identify different applications and services
-- **Minimal Overhead**: Simple header structure with minimal processing requirements
-- **Best-Effort Delivery**: No guarantees for packet delivery, ordering, or duplicate prevention
-
-**Implementation Strategy**:
-Define UDP header structure with source/destination ports, length, and checksum fields. Implement packet reception that validates headers and delivers data to appropriate services. Create transmission functions that build UDP headers and integrate with IP layer. Support port-based application multiplexing for service identification.
-
-**Files to Create**: `src/sys/net/udp.h` and `src/sys/net/udp.c`
+**Files**: `src/sys/net/udp.h` and `src/sys/net/udp.c`
 
 ## Phase 4: System Call Interface
 
@@ -440,18 +421,25 @@ System calls provide a controlled interface between user space and kernel space.
 
 ### Step 6.4: QEMU
 
-Run QEMU with RTL8139 networking
+ToyOS uses TAP networking for direct Layer 2 connectivity between the host and guest.
 
+**Setup:**
 ```bash
-qemu-system-i386 \
-    -hda ./bin/os.bin \
-    -netdev user,id=net0,hostfwd=udp::8080-:7 \
-    -device rtl8139,netdev=net0 \
-    -monitor stdio \
-    -m 32M
+./setup_tap.sh    # one-time TAP interface setup (requires sudo)
+./run.sh          # run ToyOS
+./teardown_tap.sh # remove TAP interface when done
 ```
 
-The `hostfwd` option forwards UDP port 8080 on the host to port 7 in the guest. This allows testing the echo server from the host machine.
+**Network topology:**
+- Host (`tap0`): `10.0.2.1/24`
+- Guest (ToyOS): `10.0.2.15/24`
+
+**Testing:**
+```bash
+ping 10.0.2.15                    # ICMP ping (working)
+echo "test" | nc -u -w1 10.0.2.15 7  # UDP echo (working)
+sudo tcpdump -i tap0 -n           # capture traffic for debugging
+```
 
 ---
 
