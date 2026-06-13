@@ -474,6 +474,10 @@ udpecho
 echo "hello" | nc -u -w1 10.0.2.15 7
 ```
 
+**Demo:**
+
+![ToyOS networking demo: ping and UDP echo](../gif/udpecho.gif)
+
 **Note:** `recvfrom()` is non-blocking (returns 0 immediately if no data). The user program polls in a loop. Blocking I/O (sleeping until data arrives) is a future improvement.
 
 ### Step 5.3: Example UDP Client
