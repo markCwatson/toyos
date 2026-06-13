@@ -107,80 +107,73 @@ make clean
 ./build.sh
 ```
 
-### Emulation (QEMU) and debugging (GDB)
+### Emulation (QEMU)
 
-To run the kernel in the QEMU emulator without debugging, simply run the 32-bit x86 emulator
+ToyOS uses TAP networking, which creates a real virtual network interface (`tap0`) on the host. The guest and host are on the same Layer 2 network, like plugging two machines into the same switch. This means you can `ping` the guest directly, capture traffic with `tcpdump`, and test real network protocols without any NAT in the way.
+
+**One-time setup** (once per boot, requires sudo):
 
 ```shell
-qemu-system-i386 \
-    -hda ./bin/os.bin \
-    -netdev user,id=net0,hostfwd=udp::8080-:7 \
-    -device rtl8139,netdev=net0 \
-    -monitor stdio \
-    -m 128M
+./setup_tap.sh
+```
+
+This creates a TAP interface with the following topology:
+- **Host** (`tap0`): `10.0.2.1/24`
+- **Guest** (ToyOS): `10.0.2.15/24` (once IP stack assigns it)
+
+**Run ToyOS:**
+
+```shell
+./run.sh
+```
+
+Once the network stack is implemented, you can test from the host:
+
+```shell
+ping 10.0.2.15                         # ICMP ping
+echo "test" | nc -u 10.0.2.15 7       # UDP echo
+sudo tcpdump -i tap0 -n               # capture traffic for debugging
+```
+
+**Tear down the TAP interface** when done:
+
+```shell
+./teardown_tap.sh
 ```
 
 **⚠️ Warning: Snap VS Code Interference**
-If you encounter symbol lookup errors when running QEMU inside a VS Code termianl (e.g., `undefined symbol: __libc_pthread_init, version GLIBC_PRIVATE`), this is likely due to having the snap version of VS Code installed. The snap version sets environment variables that interfere with system binaries. To fix this:
+If you encounter symbol lookup errors when running QEMU inside a VS Code terminal (e.g., `undefined symbol: __libc_pthread_init, version GLIBC_PRIVATE`), this is likely due to having the snap version of VS Code installed. The snap version sets environment variables that interfere with system binaries. To fix this:
 - Remove the snap version: `sudo snap remove code`
 - Install using `apt` which doesn't have these conflicts
 - Alternatively, run QEMU in a regular terminal outside of VS Code.
 
-For network testing and debugging, you can enable packet dumping:
+### Debugging (GDB)
+
+Start QEMU with the GDB server enabled (port 1234):
 
 ```shell
-qemu-system-i386 \
-    -hda ./bin/os.bin \
-    -netdev user,id=net0,hostfwd=udp::8080-:7 \
-    -device rtl8139,netdev=net0 \
-    -object filter-dump,id=dump0,netdev=net0,file=network.pcap \
-    -m 128M \
-    -monitor stdio \
-    -S -gdb tcp::1234
+./debug.sh
 ```
 
-This will capture all network traffic to `network.pcap` which you can analyze with Wireshark. Try these commands one by one:
-
-```shell
-ping 10.0.2.15
-echo "test" | nc -u 10.0.2.15 7
-echo "test" | nc -u 10.0.2.15 8080
-```
-
-To debug with GDB, first start GDB
+In a separate terminal, start GDB and load kernel symbols:
 
 ```shell
 $ gdb
-```
-
-Next, manually load symbol file at the specified address for debugging (because the emulator does not load symbol information from `os.bin` automatically).
-
-```shell
 (gdb) add-symbol-file "./build/kernelfull.o" 0x100000
-```
-
-Start the QEMU instance with GDB server enabled on TCP port 1234 (in a separate terminal):
-
-```shell
-qemu-system-i386 \
-    -hda ./bin/os.bin \
-    -netdev user,id=net0,hostfwd=udp::8080-:7 \
-    -device rtl8139,netdev=net0 \
-    -m 128M \
-    -monitor stdio \
-    -S -gdb tcp::1234
-```
-
-Then, in GDB, connect to the QEMU instance:
-
-```shell
 (gdb) target remote localhost:1234
 ```
 
-To debug user programs, use address `0x400000` for user space.
+To debug user programs, use address `0x400000` for user space:
 
 ```shell
 (gdb) break *0x400000
+```
+
+For network debugging, capture packets on the TAP interface:
+
+```shell
+sudo tcpdump -i tap0 -n -vv           # live traffic
+sudo tcpdump -i tap0 -w network.pcap  # save to file for Wireshark
 ```
 
 ### Tests
