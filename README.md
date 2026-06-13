@@ -21,11 +21,13 @@ Current features include:
 - **PCI Device driver:** PCI devices can be discovered and enumerated.
 - **Network Device abstraction:** An abstraction layer for networking devices such as the RTL8139.
 - **RTL8139 driver port:** The driver for sanos (originally developed by Donald Becker and Michael Ringgaard) has been ported to toyos.
-- **Network Stack (partial):** Ethernet frame parsing, ARP (address resolution with cache), IPv4 (packet parsing and transmission), ICMP (ping echo reply), and UDP with echo server on port 7. ToyOS responds to `ping` and echoes UDP packets.
+- **Network Stack:** Ethernet frame parsing, ARP (address resolution with cache), IPv4 (packet parsing and transmission), ICMP (ping echo reply), and UDP. ToyOS responds to `ping` and echoes UDP packets.
+- **Socket API:** Kernel socket layer with receive ring buffers, supporting `socket`, `bind`, `sendto`, and `recvfrom` via system calls (INT 0x80).
+- **User-space networking:** UDP echo server runs as a user-space program (`udpecho`) using the socket syscall interface.
 
 Work in progress:
 
-- **Networking**: Socket API, system call interface, and user-space integration. See plan [here](./docs/networking.md).
+- **Networking**: Outbound ARP, default gateway, DNS client. See plan [here](./docs/networking.md).
 
 ### Setup
 

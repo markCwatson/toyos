@@ -7,8 +7,8 @@
 3. [Phase 1: PCI Enumeration](#phase-1-pci-enumeration) ✅
 4. [Phase 2: RTL8139 Driver](#phase-2-rtl8139-driver) ✅
 5. [Phase 3: Network Stack](#phase-3-network-stack) ✅
-6. [Phase 4: System Call Interface](#phase-4-system-call-interface)
-7. [Phase 5: User Space Integration](#phase-5-user-space-integration)
+6. [Phase 4: System Call Interface](#phase-4-system-call-interface) ✅
+7. [Phase 5: User Space Integration](#phase-5-user-space-integration) ✅
 8. [Phase 6: Testing and Validation](#phase-6-testing-and-validation)
 9. [References](#references)
 
@@ -381,7 +381,9 @@ Packet arrives → RTL8139 hardware → Interrupt → rtl8139_interrupt() → rt
 
 **Files**: `src/sys/net/udp.h` and `src/sys/net/udp.c`
 
-## Phase 4: System Call Interface
+## Phase 4: System Call Interface ✅
+
+> **Status**: Complete. Four network syscalls implemented (socket, bind, sendto, recvfrom) with kernel socket layer for packet queuing.
 
 **System Call Concepts**
 System calls provide a controlled interface between user space and kernel space. They allow user programs to request services from the operating system while maintaining security and stability.
@@ -393,33 +395,94 @@ System calls provide a controlled interface between user space and kernel space.
 3. **Portability**: Standard interfaces work across different hardware
 4. **Resource Management**: Kernel controls access to shared resources
 
-### Step 4.1: Network System Call Definitions
+### Step 4.1: Network System Call Definitions ✅
 
-### Step 4.2: Network System Call Implementation
+> **Status**: Complete. Syscall numbers 16-19 added to `src/sys/sys.h`.
 
-### Step 4.3: Register Network System Calls
+| Syscall | Number | Purpose |
+|---------|--------|---------|
+| `SYSTEM_COMMAND16_SOCKET` | 16 | Create a UDP socket |
+| `SYSTEM_COMMAND17_BIND` | 17 | Bind a socket to a port |
+| `SYSTEM_COMMAND18_SENDTO` | 18 | Send a UDP packet |
+| `SYSTEM_COMMAND19_RECVFROM` | 19 | Receive a UDP packet |
+
+`sendto` and `recvfrom` use argument structs (`struct sendto_args`, `struct recvfrom_args`) passed by pointer, since they have too many parameters to push individually on the stack.
+
+### Step 4.2: Network System Call Implementation ✅
+
+> **Status**: Complete. Handlers in `src/sys/net/sys_net.c`, socket layer in `src/sys/net/socket.c`.
+
+**Kernel Socket Layer** (`src/sys/net/socket.h` / `src/sys/net/socket.c`):
+- Fixed-size socket table (16 slots), indexed by descriptor
+- Each socket has a receive ring buffer (8 packets deep)
+- `socket_create()` — allocates a slot, returns descriptor
+- `socket_bind()` — associates a socket with a UDP port
+- `socket_sendto()` — builds a netbuf and calls `udp_tx()`
+- `socket_recvfrom()` — pulls oldest packet from ring buffer (non-blocking)
+- `socket_deliver_udp()` — called from `udp_rx()` to queue incoming packets
+
+**Syscall Handlers** (`src/sys/net/sys_net.h` / `src/sys/net/sys_net.c`):
+- Read arguments from user stack via `task_get_stack_item()`
+- Convert user-space pointers to physical addresses via `task_virtual_address_to_physical()`
+- Call kernel socket functions and return results in EAX
+
+**UDP changes** (`src/sys/net/udp.c`):
+- Removed hardcoded `udp_echo()` function
+- `udp_rx()` now calls `socket_deliver_udp()` to route packets to bound sockets
+
+### Step 4.3: Register Network System Calls ✅
+
+> **Status**: Complete. All four syscalls registered in `src/sys/sys.c` via `sys_register_commands()`.
 
 ---
 
-## Phase 5: User Space Integration
+## Phase 5: User Space Integration ✅
 
-### Step 5.1: Network Library for User Programs
+> **Status**: Complete. User-space stdlib extended with socket functions. UDP echo server runs as a user program.
 
-### Step 5.2: Example UDP Echo Server
+### Step 5.1: Network Library for User Programs ✅
+
+> **Status**: Complete. Assembly stubs and C declarations added to user stdlib.
+
+**Assembly stubs** (`programs/stdlib/src/toyos.asm`):
+- `toyos_socket(type)` — pushes type, `mov eax, 16`, `int 0x80`
+- `toyos_bind(sockfd, port)` — pushes port then sockfd, `mov eax, 17`, `int 0x80`
+- `toyos_sendto(args)` — pushes pointer to `sendto_args`, `mov eax, 18`, `int 0x80`
+- `toyos_recvfrom(args)` — pushes pointer to `recvfrom_args`, `mov eax, 19`, `int 0x80`
+
+**C declarations** (`programs/stdlib/src/toyos.h`):
+- `struct sendto_args` and `struct recvfrom_args` (packed, matching kernel-side layout)
+- `SOCK_DGRAM` constant (value 2)
+- Function prototypes for all four socket functions
+
+### Step 5.2: Example UDP Echo Server ✅
+
+> **Status**: Complete. Implemented in `programs/udpecho/`.
+
+The echo server runs as a user-space process:
+1. `toyos_socket(SOCK_DGRAM)` — create a UDP socket
+2. `toyos_bind(sock, 7)` — listen on port 7
+3. Poll loop: `toyos_recvfrom()` returns 0 when empty, >0 when a packet arrives
+4. `toyos_sendto()` sends the data back to the sender
+
+**Testing:**
+```bash
+# In ToyOS shell:
+udpecho
+
+# From host:
+echo "hello" | nc -u -w1 10.0.2.15 7
+```
+
+**Note:** `recvfrom()` is non-blocking (returns 0 immediately if no data). The user program polls in a loop. Blocking I/O (sleeping until data arrives) is a future improvement.
 
 ### Step 5.3: Example UDP Client
 
+> **Status**: Not started. A client program could send UDP packets to a host service.
+
 ---
 
-## Phase 6: Testing and Validation
-
-### Step 6.1: Integration and Build System Updates
-
-### Step 6.2: Kernel Initialization Updates
-
-### Step 6.3: Network Packet Processing Loop
-
-### Step 6.4: QEMU
+## Phase 6: Testing and Validation with QEMU
 
 ToyOS uses TAP networking for direct Layer 2 connectivity between the host and guest.
 
