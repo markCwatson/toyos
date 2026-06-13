@@ -29,11 +29,13 @@ char tolower(char s1) {
  */
 char* strcpy(char* dest, const char* src) {
     char* res = dest;
+    int i = 0;
 
-    while (*src != 0) {
+    while (*src != 0 && i < 1024) {
         *dest = *src;
         src += 1;
         dest += 1;
+        i += 1;
     }
 
     // null terminator
