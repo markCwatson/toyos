@@ -15,9 +15,9 @@ int ethernet_rx(struct netdev *dev, struct netbuf *buf) {
            eth->src[3], eth->src[4], eth->src[5], eth->dest[0], eth->dest[1], eth->dest[2], eth->dest[3], eth->dest[4],
            eth->dest[5], ntohs(eth->ethertype));
 
-    // Strip ethernet header and pass to higher layers
+    // Strip ethernet header and pass to higher layers of the network stack
     buf->data = (uint8_t *)buf->data + sizeof(struct ethernet_header);
-    buf->len -= sizeof(struct ethernet_header);
+    buf->len -= sizeof(struct ethernet_header);  // advance past the header
 
     switch (ntohs(eth->ethertype)) {
     case 0x0800:  // IPv4

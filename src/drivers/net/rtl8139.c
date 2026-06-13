@@ -348,6 +348,7 @@ static int rtl8139_hw_start(struct rtl8139 *rtl) {
 
     // Convert virtual address to physical for DMA
     // Note: ToyOS might need a different approach for virtual-to-physical conversion
+    //  this is the crucial step where we give the NIC a physical memory address to write incoming packets into
     outl(ioaddr + RxBuf, (uint32_t)rtl->rx_ring);
 
     // Start the chip's Tx and Rx process
@@ -387,7 +388,7 @@ static int rtl8139_rx(struct rtl8139 *rtl) {
     while ((insb(ioaddr + ChipCmd) & RxBufEmpty) == 0) {
         uint32_t ring_offset = cur_rx % rtl->rx_buf_len;
         uint32_t rx_status = *(uint32_t *)(rx_ring + ring_offset);
-        uint32_t rx_size = rx_status >> 16;  // Includes the CRC
+        uint32_t rx_size = rx_status >> 16;  // upper 16 bits = packet length (including CRC)
 
         if (rx_status & 0x8000) {
             // Error condition
@@ -403,7 +404,7 @@ static int rtl8139_rx(struct rtl8139 *rtl) {
             }
         } else {
             // Good packet
-            int pkt_size = rx_size - 4;
+            int pkt_size = rx_size - 4;  // strip the 4-byte CRC
             struct netbuf *netbuf = netbuf_alloc(pkt_size);
             if (netbuf == NULL) {
                 printf("%s: Memory squeeze, deferring packet.\n", rtl->netdev->name);
@@ -411,7 +412,9 @@ static int rtl8139_rx(struct rtl8139 *rtl) {
                 break;
             }
 
+            // Copy the packet data from the ring buffer into the netbuf
             if (ring_offset + rx_size > rtl->rx_buf_len) {
+                // handling wrap-around if the packet spans the end of the ring
                 int semi_count = rtl->rx_buf_len - ring_offset - 4;
                 memcpy(netbuf->data, &rx_ring[ring_offset + 4], semi_count);
                 memcpy((char *)netbuf->data + semi_count, rx_ring, pkt_size - semi_count);
@@ -422,7 +425,8 @@ static int rtl8139_rx(struct rtl8139 *rtl) {
             netbuf->len = pkt_size;
             netbuf->total_len = pkt_size;
 
-            // Send packet to upper layer
+            // Send packet to upper layer of the network stack
+            // eg. ethernet -> arp or ethernet -> ip -> tcp/udp/icmp
             if (netdev_rx(rtl->netdev, netbuf) < 0) {
                 netbuf_free(netbuf);
             }
@@ -431,6 +435,7 @@ static int rtl8139_rx(struct rtl8139 *rtl) {
             rtl->netdev->stats.rx_packets++;
         }
 
+        // advances the ring pointer: cur_rx = (cur_rx + rx_size + 4 + 3) & ~3 (the & ~3 rounds up to 4-byte alignment).
         cur_rx = (cur_rx + rx_size + 4 + 3) & ~3;
         outw(ioaddr + RxBufPtr, cur_rx - 16);
     }
@@ -527,7 +532,7 @@ static void rtl8139_tx_timeout(struct rtl8139 *rtl) {
 }
 
 static void rtl8139_interrupt(struct interrupt_frame *frame) {
-    printf("RTL8139: INTERRUPT RECEIVED!\n");
+    // printf("RTL8139: INTERRUPT RECEIVED!\n");
 
     // TODO: For now we need a way to get the device from the interrupt
     // This is a simplified version - normally we'd get the device from interrupt registration
@@ -556,7 +561,10 @@ static void rtl8139_interrupt(struct interrupt_frame *frame) {
             break;  // No more interrupts or device removed
         }
 
-        // Acknowledge interrupts
+        // Acknowledge interrupts:
+        // Why acknowledge before processing? If we process first and another packet
+        // arrives during processing, we'd miss the interrupt. Acknowledging first ensures
+        // the NIC can fire again.
         outw(ioaddr + IntrStatus, status);
 
         // Handle receive interrupts
@@ -593,21 +601,23 @@ static struct netdev_ops rtl8139_netdev_ops = {
 
 int rtl8139_open(struct netdev *dev) {
     struct rtl8139 *rtl = (struct rtl8139 *)dev->driver_data;
-    int rx_buf_len_idx;
+    int rx_buf_len_idx = RX_BUF_LEN_IDX;
 
     // Register interrupt handler (IRQ numbers start at 0x20)
     idt_register_interrupt_callback(0x20 + rtl->irq, rtl8139_interrupt);
     printf("%s: Registered interrupt handler for IRQ %i (vector 0x%x)\n", dev->name, rtl->irq, 0x20 + rtl->irq);
 
-    // Allocate receive buffer
-    rx_buf_len_idx = RX_BUF_LEN_IDX;
+    // Allocate receive ring buffer:
+    // ...a large (32KB) contiguous block of memory via kzalloc(). Because ToyOS uses identity-mapped
+    // paging (virtual == physical), this pointer is also a valid physical address, which is critical
+    // because the NIC's DMA engine operates on physical addresses.
     do {
         rtl->rx_buf_len = 8192 << rx_buf_len_idx;
         rtl->rx_ring = kzalloc(rtl->rx_buf_len + 16 + (TX_BUF_SIZE * NUM_TX_DESC));
     } while (rtl->rx_ring == NULL && --rx_buf_len_idx >= 0);
 
     if (rtl->rx_ring == NULL) {
-        printf("%s: Failed to allocate RX buffer\n", dev->name);
+        printf("%s: Failed to allocate RTL8139 RX ring buffer\n", dev->name);
         return -1;
     }
 
@@ -627,6 +637,13 @@ int rtl8139_open(struct netdev *dev) {
     printf("%s: RTL8139 opened successfully\n", dev->name);
     printf("RTL8139: Device state - Interrupt Status: 0x%x, Chip Command: 0x%x\n", insw(rtl->iobase + IntrStatus),
            insb(rtl->iobase + ChipCmd));
+
+    /**
+     *
+     * The NIC is now live! Any Ethernet frame arriving on the wire will be DMA'd into rx_ring
+     * and an interrupt will fire.
+     *
+     * */
     return 0;
 }
 

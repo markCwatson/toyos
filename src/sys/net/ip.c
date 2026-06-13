@@ -131,7 +131,7 @@ int ip_rx(struct netdev *dev, struct netbuf *buf) {
     payload.next = NULL;
 
     switch (ip->protocol) {
-    case IP_PROTO_ICMP:
+    case IP_PROTO_ICMP:  // eg. ping
         return icmp_rx(dev, ip, &payload);
 
     case IP_PROTO_UDP:
